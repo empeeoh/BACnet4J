@@ -1,0 +1,125 @@
+package com.serotonin.bacnet4j.service.confirmed;
+
+import com.serotonin.bacnet4j.LocalDevice;
+import com.serotonin.bacnet4j.exception.BACnetException;
+import com.serotonin.bacnet4j.exception.NotImplementedException;
+import com.serotonin.bacnet4j.service.acknowledgement.AcknowledgementService;
+import com.serotonin.bacnet4j.type.constructed.Address;
+import com.serotonin.bacnet4j.type.constructed.TimeStamp;
+import com.serotonin.bacnet4j.type.enumerated.EventState;
+import com.serotonin.bacnet4j.type.primitive.CharacterString;
+import com.serotonin.bacnet4j.type.primitive.ObjectIdentifier;
+import com.serotonin.bacnet4j.type.primitive.UnsignedInteger;
+import com.serotonin.util.queue.ByteQueue;
+
+public class AcknowledgeAlarmRequest extends ConfirmedRequestService {
+    public static final byte TYPE_ID = 0;
+    
+    private UnsignedInteger acknowledgingProcessIdentifier;
+    private ObjectIdentifier eventObjectIdentifier;
+    private EventState eventStateAcknowledged;
+    private TimeStamp timeStamp;
+    private CharacterString acknowledgmentSource;
+    private TimeStamp timeOfAcknowledgment;
+    
+    public AcknowledgeAlarmRequest(UnsignedInteger acknowledgingProcessIdentifier, 
+            ObjectIdentifier eventObjectIdentifier, EventState eventStateAcknowledged, TimeStamp timeStamp, 
+            CharacterString acknowledgmentSource, TimeStamp timeOfAcknowledgment) {
+        this.acknowledgingProcessIdentifier = acknowledgingProcessIdentifier;
+        this.eventObjectIdentifier = eventObjectIdentifier;
+        this.eventStateAcknowledged = eventStateAcknowledged;
+        this.timeStamp = timeStamp;
+        this.acknowledgmentSource = acknowledgmentSource;
+        this.timeOfAcknowledgment = timeOfAcknowledgment;
+    }
+
+    @Override
+    public byte getChoiceId() {
+        return TYPE_ID;
+    }
+    
+    @Override
+    public AcknowledgementService handle(LocalDevice localDevice, Address from) throws BACnetException {
+        throw new NotImplementedException();
+    }
+
+    @Override
+    public void write(ByteQueue queue) {
+        acknowledgingProcessIdentifier.write(queue, 0);
+        eventObjectIdentifier.write(queue, 1);
+        eventStateAcknowledged.write(queue, 2);
+        timeStamp.write(queue, 3);
+        acknowledgmentSource.write(queue, 4);
+        timeOfAcknowledgment.write(queue, 5);
+    }
+    
+    AcknowledgeAlarmRequest(ByteQueue queue) throws BACnetException {
+        acknowledgingProcessIdentifier = read(queue, UnsignedInteger.class, 0);
+        eventObjectIdentifier = read(queue, ObjectIdentifier.class, 1);
+        eventStateAcknowledged = read(queue, EventState.class, 2);
+        timeStamp = read(queue, TimeStamp.class, 3);
+        acknowledgmentSource = read(queue, CharacterString.class, 4);
+        timeOfAcknowledgment = read(queue, TimeStamp.class, 5);
+    }
+
+    @Override
+    public int hashCode() {
+        final int PRIME = 31;
+        int result = 1;
+        result = PRIME * result + ((acknowledgingProcessIdentifier == null) ? 0 : acknowledgingProcessIdentifier.hashCode());
+        result = PRIME * result + ((acknowledgmentSource == null) ? 0 : acknowledgmentSource.hashCode());
+        result = PRIME * result + ((eventObjectIdentifier == null) ? 0 : eventObjectIdentifier.hashCode());
+        result = PRIME * result + ((eventStateAcknowledged == null) ? 0 : eventStateAcknowledged.hashCode());
+        result = PRIME * result + ((timeOfAcknowledgment == null) ? 0 : timeOfAcknowledgment.hashCode());
+        result = PRIME * result + ((timeStamp == null) ? 0 : timeStamp.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        final AcknowledgeAlarmRequest other = (AcknowledgeAlarmRequest) obj;
+        if (acknowledgingProcessIdentifier == null) {
+            if (other.acknowledgingProcessIdentifier != null)
+                return false;
+        }
+        else if (!acknowledgingProcessIdentifier.equals(other.acknowledgingProcessIdentifier))
+            return false;
+        if (acknowledgmentSource == null) {
+            if (other.acknowledgmentSource != null)
+                return false;
+        }
+        else if (!acknowledgmentSource.equals(other.acknowledgmentSource))
+            return false;
+        if (eventObjectIdentifier == null) {
+            if (other.eventObjectIdentifier != null)
+                return false;
+        }
+        else if (!eventObjectIdentifier.equals(other.eventObjectIdentifier))
+            return false;
+        if (eventStateAcknowledged == null) {
+            if (other.eventStateAcknowledged != null)
+                return false;
+        }
+        else if (!eventStateAcknowledged.equals(other.eventStateAcknowledged))
+            return false;
+        if (timeOfAcknowledgment == null) {
+            if (other.timeOfAcknowledgment != null)
+                return false;
+        }
+        else if (!timeOfAcknowledgment.equals(other.timeOfAcknowledgment))
+            return false;
+        if (timeStamp == null) {
+            if (other.timeStamp != null)
+                return false;
+        }
+        else if (!timeStamp.equals(other.timeStamp))
+            return false;
+        return true;
+    }
+}

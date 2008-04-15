@@ -1,0 +1,85 @@
+package com.serotonin.bacnet4j.type.error;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import com.serotonin.bacnet4j.exception.BACnetException;
+import com.serotonin.bacnet4j.service.VendorServiceKey;
+import com.serotonin.bacnet4j.type.Encodable;
+import com.serotonin.bacnet4j.type.SequenceDefinition;
+import com.serotonin.bacnet4j.type.constructed.BACnetError;
+import com.serotonin.bacnet4j.type.constructed.BaseType;
+import com.serotonin.bacnet4j.type.primitive.UnsignedInteger;
+import com.serotonin.util.queue.ByteQueue;
+
+public class ConfirmedPrivateTransferError extends BaseError {
+    public static final Map<VendorServiceKey, SequenceDefinition> vendorServiceResolutions = 
+            new HashMap<VendorServiceKey, SequenceDefinition>();
+    
+    private UnsignedInteger vendorId;
+    private UnsignedInteger serviceNumber;
+    private Encodable errorParameters;
+    
+    public ConfirmedPrivateTransferError(byte choice, BACnetError error, UnsignedInteger vendorId, 
+            UnsignedInteger serviceNumber, BaseType errorParameters) {
+        super(choice, error);
+        this.vendorId = vendorId;
+        this.serviceNumber = serviceNumber;
+        this.errorParameters = errorParameters;
+    }
+
+    public void write(ByteQueue queue) {
+        queue.push(choice);
+        write(queue, error, 0);
+        write(queue, vendorId, 1);
+        write(queue, serviceNumber, 2);
+        writeOptional(queue, errorParameters, 3);
+    }
+    
+    ConfirmedPrivateTransferError(byte choice, ByteQueue queue) throws BACnetException {
+        super(choice, queue, 0);
+        vendorId = read(queue, UnsignedInteger.class, 1);
+        serviceNumber = read(queue, UnsignedInteger.class, 2);
+        errorParameters = readVendorSpecific(queue, vendorId, serviceNumber, vendorServiceResolutions, 3);
+    }
+
+    @Override
+    public int hashCode() {
+        final int PRIME = 31;
+        int result = super.hashCode();
+        result = PRIME * result + ((errorParameters == null) ? 0 : errorParameters.hashCode());
+        result = PRIME * result + ((serviceNumber == null) ? 0 : serviceNumber.hashCode());
+        result = PRIME * result + ((vendorId == null) ? 0 : vendorId.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (!super.equals(obj))
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        final ConfirmedPrivateTransferError other = (ConfirmedPrivateTransferError) obj;
+        if (errorParameters == null) {
+            if (other.errorParameters != null)
+                return false;
+        }
+        else if (!errorParameters.equals(other.errorParameters))
+            return false;
+        if (serviceNumber == null) {
+            if (other.serviceNumber != null)
+                return false;
+        }
+        else if (!serviceNumber.equals(other.serviceNumber))
+            return false;
+        if (vendorId == null) {
+            if (other.vendorId != null)
+                return false;
+        }
+        else if (!vendorId.equals(other.vendorId))
+            return false;
+        return true;
+    }
+}

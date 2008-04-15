@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+
+<project name="BACnet4J" basedir="." default="jar">
+  <path id="master-classpath">
+    <fileset dir="lib">
+      <include name="*.jar"/>
+    </fileset>
+    <pathelement path="target"/>
+  </path>
+  
+  <target name="clean" description="Clean the target area">
+    <delete dir="target"/>
+  </target>
+  	
+  <target name="compile" description="Compile main source tree java files">
+    <mkdir dir="target"/>
+    <javac destdir="target" target="1.5" source="1.5" debug="true" debuglevel="lines,vars,source" 
+           deprecation="true" optimize="false" failonerror="true">
+      <src path="src"/>
+      <classpath refid="master-classpath"/>
+    </javac>
+  </target>
+
+  <target name="jar" depends="clean,compile" description="Create a jar file of the compiled classes">
+  	<delete file="bacnet4J.jar"/>
+    <jar destfile="bacnet4J.jar">
+      <fileset dir="target">
+        <include name="**/*.class"/>
+      </fileset>
+  	</jar>
+  </target>
+</project>
