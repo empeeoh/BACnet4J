@@ -505,7 +505,16 @@ public class LocalDevice implements RequestHandler {
             recipientList = (SequenceOf<Destination>)nc.getPropertyRequired(PropertyIdentifier.recipientList);
             ackRequired = new Boolean(
                     ((EventTransitionBits)nc.getPropertyRequired(PropertyIdentifier.ackRequired)).contains(toState));
-            priority = (UnsignedInteger)nc.getPropertyRequired(PropertyIdentifier.priority);
+            
+            // Determine which priority value to use based upon the toState.
+            SequenceOf<UnsignedInteger> priorities =
+                (SequenceOf<UnsignedInteger>)nc.getPropertyRequired(PropertyIdentifier.priority);
+            if (toState.equals(EventState.normal))
+                priority = priorities.get(3);
+            else if (toState.equals(EventState.fault))
+                priority = priorities.get(2);
+            else // everything else is offnormal
+                priority = priorities.get(1);
         }
         catch (BACnetServiceException e) {
             // Should never happen, so wrap in a RTE
