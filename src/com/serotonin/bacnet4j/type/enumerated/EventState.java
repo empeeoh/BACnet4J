@@ -18,4 +18,21 @@ public class EventState extends Enumerated {
     public EventState(ByteQueue queue) {
         super(queue);
     }
+    
+    @Override
+    public String toString() {
+        if (intValue() == 0)
+            return "normal";
+        if (intValue() == 1)
+            return "fault";
+        if (intValue() == 2)
+            return "off normal";
+        if (intValue() == 3)
+            return "high limit";
+        if (intValue() == 4)
+            return "low limit";
+        if (intValue() == 5)
+            return "life safety alarm";
+        return "Unknown";
+    }
 }
