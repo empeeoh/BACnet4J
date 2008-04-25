@@ -481,6 +481,7 @@ public class IpMessageControl extends Thread {
                         sendImpl(new Error(confAPDU.getInvokeId(), new BaseError((byte)127,
                                 new BACnetError(ErrorClass.services, ErrorCode.inconsistentParameters))),
                                 false, from);
+                        LocalDevice.getExceptionListener().receivedThrowable(e.getCause());
                     }
                 }
             }
