@@ -11,6 +11,7 @@ import com.serotonin.bacnet4j.service.acknowledgement.AcknowledgementService;
 import com.serotonin.bacnet4j.type.Encodable;
 import com.serotonin.bacnet4j.type.constructed.Address;
 import com.serotonin.bacnet4j.type.constructed.BACnetError;
+import com.serotonin.bacnet4j.type.constructed.PropertyValue;
 import com.serotonin.bacnet4j.type.constructed.SequenceOf;
 import com.serotonin.bacnet4j.type.enumerated.ErrorClass;
 import com.serotonin.bacnet4j.type.enumerated.ErrorCode;
@@ -77,15 +78,21 @@ public class RemoveListElementRequest extends ConfirmedRequestService {
         
         SequenceOf<Encodable> propList = (SequenceOf<Encodable>)e;
         
-        for (int i=1; i<=propList.getCount(); i++) {
-            Encodable prop = propList.get(i);
-            if (prop != null) {
-                for (Encodable rem : listOfElements) {
-                    if (prop.equals(rem))
-                        propList.remove(i);
+        PropertyValue pv = new PropertyValue(propertyIdentifier, propertyArrayIndex, listOfElements, null);
+        if (localDevice.getEventHandler().checkAllowPropertyWrite(obj, pv)) {
+            for (int i=1; i<=propList.getCount(); i++) {
+                Encodable prop = propList.get(i);
+                if (prop != null) {
+                    for (Encodable rem : listOfElements) {
+                        if (prop.equals(rem))
+                            propList.remove(i);
+                    }
                 }
             }
+            localDevice.getEventHandler().propertyWritten(obj, pv);
         }
+        else
+            throw createException(ErrorClass.property, ErrorCode.writeAccessDenied, new UnsignedInteger(1));
         
         return null;
     }
@@ -95,7 +102,7 @@ public class RemoveListElementRequest extends ConfirmedRequestService {
         return new BACnetErrorException(new ChangeListError(getChoiceId(),
                 new BACnetError(errorClass, errorCode), firstFailedElementNumber));
     }
-
+    
     @Override
     public int hashCode() {
         final int PRIME = 31;

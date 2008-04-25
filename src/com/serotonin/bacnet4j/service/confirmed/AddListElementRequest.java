@@ -11,6 +11,7 @@ import com.serotonin.bacnet4j.service.acknowledgement.AcknowledgementService;
 import com.serotonin.bacnet4j.type.Encodable;
 import com.serotonin.bacnet4j.type.constructed.Address;
 import com.serotonin.bacnet4j.type.constructed.BACnetError;
+import com.serotonin.bacnet4j.type.constructed.PropertyValue;
 import com.serotonin.bacnet4j.type.constructed.SequenceOf;
 import com.serotonin.bacnet4j.type.enumerated.ErrorClass;
 import com.serotonin.bacnet4j.type.enumerated.ErrorCode;
@@ -60,8 +61,14 @@ public class AddListElementRequest extends ConfirmedRequestService {
         
         SequenceOf<Encodable> propList = (SequenceOf<Encodable>)e;
         
-        for (Encodable pr : listOfElements)
-            propList.add(pr);
+        PropertyValue pv = new PropertyValue(propertyIdentifier, propertyArrayIndex, listOfElements, null);
+        if (localDevice.getEventHandler().checkAllowPropertyWrite(obj, pv)) {
+            for (Encodable pr : listOfElements)
+                propList.add(pr);
+            localDevice.getEventHandler().propertyWritten(obj, pv);
+        }
+        else
+            throw createException(ErrorClass.property, ErrorCode.writeAccessDenied, new UnsignedInteger(1));
         
         return null;
     }
