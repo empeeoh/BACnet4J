@@ -7,17 +7,20 @@ import com.serotonin.bacnet4j.exception.BACnetServiceException;
 import com.serotonin.bacnet4j.obj.BACnetObject;
 import com.serotonin.bacnet4j.service.acknowledgement.AcknowledgementService;
 import com.serotonin.bacnet4j.type.constructed.Address;
+import com.serotonin.bacnet4j.type.constructed.BACnetError;
+import com.serotonin.bacnet4j.type.constructed.ObjectPropertyReference;
 import com.serotonin.bacnet4j.type.constructed.PropertyValue;
 import com.serotonin.bacnet4j.type.constructed.SequenceOf;
 import com.serotonin.bacnet4j.type.constructed.WriteAccessSpecification;
 import com.serotonin.bacnet4j.type.enumerated.ErrorClass;
 import com.serotonin.bacnet4j.type.enumerated.ErrorCode;
+import com.serotonin.bacnet4j.type.error.WritePropertyMultipleError;
 import com.serotonin.util.queue.ByteQueue;
 
 public class WritePropertyMultipleRequest extends ConfirmedRequestService {
     public static final byte TYPE_ID = 16;
     
-    private SequenceOf<WriteAccessSpecification> listOfWriteAccessSpecifications;
+    private final SequenceOf<WriteAccessSpecification> listOfWriteAccessSpecifications;
     
     public WritePropertyMultipleRequest(SequenceOf<WriteAccessSpecification> listOfWriteAccessSpecifications) {
         this.listOfWriteAccessSpecifications = listOfWriteAccessSpecifications;
@@ -43,7 +46,7 @@ public class WritePropertyMultipleRequest extends ConfirmedRequestService {
         for (WriteAccessSpecification spec : listOfWriteAccessSpecifications) {
             obj = localDevice.getObject(spec.getObjectIdentifier());
             if (obj == null)
-                throw new BACnetErrorException(getChoiceId(), ErrorClass.object, ErrorCode.unknownObject);
+                throw createException(ErrorClass.property, ErrorCode.writeAccessDenied, spec, null);
             
             for (PropertyValue pv : spec.getListOfProperties()) {
                 try {
@@ -52,15 +55,25 @@ public class WritePropertyMultipleRequest extends ConfirmedRequestService {
                         localDevice.getEventHandler().propertyWritten(obj, pv);
                     }
                     else
-                        throw new BACnetServiceException(ErrorClass.property, ErrorCode.writeAccessDenied);
+                        throw createException(ErrorClass.property, ErrorCode.writeAccessDenied, spec, pv);
                 }
                 catch (BACnetServiceException e) {
-                    throw new BACnetErrorException(getChoiceId(), e);
+                    throw createException(e.getErrorClass(), e.getErrorCode(), spec, pv);
                 }
             }
         }
         
         return null;
+    }
+    
+    private BACnetErrorException createException(ErrorClass errorClass, ErrorCode errorCode,
+            WriteAccessSpecification spec, PropertyValue pv) {
+        if (pv == null)
+            pv = spec.getListOfProperties().get(1);
+        return new BACnetErrorException(new WritePropertyMultipleError(getChoiceId(),
+                new BACnetError(errorClass, errorCode),
+                new ObjectPropertyReference(spec.getObjectIdentifier(), pv.getPropertyIdentifier(),
+                        pv.getPropertyArrayIndex())));
     }
 
     @Override
