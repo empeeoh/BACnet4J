@@ -1,5 +1,6 @@
 package com.serotonin.bacnet4j.type.constructed;
 
+import java.util.Calendar;
 import java.util.GregorianCalendar;
 
 import com.serotonin.bacnet4j.exception.BACnetException;
@@ -39,6 +40,13 @@ public class DateTime extends BaseType {
 
     public Time getTime() {
         return time;
+    }
+    
+    public long getTimeMillis() {
+        GregorianCalendar gc = new GregorianCalendar(date.getYear(), date.getMonth().getId()-1, date.getDay(),
+                time.getHour(), time.getMinute(), time.getSecond());
+        gc.set(Calendar.MILLISECOND, time.getHundredth()*10);
+        return gc.getTimeInMillis();
     }
 
     @Override
