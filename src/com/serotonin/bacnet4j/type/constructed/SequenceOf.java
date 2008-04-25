@@ -59,6 +59,12 @@ public class SequenceOf<E extends Encodable> extends BaseType implements Iterabl
     }
     
     public void add(E value) {
+        for (int i=0; i<values.size(); i++) {
+            if (values.get(i) == null) {
+                values.set(i, value);
+                return;
+            }
+        }
         values.add(value);
     }
     
