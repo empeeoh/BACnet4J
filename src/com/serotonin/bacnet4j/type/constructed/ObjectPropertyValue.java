@@ -8,11 +8,11 @@ import com.serotonin.bacnet4j.type.primitive.UnsignedInteger;
 import com.serotonin.util.queue.ByteQueue;
 
 public class ObjectPropertyValue extends BaseType {
-    private ObjectIdentifier objectIdentifier;
-    private PropertyIdentifier propertyIdentifier;
-    private UnsignedInteger propertyArrayIndex;
-    private Encodable value;
-    private UnsignedInteger priority;
+    private final ObjectIdentifier objectIdentifier;
+    private final PropertyIdentifier propertyIdentifier;
+    private final UnsignedInteger propertyArrayIndex;
+    private final Encodable value;
+    private final UnsignedInteger priority;
     
     public ObjectPropertyValue(ObjectIdentifier objectIdentifier, PropertyIdentifier propertyIdentifier, 
             UnsignedInteger propertyArrayIndex, Encodable value, UnsignedInteger priority) {
@@ -23,6 +23,7 @@ public class ObjectPropertyValue extends BaseType {
         this.priority = priority;
     }
 
+    @Override
     public void write(ByteQueue queue) {
         write(queue, objectIdentifier, 0);
         write(queue, propertyIdentifier, 1);
@@ -35,7 +36,7 @@ public class ObjectPropertyValue extends BaseType {
         objectIdentifier = read(queue, ObjectIdentifier.class, 0);
         propertyIdentifier = read(queue, PropertyIdentifier.class, 1);
         propertyArrayIndex = readOptional(queue, UnsignedInteger.class, 2);
-        value = readEncodable(queue, objectIdentifier.getObjectType(), propertyIdentifier, 3);
+        value = readEncodable(queue, objectIdentifier.getObjectType(), propertyIdentifier, propertyArrayIndex, 3);
         priority = readOptional(queue, UnsignedInteger.class, 4);
     }
 

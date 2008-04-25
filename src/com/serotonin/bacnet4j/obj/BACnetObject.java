@@ -165,8 +165,12 @@ public class BACnetObject {
     }
     
     public void setProperty(PropertyValue value) throws BACnetServiceException {
-        if (value.getValue() == null)
-            removeProperty(value.getPropertyIdentifier());
+        if (value.getValue() == null) {
+            if (value.getPropertyArrayIndex() == null)
+                removeProperty(value.getPropertyIdentifier());
+            else
+                removeProperty(value.getPropertyIdentifier(), value.getPropertyArrayIndex());
+        }
         else {
             PropertyIdentifier pid = value.getPropertyIdentifier();
             
@@ -301,6 +305,15 @@ public class BACnetObject {
         if (def.isRequired())
             throw new BACnetServiceException(ErrorClass.property, ErrorCode.writeAccessDenied);
         properties.remove(pid);
+    }
+
+    public void removeProperty(PropertyIdentifier pid, UnsignedInteger propertyArrayIndex) throws BACnetServiceException {
+        PropertyTypeDefinition def = ObjectProperties.getPropertyTypeDefinitionRequired(id.getObjectType(), pid);
+        if (!def.isSequence())
+            throw new BACnetServiceException(ErrorClass.property, ErrorCode.invalidArrayIndex);
+        SequenceOf<?> sequence = (SequenceOf<?>)properties.get(pid);
+        if (sequence != null)
+            sequence.remove(propertyArrayIndex.intValue());
     }
 
     @Override
