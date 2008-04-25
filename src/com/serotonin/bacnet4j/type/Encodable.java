@@ -242,12 +242,7 @@ abstract public class Encodable {
         // A property array index of 0 indicates a request for the length of an array.
         if (propertyArrayIndex != null && propertyArrayIndex.intValue() == 0)
             return readWrapped(queue, UnsignedInteger.class, contextId);
-        else
-            return readEncodable(queue, objectType, propertyIdentifier, contextId);
-    }
-            
-    protected static Encodable readEncodable(ByteQueue queue, ObjectType objectType, 
-            PropertyIdentifier propertyIdentifier, int contextId) throws BACnetException {
+        
         if (!matchNonEndTag(queue, contextId))
             throw new BACnetErrorException(ErrorClass.property, ErrorCode.missingRequiredParameter);
         
@@ -255,17 +250,34 @@ abstract public class Encodable {
         if (def == null)
             return new AmbiguousValue(queue, contextId);
         
-        if (def.isSequence())
+        if (propertyArrayIndex != null && !def.isSequence())
+            throw new BACnetErrorException(ErrorClass.property, ErrorCode.propertyIsNotAList);
+        if (propertyArrayIndex == null && def.isSequence())
             return readSequenceOf(queue, def.getClazz(), contextId);
-        else
-            return readWrapped(queue, def.getClazz(), contextId);
+        
+        return readWrapped(queue, def.getClazz(), contextId);
     }
+    
+//    protected static Encodable readEncodable(ByteQueue queue, ObjectType objectType, 
+//            PropertyIdentifier propertyIdentifier, int contextId) throws BACnetException {
+//        if (!matchNonEndTag(queue, contextId))
+//            throw new BACnetErrorException(ErrorClass.property, ErrorCode.missingRequiredParameter);
+//        
+//        PropertyTypeDefinition def = ObjectProperties.getPropertyTypeDefinition(objectType, propertyIdentifier);
+//        if (def == null)
+//            return new AmbiguousValue(queue, contextId);
+//        
+//        if (def.isSequence())
+//            return readSequenceOf(queue, def.getClazz(), contextId);
+//        else
+//            return readWrapped(queue, def.getClazz(), contextId);
+//    }
     
     protected static Encodable readOptionalEncodable(ByteQueue queue, ObjectType objectType, 
             PropertyIdentifier propertyIdentifier, int contextId) throws BACnetException {
         if (readStart(queue) != contextId)
             return null;
-        return readEncodable(queue, objectType, propertyIdentifier, contextId);
+        return readEncodable(queue, objectType, propertyIdentifier, null, contextId);
     }
     
     protected static SequenceOf<? extends Encodable> readSequenceOfEncodable(ByteQueue queue, ObjectType objectType, 
