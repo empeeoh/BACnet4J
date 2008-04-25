@@ -14,10 +14,10 @@ import com.serotonin.util.queue.ByteQueue;
 public class AddListElementRequest extends ConfirmedRequestService {
     public static final byte TYPE_ID = 8;
     
-    private ObjectIdentifier eventObjectIdentifier;
-    private PropertyIdentifier propertyIdentifier;
-    private UnsignedInteger propertyArrayIndex;
-    private Encodable listOfElements;
+    private final ObjectIdentifier eventObjectIdentifier;
+    private final PropertyIdentifier propertyIdentifier;
+    private final UnsignedInteger propertyArrayIndex;
+    private final Encodable listOfElements;
     
     public AddListElementRequest(ObjectIdentifier eventObjectIdentifier, PropertyIdentifier propertyIdentifier, 
             UnsignedInteger propertyArrayIndex, Encodable listOfElements) {
@@ -49,7 +49,8 @@ public class AddListElementRequest extends ConfirmedRequestService {
         eventObjectIdentifier = read(queue, ObjectIdentifier.class, 0);
         propertyIdentifier = read(queue, PropertyIdentifier.class, 1);
         propertyArrayIndex = readOptional(queue, UnsignedInteger.class, 2);
-        listOfElements = readEncodable(queue, eventObjectIdentifier.getObjectType(), propertyIdentifier, 3);
+        listOfElements = readEncodable(queue, eventObjectIdentifier.getObjectType(), propertyIdentifier,
+                propertyArrayIndex, 3);
     }
 
     @Override

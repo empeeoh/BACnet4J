@@ -52,7 +52,8 @@ public class WritePropertyRequest extends ConfirmedRequestService {
         objectIdentifier = read(queue, ObjectIdentifier.class, 0);
         propertyIdentifier = read(queue, PropertyIdentifier.class, 1);
         propertyArrayIndex = readOptional(queue, UnsignedInteger.class, 2);
-        propertyValue = readEncodable(queue, objectIdentifier.getObjectType(), propertyIdentifier, 3);
+        propertyValue = readEncodable(queue, objectIdentifier.getObjectType(), propertyIdentifier, 
+                propertyArrayIndex, 3);
         priority = readOptional(queue, UnsignedInteger.class, 4);
     }
 

@@ -9,19 +9,21 @@ import com.serotonin.bacnet4j.type.primitive.UnsignedInteger;
 import com.serotonin.util.queue.ByteQueue;
 
 public class ReadAccessResult extends BaseType {
-    private ObjectIdentifier objectIdentifier;
-    private SequenceOf<Result> listOfResults;
+    private final ObjectIdentifier objectIdentifier;
+    private final SequenceOf<Result> listOfResults;
 
     public ReadAccessResult(ObjectIdentifier objectIdentifier, SequenceOf<Result> listOfResults) {
         this.objectIdentifier = objectIdentifier;
         this.listOfResults = listOfResults;
     }
 
+    @Override
     public void write(ByteQueue queue) {
         write(queue, objectIdentifier, 0);
         writeOptional(queue, listOfResults, 1);
     }
     
+    @Override
     public String toString() {
         return "ReadAccessResult(oid="+ objectIdentifier +", results="+ listOfResults +")";
     }
@@ -42,8 +44,8 @@ public class ReadAccessResult extends BaseType {
     }
     
     public static class Result extends BaseType {
-        private PropertyIdentifier propertyIdentifier;
-        private UnsignedInteger propertyArrayIndex;
+        private final PropertyIdentifier propertyIdentifier;
+        private final UnsignedInteger propertyArrayIndex;
         private Choice readResult;
         
         public Result(PropertyIdentifier propertyIdentifier, UnsignedInteger propertyArrayIndex, Encodable readResult) {
@@ -66,17 +68,23 @@ public class ReadAccessResult extends BaseType {
         public PropertyIdentifier getPropertyIdentifier() {
             return propertyIdentifier;
         }
+        
+        public boolean isError() {
+            return readResult.getContextId() == 5;
+        }
 
         public Choice getReadResult() {
             return readResult;
         }
 
+        @Override
         public String toString() {
             return "Result(pid="+ propertyIdentifier 
                     +(propertyArrayIndex == null ? "" : ", pin="+ propertyArrayIndex) 
                     +", value="+ readResult +")";
         }
 
+        @Override
         public void write(ByteQueue queue) {
             write(queue, propertyIdentifier, 2);
             writeOptional(queue, propertyArrayIndex, 3);
@@ -91,7 +99,8 @@ public class ReadAccessResult extends BaseType {
             propertyArrayIndex = readOptional(queue, UnsignedInteger.class, 3);
             int contextId = peekTagNumber(queue);
             if (contextId == 4)
-                readResult = new Choice(4, readEncodable(queue, ThreadLocalObjectType.get(), propertyIdentifier, 4));
+                readResult = new Choice(4, readEncodable(queue, ThreadLocalObjectType.get(), propertyIdentifier,
+                        propertyArrayIndex, 4));
             else
                 readResult = new Choice(5, read(queue, BACnetError.class, 5));
         }
