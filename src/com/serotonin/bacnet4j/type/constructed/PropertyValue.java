@@ -10,7 +10,7 @@ import com.serotonin.util.queue.ByteQueue;
 public class PropertyValue extends BaseType {
     private final PropertyIdentifier propertyIdentifier; // 0
     private final UnsignedInteger propertyArrayIndex;    // 1 optional
-    private Encodable value;                       // 2
+    private Encodable value;                             // 2
     private final UnsignedInteger priority;              // 3 optional
     
     public PropertyValue(PropertyIdentifier propertyIdentifier, Encodable value) {
@@ -59,6 +59,15 @@ public class PropertyValue extends BaseType {
         value = readEncodable(queue, ThreadLocalObjectType.get(), propertyIdentifier, propertyArrayIndex, 2);
         priority = readOptional(queue, UnsignedInteger.class, 3);
     }
+    
+    @Override
+    public String toString() {
+        return "PropertyValue(propertyIdentifier="+ propertyIdentifier +
+        ", propertyArrayIndex="+ propertyArrayIndex +
+        ", value="+ value +
+        ", priority="+ priority +
+        ")";
+    }
 
     @Override
     public int hashCode() {
@@ -70,7 +79,7 @@ public class PropertyValue extends BaseType {
         result = PRIME * result + ((value == null) ? 0 : value.hashCode());
         return result;
     }
-
+    
     @Override
     public boolean equals(Object obj) {
         if (this == obj)

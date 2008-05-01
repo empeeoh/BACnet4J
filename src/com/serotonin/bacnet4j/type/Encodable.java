@@ -22,6 +22,11 @@ abstract public class Encodable {
     abstract public void write(ByteQueue queue);
     abstract public void write(ByteQueue queue, int contextId);
     
+    @Override
+    public String toString() {
+        return "Encodable("+ getClass().getName() +")";
+    }
+    
     protected static void popTagData(ByteQueue queue, TagData tagData) {
         peekTagData(queue, tagData);
         queue.pop(tagData.tagLength);
