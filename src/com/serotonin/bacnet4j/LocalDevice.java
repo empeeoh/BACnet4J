@@ -96,7 +96,6 @@ import com.serotonin.util.ObjectUtils;
 public class LocalDevice implements RequestHandler {
     public static final int DEFAULT_PORT = 0xBAC0;
     private static final int VENDOR_ID = 236; // Serotonin Software
-    private static final int MAX_READ_MULTIPLE_REFERENCES = 200;
     private static ExceptionListener exceptionListener = new DefaultExceptionListener();
     
     public static void setExceptionListener(ExceptionListener l) {
@@ -114,6 +113,9 @@ public class LocalDevice implements RequestHandler {
     private BACnetObject configuration;
     private final List<BACnetObject> localObjects = new CopyOnWriteArrayList<BACnetObject>();
     private final List<RemoteDevice> remoteDevices = new CopyOnWriteArrayList<RemoteDevice>();
+    
+    // Misc configuration.
+    private int maxReadMultipleReferences = 200;
     
     // Event listeners
     private final DeviceEventHandler eventHandler = new DeviceEventHandler();
@@ -234,6 +236,14 @@ public class LocalDevice implements RequestHandler {
         return messageControl.getRetries();
     }
     
+    public int getMaxReadMultipleReferences() {
+        return maxReadMultipleReferences;
+    }
+
+    public void setMaxReadMultipleReferences(int maxReadMultipleReferences) {
+        this.maxReadMultipleReferences = maxReadMultipleReferences;
+    }
+
     
     
     
@@ -682,7 +692,7 @@ public class LocalDevice implements RequestHandler {
         
         if (refs.size() > 1 && d.getServicesSupported() != null && d.getServicesSupported().isReadPropertyMultiple()) {
             // If the device supports read property multiple, send them all at once, or at least in partitions.
-            List<PropertyReferences> partitions = refs.getPropertiesPartitioned(MAX_READ_MULTIPLE_REFERENCES);
+            List<PropertyReferences> partitions = refs.getPropertiesPartitioned(maxReadMultipleReferences);
             for (PropertyReferences partition : partitions) {
                 properties = partition.getProperties();
                 List<ReadAccessSpecification> specs = new ArrayList<ReadAccessSpecification>();
