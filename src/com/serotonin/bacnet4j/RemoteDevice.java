@@ -14,6 +14,7 @@ import com.serotonin.bacnet4j.type.primitive.ObjectIdentifier;
 public class RemoteDevice {
     private final int instanceNumber;
     private final Address address;
+    private final Network network;
     private int maxAPDULengthAccepted;
     private Segmentation segmentationSupported;
     private int vendorId;
@@ -22,9 +23,14 @@ public class RemoteDevice {
     private final Map<ObjectIdentifier, RemoteObject> objects = new HashMap<ObjectIdentifier, RemoteObject>();
     private Object userData;
     
-    public RemoteDevice(int instanceNumber, Address address) {
+//    public RemoteDevice(int instanceNumber, Address address) {
+//        this(instanceNumber, address, null);
+//    }
+    
+    public RemoteDevice(int instanceNumber, Address address, Network network) {
         this.instanceNumber = instanceNumber;
         this.address = address;
+        this.network = network;
     }
     
     public ObjectIdentifier getObjectIdentifier() {
@@ -33,12 +39,13 @@ public class RemoteDevice {
     
     @Override
     public String toString() {
-        return "RemoteDevice(instanceNumber="+ instanceNumber +", address="+ address +")";
+        return "RemoteDevice(instanceNumber="+ instanceNumber +", address="+ address +", network="+ network +")";
     }
 
     public String toExtendedString() {
         return "RemoteDevice(instanceNumber="+ instanceNumber
                 +", address="+ address
+                +", network="+ network
                 +", maxAPDULengthAccepted="+ maxAPDULengthAccepted
                 +", segmentationSupported="+ segmentationSupported
                 +", vendorId="+ vendorId
@@ -61,6 +68,10 @@ public class RemoteDevice {
     
     public Address getAddress() {
         return address;
+    }
+
+    public Network getNetwork() {
+        return network;
     }
 
     public int getMaxAPDULengthAccepted() {

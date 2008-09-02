@@ -1,6 +1,7 @@
 package com.serotonin.bacnet4j.service.confirmed;
 
 import com.serotonin.bacnet4j.LocalDevice;
+import com.serotonin.bacnet4j.Network;
 import com.serotonin.bacnet4j.exception.BACnetException;
 import com.serotonin.bacnet4j.exception.NotImplementedException;
 import com.serotonin.bacnet4j.service.acknowledgement.AcknowledgementService;
@@ -29,12 +30,12 @@ public class GetEnrollmentSummaryRequest extends ConfirmedRequestService {
         int active = 4;
     }
     
-    private Enumerated acknowledgmentFilter;  // 0
-    private RecipientProcess enrollmentFilter;  // 1 optional
-    private Enumerated eventStateFilter;  // 2 optional
-    private EventType eventTypeFilter;  // 3 optional
-    private PriorityFilter priorityFilter;  // 4 optional
-    private UnsignedInteger notificationClassFilter;  // 5 optional
+    private final Enumerated acknowledgmentFilter;  // 0
+    private final RecipientProcess enrollmentFilter;  // 1 optional
+    private final Enumerated eventStateFilter;  // 2 optional
+    private final EventType eventTypeFilter;  // 3 optional
+    private final PriorityFilter priorityFilter;  // 4 optional
+    private final UnsignedInteger notificationClassFilter;  // 5 optional
     
     public GetEnrollmentSummaryRequest(Enumerated acknowledgmentFilter, RecipientProcess enrollmentFilter, 
             Enumerated eventStateFilter, EventType eventTypeFilter, PriorityFilter priorityFilter, 
@@ -53,7 +54,8 @@ public class GetEnrollmentSummaryRequest extends ConfirmedRequestService {
     }
 
     @Override
-    public AcknowledgementService handle(LocalDevice localDevice, Address from) throws BACnetException {
+    public AcknowledgementService handle(LocalDevice localDevice, Address from, Network network)
+            throws BACnetException {
         throw new NotImplementedException();
     }
 
@@ -77,8 +79,8 @@ public class GetEnrollmentSummaryRequest extends ConfirmedRequestService {
     }
     
     public static class PriorityFilter extends BaseType {
-        private UnsignedInteger minPriority;
-        private UnsignedInteger maxPriority;
+        private final UnsignedInteger minPriority;
+        private final UnsignedInteger maxPriority;
         
         public PriorityFilter(UnsignedInteger minPriority, UnsignedInteger maxPriority) {
             this.minPriority = minPriority;

@@ -1,6 +1,7 @@
 package com.serotonin.bacnet4j.service.unconfirmed;
 
 import com.serotonin.bacnet4j.LocalDevice;
+import com.serotonin.bacnet4j.Network;
 import com.serotonin.bacnet4j.exception.BACnetException;
 import com.serotonin.bacnet4j.type.ThreadLocalObjectType;
 import com.serotonin.bacnet4j.type.constructed.Address;
@@ -13,11 +14,11 @@ import com.serotonin.util.queue.ByteQueue;
 public class UnconfirmedCovNotificationRequest extends UnconfirmedRequestService {
     public static final byte TYPE_ID = 2;
     
-    private UnsignedInteger subscriberProcessIdentifier;
-    private ObjectIdentifier initiatingDeviceIdentifier;
-    private ObjectIdentifier monitoredObjectIdentifier;
-    private UnsignedInteger timeRemaining;
-    private SequenceOf<PropertyValue> listOfValues;
+    private final UnsignedInteger subscriberProcessIdentifier;
+    private final ObjectIdentifier initiatingDeviceIdentifier;
+    private final ObjectIdentifier monitoredObjectIdentifier;
+    private final UnsignedInteger timeRemaining;
+    private final SequenceOf<PropertyValue> listOfValues;
     
     public UnconfirmedCovNotificationRequest(UnsignedInteger subscriberProcessIdentifier, 
             ObjectIdentifier initiatingDeviceIdentifier, ObjectIdentifier monitoredObjectIdentifier, 
@@ -35,9 +36,9 @@ public class UnconfirmedCovNotificationRequest extends UnconfirmedRequestService
     }
 
     @Override
-    public void handle(LocalDevice localDevice, Address from) throws BACnetException {
+    public void handle(LocalDevice localDevice, Address from, Network network) throws BACnetException {
         localDevice.getEventHandler().fireCovNotification(subscriberProcessIdentifier,
-                localDevice.getRemoteDeviceCreate(initiatingDeviceIdentifier.getInstanceNumber(), from), 
+                localDevice.getRemoteDeviceCreate(initiatingDeviceIdentifier.getInstanceNumber(), from, network), 
                 monitoredObjectIdentifier, timeRemaining, listOfValues);
     }
 

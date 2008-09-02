@@ -1,6 +1,7 @@
 package com.serotonin.bacnet4j.service.unconfirmed;
 
 import com.serotonin.bacnet4j.LocalDevice;
+import com.serotonin.bacnet4j.Network;
 import com.serotonin.bacnet4j.RemoteDevice;
 import com.serotonin.bacnet4j.exception.BACnetException;
 import com.serotonin.bacnet4j.type.constructed.Address;
@@ -12,10 +13,10 @@ import com.serotonin.util.queue.ByteQueue;
 public class IAmRequest extends UnconfirmedRequestService {
     public static final byte TYPE_ID = 0;
     
-    private ObjectIdentifier iAmDeviceIdentifier;
-    private UnsignedInteger maxAPDULengthAccepted;
-    private Segmentation segmentationSupported;
-    private UnsignedInteger vendorId;
+    private final ObjectIdentifier iAmDeviceIdentifier;
+    private final UnsignedInteger maxAPDULengthAccepted;
+    private final Segmentation segmentationSupported;
+    private final UnsignedInteger vendorId;
     
     public IAmRequest(ObjectIdentifier iamDeviceIdentifier, UnsignedInteger maxAPDULengthAccepted, 
             Segmentation segmentationSupported, UnsignedInteger vendorId) {
@@ -31,13 +32,13 @@ public class IAmRequest extends UnconfirmedRequestService {
     }
 
     @Override
-    public void handle(LocalDevice localDevice, Address from) {
+    public void handle(LocalDevice localDevice, Address from, Network network) {
         // Make sure we're not hearing from ourselves.
         if (iAmDeviceIdentifier.getInstanceNumber() == localDevice.getConfiguration().getInstanceId())
             return;
         
         // Register the device in the list of known devices.
-        RemoteDevice d = localDevice.getRemoteDeviceCreate(iAmDeviceIdentifier.getInstanceNumber(), from);
+        RemoteDevice d = localDevice.getRemoteDeviceCreate(iAmDeviceIdentifier.getInstanceNumber(), from, network);
         d.setMaxAPDULengthAccepted(maxAPDULengthAccepted.intValue());
         d.setSegmentationSupported(segmentationSupported);
         d.setVendorId(vendorId.intValue());

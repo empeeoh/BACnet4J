@@ -9,8 +9,8 @@ import com.serotonin.util.queue.ByteQueue;
  * @author mlohbihler
  */
 public class NPCI {
-    private int version;
-    private BigInteger control;
+    private final int version;
+    private final BigInteger control;
     private int destinationNetwork;
     private int destinationLength;
     private byte[] destinationAddress;
@@ -118,5 +118,15 @@ public class NPCI {
 
     public int getVersion() {
         return version;
+    }
+    
+    public static void main(String[] args) {
+        byte[] b1 = {(byte)0x81,(byte)0xb,(byte)0x0,(byte)0x18};
+        byte[] b2 = {(byte)0x1,(byte)0x8,(byte)0x0,(byte)0x64,(byte)0x1,
+                (byte)0x2,(byte)0x10,(byte)0x0,(byte)0xc4,(byte)0x2,(byte)0x0,(byte)0x7,(byte)0xd0,(byte)0x22,
+                (byte)0x1,(byte)0xe0,(byte)0x91,(byte)0x0,(byte)0x21,(byte)0x23};
+        ByteQueue q = new ByteQueue(b2);
+        new NPCI(q);
+
     }
 }

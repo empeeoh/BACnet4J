@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.serotonin.bacnet4j.LocalDevice;
+import com.serotonin.bacnet4j.Network;
 import com.serotonin.bacnet4j.exception.BACnetErrorException;
 import com.serotonin.bacnet4j.exception.BACnetException;
 import com.serotonin.bacnet4j.exception.BACnetServiceException;
@@ -28,7 +29,7 @@ import com.serotonin.util.queue.ByteQueue;
 public class ReadPropertyMultipleRequest extends ConfirmedRequestService {
     public static final byte TYPE_ID = 14;
     
-    private SequenceOf<ReadAccessSpecification> listOfReadAccessSpecs;
+    private final SequenceOf<ReadAccessSpecification> listOfReadAccessSpecs;
     
     public ReadPropertyMultipleRequest(SequenceOf<ReadAccessSpecification> listOfReadAccessSpecs) {
         this.listOfReadAccessSpecs = listOfReadAccessSpecs;
@@ -49,7 +50,8 @@ public class ReadPropertyMultipleRequest extends ConfirmedRequestService {
     }
 
     @Override
-    public AcknowledgementService handle(LocalDevice localDevice, Address from) throws BACnetException {
+    public AcknowledgementService handle(LocalDevice localDevice, Address from, Network network)
+            throws BACnetException {
         BACnetObject obj;
         ObjectIdentifier oid;
         List<ReadAccessResult> readAccessResults = new ArrayList<ReadAccessResult>();

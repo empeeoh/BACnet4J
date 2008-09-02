@@ -4,6 +4,7 @@ import java.net.InetSocketAddress;
 import java.util.HashMap;
 import java.util.LinkedList;
 
+import com.serotonin.bacnet4j.Network;
 import com.serotonin.bacnet4j.apdu.APDU;
 import com.serotonin.bacnet4j.apdu.Abort;
 import com.serotonin.bacnet4j.apdu.AckAPDU;
@@ -15,7 +16,7 @@ import com.serotonin.bacnet4j.exception.BACnetTimeoutException;
 import com.serotonin.bacnet4j.exception.SegmentedMessageAbortedException;
 
 public class WaitingRoom {
-    private HashMap<Key, Member> waitHere = new HashMap<Key, Member>();
+    private final HashMap<Key, Member> waitHere = new HashMap<Key, Member>();
     
 //    public AckAPDU waitForAck(InetSocketAddress peer, byte id, boolean server, long timeout,
 //            boolean throwTimeout) throws BACnetException {
@@ -38,9 +39,9 @@ public class WaitingRoom {
 //        }
 //    }
     
-    public Key enter(InetSocketAddress peer, byte id, boolean server) {
+    public Key enter(InetSocketAddress peer, Network network, byte id, boolean server) {
         Member member = new Member();
-        Key key = new Key(peer, id, !server);
+        Key key = new Key(peer, network, id, !server);
         
         synchronized (waitHere) {
             if (waitHere.get(key) != null)
@@ -82,9 +83,9 @@ public class WaitingRoom {
     }
     
     
-    public void notifyMember(InetSocketAddress peer, byte id, boolean isFromServer, APDU apdu)
+    public void notifyMember(InetSocketAddress peer, Network network, byte id, boolean isFromServer, APDU apdu)
             throws BACnetException {
-        Key key = new Key(peer, id, isFromServer);
+        Key key = new Key(peer, network, id, isFromServer);
         Member member = getMember(key);
         if (member != null) {
             member.setAPDU(apdu);
@@ -130,7 +131,7 @@ public class WaitingRoom {
      * @author mlohbihler
      */
     class Member {
-        private LinkedList<APDU> apdus = new LinkedList<APDU>();
+        private final LinkedList<APDU> apdus = new LinkedList<APDU>();
         
         synchronized void setAPDU(APDU apdu) {
             apdus.add(apdu);
@@ -159,18 +160,24 @@ public class WaitingRoom {
     }
     
     public class Key {
-        private InetSocketAddress peer;
-        private byte invokeId;
-        private boolean fromServer;
+        private final InetSocketAddress peer;
+        private final Network network;
+        private final byte invokeId;
+        private final boolean fromServer;
         
-        public Key(InetSocketAddress peer, byte invokeId, boolean fromServer) {
+        public Key(InetSocketAddress peer, Network network, byte invokeId, boolean fromServer) {
             this.peer = peer;
+            this.network = network;
             this.invokeId = invokeId;
             this.fromServer = fromServer;
         }
 
         public InetSocketAddress getPeer() {
             return peer;
+        }
+
+        public Network getNetwork() {
+            return network;
         }
 
         public byte getInvokeId() {
@@ -181,16 +188,18 @@ public class WaitingRoom {
             return fromServer;
         }
         
+        @Override
         public String toString() {
-            return "Key(peer="+ peer +", invokeId="+ invokeId +", fromServer="+ fromServer +")";
+            return "Key(peer="+ peer +", network="+ network +", invokeId="+ invokeId +", fromServer="+ fromServer +")";
         }
 
         @Override
         public int hashCode() {
-            final int PRIME = 31;
+            final int prime = 31;
             int result = 1;
-            result = PRIME * result + ((peer == null) ? 0 : peer.hashCode());
-            result = PRIME * result + (fromServer ? 1231 : 1237);
+            result = prime * result + (fromServer ? 1231 : 1237);
+            result = prime * result + ((network == null) ? 0 : network.hashCode());
+            result = prime * result + ((peer == null) ? 0 : peer.hashCode());
             return result;
         }
 
@@ -203,15 +212,21 @@ public class WaitingRoom {
             if (getClass() != obj.getClass())
                 return false;
             final Key other = (Key) obj;
+            if (fromServer != other.fromServer)
+                return false;
+            if (invokeId != other.invokeId)
+                return false;
+            if (network == null) {
+                if (other.network != null)
+                    return false;
+            }
+            else if (!network.equals(other.network))
+                return false;
             if (peer == null) {
                 if (other.peer != null)
                     return false;
             }
             else if (!peer.equals(other.peer))
-                return false;
-            if (invokeId != other.invokeId)
-                return false;
-            if (fromServer != other.fromServer)
                 return false;
             return true;
         }

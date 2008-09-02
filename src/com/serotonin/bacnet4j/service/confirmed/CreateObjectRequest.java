@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.serotonin.bacnet4j.LocalDevice;
+import com.serotonin.bacnet4j.Network;
 import com.serotonin.bacnet4j.exception.BACnetErrorException;
 import com.serotonin.bacnet4j.exception.BACnetException;
 import com.serotonin.bacnet4j.exception.BACnetServiceException;
@@ -32,8 +33,8 @@ public class CreateObjectRequest extends ConfirmedRequestService {
         classes.add(ObjectIdentifier.class);
     }
     
-    private Choice objectSpecifier;
-    private SequenceOf<PropertyValue> listOfInitialValues;
+    private final Choice objectSpecifier;
+    private final SequenceOf<PropertyValue> listOfInitialValues;
     
     public CreateObjectRequest(ObjectType objectType, SequenceOf<PropertyValue> listOfInitialValues) {
         objectSpecifier = new Choice(0, objectType);
@@ -51,7 +52,8 @@ public class CreateObjectRequest extends ConfirmedRequestService {
     }
     
     @Override
-    public AcknowledgementService handle(LocalDevice localDevice, Address from) throws BACnetErrorException {
+    public AcknowledgementService handle(LocalDevice localDevice, Address from, Network network)
+            throws BACnetErrorException {
         ObjectIdentifier id;
         if (objectSpecifier.getContextId() == 0) {
             ObjectType type = (ObjectType)objectSpecifier.getDatum();

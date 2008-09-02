@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.serotonin.bacnet4j.LocalDevice;
+import com.serotonin.bacnet4j.Network;
 import com.serotonin.bacnet4j.RemoteDevice;
 import com.serotonin.bacnet4j.exception.BACnetException;
 import com.serotonin.bacnet4j.exception.BACnetRuntimeException;
@@ -216,7 +217,7 @@ public class BACnetObject {
     /// COV subscriptions
     ///
     //
-    public void addCovSubscription(Address from, UnsignedInteger subscriberProcessIdentifier,
+    public void addCovSubscription(Address from, Network network, UnsignedInteger subscriberProcessIdentifier,
             Boolean issueConfirmedNotifications, UnsignedInteger lifetime) throws BACnetServiceException {
         synchronized (covSubscriptions) {
             ObjectCovSubscription sub = findCovSubscription(from, subscriberProcessIdentifier);
@@ -231,7 +232,7 @@ public class BACnetObject {
                                 "From address not found in remote device list. Cannot send confirmed notifications");
                 }
                 
-                sub = new ObjectCovSubscription(from, subscriberProcessIdentifier);
+                sub = new ObjectCovSubscription(from, network, subscriberProcessIdentifier);
                 covSubscriptions.add(sub);
             }
             
@@ -275,7 +276,7 @@ public class BACnetObject {
                 UnconfirmedCovNotificationRequest req = new UnconfirmedCovNotificationRequest(
                         sub.getSubscriberProcessIdentifier(), localDevice.getConfiguration().getId(), id,
                         timeLeft, values);
-                localDevice.sendUnconfirmed(sub.getPeer(), req);
+                localDevice.sendUnconfirmed(sub.getPeer(), sub.getNetwork(), req);
             }
         }
         catch (BACnetException e) {

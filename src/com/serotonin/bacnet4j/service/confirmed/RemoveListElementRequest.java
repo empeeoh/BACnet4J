@@ -1,6 +1,7 @@
 package com.serotonin.bacnet4j.service.confirmed;
 
 import com.serotonin.bacnet4j.LocalDevice;
+import com.serotonin.bacnet4j.Network;
 import com.serotonin.bacnet4j.exception.BACnetErrorException;
 import com.serotonin.bacnet4j.exception.BACnetException;
 import com.serotonin.bacnet4j.exception.BACnetServiceException;
@@ -61,7 +62,8 @@ public class RemoveListElementRequest extends ConfirmedRequestService {
 
     @SuppressWarnings("unchecked")
     @Override
-    public AcknowledgementService handle(LocalDevice localDevice, Address from) throws BACnetException {
+    public AcknowledgementService handle(LocalDevice localDevice, Address from, Network network)
+            throws BACnetException {
         BACnetObject obj = localDevice.getObject(objectIdentifier);
         if (obj == null)
             throw createException(ErrorClass.property, ErrorCode.writeAccessDenied, new UnsignedInteger(1));

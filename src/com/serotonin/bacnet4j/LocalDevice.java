@@ -350,25 +350,26 @@ public class LocalDevice implements RequestHandler {
     ///
     //
     public AcknowledgementService send(RemoteDevice d, ConfirmedRequestService serviceRequest) throws BACnetException {
-        return send(d.getAddress(), d.getMaxAPDULengthAccepted(), d.getSegmentationSupported(), serviceRequest);
+        return send(d.getAddress(), d.getNetwork(), d.getMaxAPDULengthAccepted(), d.getSegmentationSupported(),
+                serviceRequest);
     }
     
-    public AcknowledgementService send(Address address, int maxAPDULengthAccepted, Segmentation segmentationSupported,
-            ConfirmedRequestService serviceRequest) throws BACnetException {
+    public AcknowledgementService send(Address address, Network network, int maxAPDULengthAccepted,
+            Segmentation segmentationSupported, ConfirmedRequestService serviceRequest) throws BACnetException {
         try {
             return send(new InetSocketAddress(
                     InetAddress.getByAddress(address.getMacAddress().getBytes()),
-                    address.getNetworkNumber().intValue()), 
-                    maxAPDULengthAccepted, segmentationSupported, serviceRequest);
+                    address.getNetworkNumber().intValue()),
+                    network, maxAPDULengthAccepted, segmentationSupported, serviceRequest);
         }
         catch (UnknownHostException e) {
             throw new BACnetException(e);
         }
     }
     
-    public AcknowledgementService send(InetSocketAddress addr, int maxAPDULengthAccepted, 
+    public AcknowledgementService send(InetSocketAddress addr, Network network, int maxAPDULengthAccepted, 
             Segmentation segmentationSupported, ConfirmedRequestService serviceRequest) throws BACnetException {
-        AckAPDU apdu = messageControl.send(addr, maxAPDULengthAccepted, segmentationSupported, serviceRequest);
+        AckAPDU apdu = messageControl.send(addr, network, maxAPDULengthAccepted, segmentationSupported, serviceRequest);
             
         if (apdu instanceof SimpleACK)
             return null;
@@ -388,28 +389,38 @@ public class LocalDevice implements RequestHandler {
         throw new BACnetException("Unexpected APDU: "+ apdu);
     }
     
-    public void sendUnconfirmed(Address address, UnconfirmedRequestService serviceRequest) throws BACnetException {
+    public void sendUnconfirmed(Address address, Network network, UnconfirmedRequestService serviceRequest)
+            throws BACnetException {
         try {
             sendUnconfirmed(new InetSocketAddress(
                     InetAddress.getByAddress(address.getMacAddress().getBytes()), 
-                    address.getNetworkNumber().intValue()), serviceRequest);
+                    address.getNetworkNumber().intValue()), network, serviceRequest);
         }
         catch (UnknownHostException e) {
             throw new BACnetException(e);
         }
     }
     
-    public void sendUnconfirmed(InetSocketAddress addr, UnconfirmedRequestService serviceRequest)
+    public void sendUnconfirmed(InetSocketAddress addr, Network network, UnconfirmedRequestService serviceRequest)
             throws BACnetException {
-        messageControl.sendUnconfirmed(addr, serviceRequest);
+        messageControl.sendUnconfirmed(addr, network, serviceRequest);
     }
     
     public void sendBroadcast(UnconfirmedRequestService serviceRequest) throws BACnetException {
-        messageControl.sendBroadcast(serviceRequest);
+        messageControl.sendBroadcast(new Network(0xffff, new byte[0]), serviceRequest);
     }
     
     public void sendBroadcast(int port, UnconfirmedRequestService serviceRequest) throws BACnetException {
-        messageControl.sendBroadcast(port, serviceRequest);
+        messageControl.sendBroadcast(port, new Network(0xffff, new byte[0]), serviceRequest);
+    }
+    
+    public void sendBroadcast(Network network, UnconfirmedRequestService serviceRequest) throws BACnetException {
+        messageControl.sendBroadcast(network, serviceRequest);
+    }
+    
+    public void sendBroadcast(int port, Network network, UnconfirmedRequestService serviceRequest)
+            throws BACnetException {
+        messageControl.sendBroadcast(port, network, serviceRequest);
     }
     
     
@@ -425,10 +436,10 @@ public class LocalDevice implements RequestHandler {
         return d;
     }
     
-    public RemoteDevice getRemoteDeviceCreate(int instanceId, Address address) {
+    public RemoteDevice getRemoteDeviceCreate(int instanceId, Address address, Network network) {
         RemoteDevice d = getRemoteDeviceImpl(instanceId, address);
         if (d == null) {
-            d = new RemoteDevice(instanceId, address);
+            d = new RemoteDevice(instanceId, address, network);
             remoteDevices.add(d);
         }
         return d;
@@ -575,7 +586,7 @@ public class LocalDevice implements RequestHandler {
                                 timeStamp, new UnsignedInteger(notificationClassId), priority, eventType, messageText, 
                                 notifyType, ackRequired, fromState, toState, eventValues);
                         try {
-                            sendUnconfirmed(address, req);
+                            sendUnconfirmed(address, null, req);
                         }
                         catch (BACnetException e) {
                             sendExceptions.add(e);
@@ -596,10 +607,10 @@ public class LocalDevice implements RequestHandler {
     /// Request Handler
     ///
     //
-    public AcknowledgementService handleConfirmedRequest(Address from, byte invokeId, 
+    public AcknowledgementService handleConfirmedRequest(Address from, Network network, byte invokeId, 
             ConfirmedRequestService serviceRequest) throws BACnetException {
         try {
-            return serviceRequest.handle(this, from);
+            return serviceRequest.handle(this, from, network);
         }
         catch (NotImplementedException e) {
             System.out.println("Unsupported confirmed request: invokeId="+ invokeId +", from="+ from 
@@ -614,9 +625,9 @@ public class LocalDevice implements RequestHandler {
         }
     }
 
-    public void handleUnconfirmedRequest(Address from, UnconfirmedRequestService serviceRequest) {
+    public void handleUnconfirmedRequest(Address from, Network network, UnconfirmedRequestService serviceRequest) {
         try {
-            serviceRequest.handle(this, from);
+            serviceRequest.handle(this, from, network);
         }
         catch (BACnetException e) {
             getExceptionListener().receivedException(e);
@@ -672,7 +683,7 @@ public class LocalDevice implements RequestHandler {
     }
     
     public void getExtendedDeviceInformation(RemoteDevice d) throws BACnetException {
-        // Get the devices supported services
+        // Get the device's supported services
         ReadPropertyAck supportedServicesAck = (ReadPropertyAck)send(d, new ReadPropertyRequest(
                 d.getObjectIdentifier(), PropertyIdentifier.protocolServicesSupported));
         d.setServicesSupported((ServicesSupported)supportedServicesAck.getValue());

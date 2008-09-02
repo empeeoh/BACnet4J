@@ -1,6 +1,7 @@
 package com.serotonin.bacnet4j.service.unconfirmed;
 
 import com.serotonin.bacnet4j.LocalDevice;
+import com.serotonin.bacnet4j.Network;
 import com.serotonin.bacnet4j.exception.BACnetException;
 import com.serotonin.bacnet4j.exception.NotImplementedException;
 import com.serotonin.bacnet4j.type.constructed.Address;
@@ -10,7 +11,7 @@ import com.serotonin.util.queue.ByteQueue;
 public class UTCTimeSynchronizationRequest extends UnconfirmedRequestService {
     public static final byte TYPE_ID = 9;
     
-    private DateTime time;
+    private final DateTime time;
     
     public UTCTimeSynchronizationRequest(DateTime time) {
         this.time = time;
@@ -31,7 +32,7 @@ public class UTCTimeSynchronizationRequest extends UnconfirmedRequestService {
     }
 
     @Override
-    public void handle(LocalDevice localDevice, Address from) throws BACnetException {
+    public void handle(LocalDevice localDevice, Address from, Network network) throws BACnetException {
         throw new NotImplementedException();
     }
 

@@ -3,6 +3,7 @@ package com.serotonin.bacnet4j.obj;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.serotonin.bacnet4j.Network;
 import com.serotonin.bacnet4j.exception.BACnetServiceException;
 import com.serotonin.bacnet4j.type.Encodable;
 import com.serotonin.bacnet4j.type.constructed.Address;
@@ -49,18 +50,24 @@ public class ObjectCovSubscription {
         }
     }
     
-    private Address peer;
-    private UnsignedInteger subscriberProcessIdentifier;
+    private final Address peer;
+    private final Network network;
+    private final UnsignedInteger subscriberProcessIdentifier;
     private boolean issueConfirmedNotifications;
     private long expiryTime;
     
-    public ObjectCovSubscription(Address peer, UnsignedInteger subscriberProcessIdentifier) {
+    public ObjectCovSubscription(Address peer, Network network, UnsignedInteger subscriberProcessIdentifier) {
         this.peer = peer;
+        this.network = network;
         this.subscriberProcessIdentifier = subscriberProcessIdentifier;
     }
 
     public Address getPeer() {
         return peer;
+    }
+
+    public Network getNetwork() {
+        return network;
     }
 
     public boolean isIssueConfirmedNotifications() {

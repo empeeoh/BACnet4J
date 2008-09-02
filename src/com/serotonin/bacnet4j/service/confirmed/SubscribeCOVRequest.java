@@ -1,6 +1,7 @@
 package com.serotonin.bacnet4j.service.confirmed;
 
 import com.serotonin.bacnet4j.LocalDevice;
+import com.serotonin.bacnet4j.Network;
 import com.serotonin.bacnet4j.exception.BACnetErrorException;
 import com.serotonin.bacnet4j.exception.BACnetException;
 import com.serotonin.bacnet4j.exception.BACnetServiceException;
@@ -15,10 +16,10 @@ import com.serotonin.util.queue.ByteQueue;
 public class SubscribeCOVRequest extends ConfirmedRequestService {
     public static final byte TYPE_ID = 5;
     
-    private UnsignedInteger subscriberProcessIdentifier;
-    private ObjectIdentifier monitoredObjectIdentifier;
-    private Boolean issueConfirmedNotifications;
-    private UnsignedInteger lifetime;
+    private final UnsignedInteger subscriberProcessIdentifier;
+    private final ObjectIdentifier monitoredObjectIdentifier;
+    private final Boolean issueConfirmedNotifications;
+    private final UnsignedInteger lifetime;
     
     public SubscribeCOVRequest(UnsignedInteger subscriberProcessIdentifier, ObjectIdentifier monitoredObjectIdentifier, Boolean issueConfirmedNotifications, UnsignedInteger lifetime) {
         this.subscriberProcessIdentifier = subscriberProcessIdentifier;
@@ -48,13 +49,15 @@ public class SubscribeCOVRequest extends ConfirmedRequestService {
     }
 
     @Override
-    public AcknowledgementService handle(LocalDevice localDevice, Address from) throws BACnetException {
+    public AcknowledgementService handle(LocalDevice localDevice, Address from, Network network)
+            throws BACnetException {
         try {
             BACnetObject obj = localDevice.getObjectRequired(monitoredObjectIdentifier);
             if (issueConfirmedNotifications == null && lifetime == null)
                 obj.removeCovSubscription(from, subscriberProcessIdentifier);
             else
-                obj.addCovSubscription(from, subscriberProcessIdentifier, issueConfirmedNotifications, lifetime);
+                obj.addCovSubscription(from, network, subscriberProcessIdentifier, issueConfirmedNotifications,
+                        lifetime);
             return null;
         }
         catch (BACnetServiceException e) {

@@ -1,6 +1,7 @@
 package com.serotonin.bacnet4j.service.confirmed;
 
 import com.serotonin.bacnet4j.LocalDevice;
+import com.serotonin.bacnet4j.Network;
 import com.serotonin.bacnet4j.exception.BACnetErrorException;
 import com.serotonin.bacnet4j.exception.BACnetException;
 import com.serotonin.bacnet4j.exception.BACnetServiceException;
@@ -12,7 +13,7 @@ import com.serotonin.util.queue.ByteQueue;
 public class DeleteObjectRequest extends ConfirmedRequestService {
     public static final byte TYPE_ID = 11;
     
-    private ObjectIdentifier objectIdentifier;
+    private final ObjectIdentifier objectIdentifier;
     
     public DeleteObjectRequest(ObjectIdentifier objectIdentifier) {
         this.objectIdentifier = objectIdentifier;
@@ -24,7 +25,8 @@ public class DeleteObjectRequest extends ConfirmedRequestService {
     }
     
     @Override
-    public AcknowledgementService handle(LocalDevice localDevice, Address from) throws BACnetErrorException {
+    public AcknowledgementService handle(LocalDevice localDevice, Address from, Network network)
+            throws BACnetErrorException {
         try {
             localDevice.removeObject(objectIdentifier);
         }

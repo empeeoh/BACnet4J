@@ -1,6 +1,7 @@
 package com.serotonin.bacnet4j.service.confirmed;
 
 import com.serotonin.bacnet4j.LocalDevice;
+import com.serotonin.bacnet4j.Network;
 import com.serotonin.bacnet4j.exception.BACnetException;
 import com.serotonin.bacnet4j.exception.NotImplementedException;
 import com.serotonin.bacnet4j.service.acknowledgement.AcknowledgementService;
@@ -11,10 +12,10 @@ import com.serotonin.util.queue.ByteQueue;
 public class RequestKeyRequest extends ConfirmedRequestService {
     public static final byte TYPE_ID = 25;
     
-    private ObjectIdentifier requestingDeviceIdentifier;
-    private Address requestingDeviceAddress;
-    private ObjectIdentifier remoteDeviceIdentifier;
-    private Address remoteDeviceAddress;
+    private final ObjectIdentifier requestingDeviceIdentifier;
+    private final Address requestingDeviceAddress;
+    private final ObjectIdentifier remoteDeviceIdentifier;
+    private final Address remoteDeviceAddress;
     
     public RequestKeyRequest(ObjectIdentifier requestingDeviceIdentifier, Address requestingDeviceAddress, 
             ObjectIdentifier remoteDeviceIdentifier, Address remoteDeviceAddress) {
@@ -45,7 +46,8 @@ public class RequestKeyRequest extends ConfirmedRequestService {
     }
 
     @Override
-    public AcknowledgementService handle(LocalDevice localDevice, Address from) throws BACnetException {
+    public AcknowledgementService handle(LocalDevice localDevice, Address from, Network network)
+            throws BACnetException {
         throw new NotImplementedException();
     }
 

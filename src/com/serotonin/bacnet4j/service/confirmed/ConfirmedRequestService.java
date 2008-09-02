@@ -1,6 +1,7 @@
 package com.serotonin.bacnet4j.service.confirmed;
 
 import com.serotonin.bacnet4j.LocalDevice;
+import com.serotonin.bacnet4j.Network;
 import com.serotonin.bacnet4j.exception.BACnetErrorException;
 import com.serotonin.bacnet4j.exception.BACnetException;
 import com.serotonin.bacnet4j.service.Service;
@@ -76,5 +77,5 @@ abstract public class ConfirmedRequestService extends Service {
         throw new BACnetErrorException(ErrorClass.device, ErrorCode.serviceRequestDenied);
     }
     
-    abstract public AcknowledgementService handle(LocalDevice localDevice, Address from) throws BACnetException;
+    abstract public AcknowledgementService handle(LocalDevice localDevice, Address from, Network network) throws BACnetException;
 }

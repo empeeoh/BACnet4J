@@ -1,6 +1,7 @@
 package com.serotonin.bacnet4j.service.confirmed;
 
 import com.serotonin.bacnet4j.LocalDevice;
+import com.serotonin.bacnet4j.Network;
 import com.serotonin.bacnet4j.exception.BACnetException;
 import com.serotonin.bacnet4j.service.acknowledgement.AcknowledgementService;
 import com.serotonin.bacnet4j.type.constructed.Address;
@@ -18,19 +19,19 @@ import com.serotonin.util.queue.ByteQueue;
 public class ConfirmedEventNotificationRequest extends ConfirmedRequestService {
     public static final byte TYPE_ID = 2;
     
-    private UnsignedInteger processIdentifier; // 0
-    private ObjectIdentifier initiatingDeviceIdentifier; // 1
-    private ObjectIdentifier eventObjectIdentifier; // 2
-    private TimeStamp timeStamp; // 3
-    private UnsignedInteger notificationClass; // 4
-    private UnsignedInteger priority; // 5
-    private EventType eventType; // 6
-    private CharacterString messageText; // 7 optional
-    private NotifyType notifyType; // 8
-    private Boolean ackRequired; // 9 optional
-    private EventState fromState; // 10 optional
-    private EventState toState; // 11
-    private NotificationParameters eventValues; // 12 optional
+    private final UnsignedInteger processIdentifier; // 0
+    private final ObjectIdentifier initiatingDeviceIdentifier; // 1
+    private final ObjectIdentifier eventObjectIdentifier; // 2
+    private final TimeStamp timeStamp; // 3
+    private final UnsignedInteger notificationClass; // 4
+    private final UnsignedInteger priority; // 5
+    private final EventType eventType; // 6
+    private final CharacterString messageText; // 7 optional
+    private final NotifyType notifyType; // 8
+    private final Boolean ackRequired; // 9 optional
+    private final EventState fromState; // 10 optional
+    private final EventState toState; // 11
+    private final NotificationParameters eventValues; // 12 optional
     
     public ConfirmedEventNotificationRequest(UnsignedInteger processIdentifier, 
             ObjectIdentifier initiatingDeviceIdentifier, ObjectIdentifier eventObjectIdentifier, TimeStamp timeStamp, 
@@ -58,9 +59,10 @@ public class ConfirmedEventNotificationRequest extends ConfirmedRequestService {
     }
 
     @Override
-    public AcknowledgementService handle(LocalDevice localDevice, Address from) throws BACnetException {
+    public AcknowledgementService handle(LocalDevice localDevice, Address from, Network network)
+            throws BACnetException {
         localDevice.getEventHandler().fireEventNotification(processIdentifier,
-                localDevice.getRemoteDeviceCreate(initiatingDeviceIdentifier.getInstanceNumber(), from),
+                localDevice.getRemoteDeviceCreate(initiatingDeviceIdentifier.getInstanceNumber(), from, network),
                 eventObjectIdentifier, timeStamp, notificationClass, priority, eventType, messageText, notifyType,
                 ackRequired, fromState, toState, eventValues);
         return null;

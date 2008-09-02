@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.serotonin.bacnet4j.LocalDevice;
+import com.serotonin.bacnet4j.Network;
 import com.serotonin.bacnet4j.exception.BACnetException;
 import com.serotonin.bacnet4j.obj.BACnetObject;
 import com.serotonin.bacnet4j.type.Encodable;
@@ -27,8 +28,8 @@ public class WhoHasRequest extends UnconfirmedRequestService {
         classes.add(CharacterString.class);
     }
     
-    private Limits limits;
-    private Choice object;
+    private final Limits limits;
+    private final Choice object;
     
     public WhoHasRequest(Limits limits, ObjectIdentifier identifier) {
         this.limits = limits;
@@ -46,7 +47,7 @@ public class WhoHasRequest extends UnconfirmedRequestService {
     }
 
     @Override
-    public void handle(LocalDevice localDevice, Address from) throws BACnetException {
+    public void handle(LocalDevice localDevice, Address from, Network network) throws BACnetException {
         // Check if we're in the device id range.
         if (limits != null) {
             int localId = localDevice.getConfiguration().getInstanceId();
@@ -72,7 +73,7 @@ public class WhoHasRequest extends UnconfirmedRequestService {
             // Return the result in an i have message.
             IHaveRequest response = new IHaveRequest(localDevice.getConfiguration().getId(), result.getId(),
                     result.getRawObjectName());
-            localDevice.sendUnconfirmed(from, response);
+            localDevice.sendUnconfirmed(from, network, response);
         }
     }
 
@@ -88,8 +89,8 @@ public class WhoHasRequest extends UnconfirmedRequestService {
     }
     
     public static class Limits extends BaseType {
-        private UnsignedInteger deviceInstanceRangeLowLimit;
-        private UnsignedInteger deviceInstanceRangeHighLimit;
+        private final UnsignedInteger deviceInstanceRangeLowLimit;
+        private final UnsignedInteger deviceInstanceRangeHighLimit;
         
         @Override
         public void write(ByteQueue queue) {

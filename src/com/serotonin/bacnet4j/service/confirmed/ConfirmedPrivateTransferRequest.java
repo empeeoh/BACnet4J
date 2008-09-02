@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.serotonin.bacnet4j.LocalDevice;
+import com.serotonin.bacnet4j.Network;
 import com.serotonin.bacnet4j.exception.BACnetException;
 import com.serotonin.bacnet4j.service.VendorServiceKey;
 import com.serotonin.bacnet4j.service.acknowledgement.AcknowledgementService;
@@ -19,9 +20,9 @@ public class ConfirmedPrivateTransferRequest extends ConfirmedRequestService {
     
     public static final byte TYPE_ID = 18;
     
-    private UnsignedInteger vendorId;
-    private UnsignedInteger serviceNumber;
-    private Encodable serviceParameters;
+    private final UnsignedInteger vendorId;
+    private final UnsignedInteger serviceNumber;
+    private final Encodable serviceParameters;
     
     public ConfirmedPrivateTransferRequest(UnsignedInteger vendorId, UnsignedInteger serviceNumber, 
             Encodable serviceParameters) {
@@ -36,7 +37,8 @@ public class ConfirmedPrivateTransferRequest extends ConfirmedRequestService {
     }
     
     @Override
-    public AcknowledgementService handle(LocalDevice localDevice, Address from) throws BACnetException {
+    public AcknowledgementService handle(LocalDevice localDevice, Address from, Network network)
+            throws BACnetException {
         localDevice.getEventHandler().firePrivateTransfer(vendorId, serviceNumber, serviceParameters);
         return null;
     }

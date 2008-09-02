@@ -1,6 +1,7 @@
 package com.serotonin.bacnet4j.service.unconfirmed;
 
 import com.serotonin.bacnet4j.LocalDevice;
+import com.serotonin.bacnet4j.Network;
 import com.serotonin.bacnet4j.RemoteDevice;
 import com.serotonin.bacnet4j.RemoteObject;
 import com.serotonin.bacnet4j.exception.BACnetException;
@@ -12,9 +13,9 @@ import com.serotonin.util.queue.ByteQueue;
 public class IHaveRequest extends UnconfirmedRequestService {
     public static final byte TYPE_ID = 1;
     
-    private ObjectIdentifier deviceIdentifier;
-    private ObjectIdentifier objectIdentifier;
-    private CharacterString objectName;
+    private final ObjectIdentifier deviceIdentifier;
+    private final ObjectIdentifier objectIdentifier;
+    private final CharacterString objectName;
     
     public IHaveRequest(ObjectIdentifier deviceIdentifier, ObjectIdentifier objectIdentifier, CharacterString objectName) {
         super();
@@ -29,8 +30,8 @@ public class IHaveRequest extends UnconfirmedRequestService {
     }
 
     @Override
-    public void handle(LocalDevice localDevice, Address from) {
-        RemoteDevice d = localDevice.getRemoteDeviceCreate(deviceIdentifier.getInstanceNumber(), from);
+    public void handle(LocalDevice localDevice, Address from, Network network) {
+        RemoteDevice d = localDevice.getRemoteDeviceCreate(deviceIdentifier.getInstanceNumber(), from, network);
         RemoteObject o = new RemoteObject(objectIdentifier);
         o.setObjectName(objectName.toString());
         d.setObject(o);

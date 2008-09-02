@@ -43,8 +43,8 @@ public class SlaveDeviceTest {
                 localDevice.getNextInstanceObjectIdentifier(ObjectType.multiStateOutput));
         mso0.setProperty(PropertyIdentifier.objectName, new CharacterString("Vegetable"));
         mso0.setProperty(PropertyIdentifier.numberOfStates, new UnsignedInteger(4));
-        mso0.setProperty(PropertyIdentifier.stateText, 1, new CharacterString("Tomatoe"));
-        mso0.setProperty(PropertyIdentifier.stateText, 2, new CharacterString("Potatoe"));
+        mso0.setProperty(PropertyIdentifier.stateText, 1, new CharacterString("Tomato"));
+        mso0.setProperty(PropertyIdentifier.stateText, 2, new CharacterString("Potato"));
         mso0.setProperty(PropertyIdentifier.stateText, 3, new CharacterString("Onion"));
         mso0.setProperty(PropertyIdentifier.stateText, 4, new CharacterString("Broccoli"));
         mso0.setProperty(PropertyIdentifier.presentValue, new UnsignedInteger(2));

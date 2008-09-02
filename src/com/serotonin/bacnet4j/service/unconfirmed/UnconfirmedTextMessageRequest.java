@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.serotonin.bacnet4j.LocalDevice;
+import com.serotonin.bacnet4j.Network;
 import com.serotonin.bacnet4j.exception.BACnetException;
 import com.serotonin.bacnet4j.type.Encodable;
 import com.serotonin.bacnet4j.type.constructed.Address;
@@ -23,10 +24,10 @@ public class UnconfirmedTextMessageRequest extends UnconfirmedRequestService {
         classes.add(UnsignedInteger.class);
         classes.add(CharacterString.class);
     }
-    private ObjectIdentifier textMessageSourceDevice;
+    private final ObjectIdentifier textMessageSourceDevice;
     private Choice messageClass;
-    private MessagePriority messagePriority;
-    private CharacterString message;
+    private final MessagePriority messagePriority;
+    private final CharacterString message;
     
     public UnconfirmedTextMessageRequest(ObjectIdentifier textMessageSourceDevice, UnsignedInteger messageClass, 
             MessagePriority messagePriority, CharacterString message) {
@@ -57,9 +58,9 @@ public class UnconfirmedTextMessageRequest extends UnconfirmedRequestService {
     }
     
     @Override
-    public void handle(LocalDevice localDevice, Address from) throws BACnetException {
+    public void handle(LocalDevice localDevice, Address from, Network network) throws BACnetException {
         localDevice.getEventHandler().fireTextMessage(
-                localDevice.getRemoteDeviceCreate(textMessageSourceDevice.getInstanceNumber(), from),
+                localDevice.getRemoteDeviceCreate(textMessageSourceDevice.getInstanceNumber(), from, network),
                 messageClass, messagePriority, message);
     }
 

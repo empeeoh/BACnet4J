@@ -58,7 +58,7 @@ public class Test {
     
     public static void test3(LocalDevice d) throws Exception {
         RemoteDevice rd = new RemoteDevice(105, new Address(new UnsignedInteger(47808), 
-                new OctetString(new byte[] {(byte)206, (byte)210, 100, (byte)134})));
+                new OctetString(new byte[] {(byte)206, (byte)210, 100, (byte)134})), null);
         rd.setSegmentationSupported(Segmentation.noSegmentation);
         rd.setMaxAPDULengthAccepted(1476);
         
@@ -179,7 +179,7 @@ public class Test {
         System.out.println(send(d, new DeleteObjectRequest(created)));
     }
     public static AcknowledgementService send(LocalDevice d, ConfirmedRequestService s) throws Exception {
-        return d.send(new InetSocketAddress("localhost", 0xbac1), 35, Segmentation.segmentedBoth, s);
+        return d.send(new InetSocketAddress("localhost", 0xbac1), null, 35, Segmentation.segmentedBoth, s);
     }
     
     

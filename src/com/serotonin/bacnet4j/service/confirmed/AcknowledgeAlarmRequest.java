@@ -1,6 +1,7 @@
 package com.serotonin.bacnet4j.service.confirmed;
 
 import com.serotonin.bacnet4j.LocalDevice;
+import com.serotonin.bacnet4j.Network;
 import com.serotonin.bacnet4j.exception.BACnetException;
 import com.serotonin.bacnet4j.exception.NotImplementedException;
 import com.serotonin.bacnet4j.service.acknowledgement.AcknowledgementService;
@@ -15,12 +16,12 @@ import com.serotonin.util.queue.ByteQueue;
 public class AcknowledgeAlarmRequest extends ConfirmedRequestService {
     public static final byte TYPE_ID = 0;
     
-    private UnsignedInteger acknowledgingProcessIdentifier;
-    private ObjectIdentifier eventObjectIdentifier;
-    private EventState eventStateAcknowledged;
-    private TimeStamp timeStamp;
-    private CharacterString acknowledgmentSource;
-    private TimeStamp timeOfAcknowledgment;
+    private final UnsignedInteger acknowledgingProcessIdentifier;
+    private final ObjectIdentifier eventObjectIdentifier;
+    private final EventState eventStateAcknowledged;
+    private final TimeStamp timeStamp;
+    private final CharacterString acknowledgmentSource;
+    private final TimeStamp timeOfAcknowledgment;
     
     public AcknowledgeAlarmRequest(UnsignedInteger acknowledgingProcessIdentifier, 
             ObjectIdentifier eventObjectIdentifier, EventState eventStateAcknowledged, TimeStamp timeStamp, 
@@ -39,7 +40,8 @@ public class AcknowledgeAlarmRequest extends ConfirmedRequestService {
     }
     
     @Override
-    public AcknowledgementService handle(LocalDevice localDevice, Address from) throws BACnetException {
+    public AcknowledgementService handle(LocalDevice localDevice, Address from, Network network)
+            throws BACnetException {
         throw new NotImplementedException();
     }
 

@@ -1,6 +1,7 @@
 package com.serotonin.bacnet4j.service.unconfirmed;
 
 import com.serotonin.bacnet4j.LocalDevice;
+import com.serotonin.bacnet4j.Network;
 import com.serotonin.bacnet4j.exception.BACnetException;
 import com.serotonin.bacnet4j.service.Service;
 import com.serotonin.bacnet4j.type.constructed.Address;
@@ -33,5 +34,5 @@ abstract public class UnconfirmedRequestService extends Service {
         throw new BACnetException("Unsupported unconfirmed service: "+ (type & 0xff));
     }
     
-    abstract public void handle(LocalDevice localDevice, Address from) throws BACnetException;
+    abstract public void handle(LocalDevice localDevice, Address from, Network network) throws BACnetException;
 }

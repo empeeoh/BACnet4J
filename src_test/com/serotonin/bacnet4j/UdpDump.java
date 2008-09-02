@@ -13,9 +13,13 @@ public class UdpDump {
         DatagramPacket packet; 
         
         // Broadcast whois
-        byte[] data = new byte[] { (byte)0x81, 0xb, 0x0, 0x8, 0x1, 0x0, 0x10, 0x8 };
-        packet = new DatagramPacket(data, data.length, new InetSocketAddress("192.168.1.255", 47808));
+        //byte[] data = new byte[] { (byte)0x81, 0xb, 0x0, 0x8, 0x1, 0x0, 0x10, 0x8 };
+        //packet = new DatagramPacket(data, data.length, new InetSocketAddress("192.168.1.255", 47808));
         
+        // Network broadcast whois.
+        byte[] data = new byte[] { (byte)0x81, 0xb, 0x0, 0xc, 0x1, 0x20, (byte)0xff, (byte)0xff, 0x0, (byte)0xff, 0x10, 0x8 };
+        packet = new DatagramPacket(data, data.length, new InetSocketAddress("192.168.1.255", 47808));
+
         // Non-broadcast whois
         //byte[] data = new byte[] { (byte)0x81, 0xa, 0x0, 0x8, 0x1, 0x0, 0x10, 0x8 };
         //packet = new DatagramPacket(data, data.length, new InetSocketAddress("192.168.1.255", 47808));

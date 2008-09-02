@@ -31,7 +31,7 @@ public class DiscoveryTest {
 //                new Address(new UnsignedInteger(47808), new OctetString(new byte[] {(byte)206, (byte)210, 100, (byte)134})), 
 //                new WhoIsRequest(new UnsignedInteger(105), new UnsignedInteger(105)));
         RemoteDevice rd = new RemoteDevice(105, new Address(new UnsignedInteger(47808), 
-                new OctetString(new byte[] {(byte)206, (byte)210, 100, (byte)134})));
+                new OctetString(new byte[] {(byte)206, (byte)210, 100, (byte)134})), null);
         rd.setSegmentationSupported(Segmentation.segmentedBoth);
         rd.setMaxAPDULengthAccepted(1476);
         localDevice.addRemoteDevice(rd);

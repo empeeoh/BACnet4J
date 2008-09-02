@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.serotonin.bacnet4j.LocalDevice;
+import com.serotonin.bacnet4j.Network;
 import com.serotonin.bacnet4j.exception.BACnetException;
 import com.serotonin.bacnet4j.exception.NotImplementedException;
 import com.serotonin.bacnet4j.service.acknowledgement.AcknowledgementService;
@@ -33,9 +34,9 @@ public class ReadRangeRequest extends ConfirmedRequestService {
         classes.add(BySequenceNumber.class);
         classes.add(ByTime.class);
     }
-    private ObjectIdentifier objectIdentifier;
-    private PropertyIdentifier propertyIdentifier;
-    private UnsignedInteger propertyArrayIndex;
+    private final ObjectIdentifier objectIdentifier;
+    private final PropertyIdentifier propertyIdentifier;
+    private final UnsignedInteger propertyArrayIndex;
     private Choice range;
     
     private ReadRangeRequest(ObjectIdentifier objectIdentifier, PropertyIdentifier propertyIdentifier, 
@@ -69,7 +70,8 @@ public class ReadRangeRequest extends ConfirmedRequestService {
     }
     
     @Override
-    public AcknowledgementService handle(LocalDevice localDevice, Address from) throws BACnetException {
+    public AcknowledgementService handle(LocalDevice localDevice, Address from, Network network)
+            throws BACnetException {
         throw new NotImplementedException();
     }
 
@@ -101,7 +103,7 @@ public class ReadRangeRequest extends ConfirmedRequestService {
     }
     
     public static class ByPosition extends Range {
-        private UnsignedInteger referenceIndex;
+        private final UnsignedInteger referenceIndex;
 
         public ByPosition(UnsignedInteger referenceIndex, SignedInteger count) {
             super(count);
@@ -121,7 +123,7 @@ public class ReadRangeRequest extends ConfirmedRequestService {
     }
     
     public static class BySequenceNumber extends Range {
-        private UnsignedInteger referenceIndex;
+        private final UnsignedInteger referenceIndex;
 
         public BySequenceNumber(UnsignedInteger referenceIndex, SignedInteger count) {
             super(count);
@@ -141,7 +143,7 @@ public class ReadRangeRequest extends ConfirmedRequestService {
     }
     
     public static class ByTime extends Range {
-        private DateTime referenceTime;
+        private final DateTime referenceTime;
 
         public ByTime(DateTime referenceTime, SignedInteger count) {
             super(count);

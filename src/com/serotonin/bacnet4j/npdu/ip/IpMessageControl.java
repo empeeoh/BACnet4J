@@ -12,6 +12,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 import com.serotonin.bacnet4j.LocalDevice;
+import com.serotonin.bacnet4j.Network;
 import com.serotonin.bacnet4j.apdu.APDU;
 import com.serotonin.bacnet4j.apdu.AckAPDU;
 import com.serotonin.bacnet4j.apdu.ComplexACK;
@@ -149,20 +150,21 @@ public class IpMessageControl extends Thread {
         return nextInvokeId++;
     }
     
-    public AckAPDU send(String host, int maxAPDULengthAccepted, Segmentation segmentationSupported, 
+    public AckAPDU send(String host, Network network, int maxAPDULengthAccepted, Segmentation segmentationSupported, 
             ConfirmedRequestService serviceRequest) throws BACnetException {
-        return send(host, port, maxAPDULengthAccepted, segmentationSupported, serviceRequest);
+        return send(host, port, network, maxAPDULengthAccepted, segmentationSupported, serviceRequest);
     }
     
-    public AckAPDU send(String host, int port, int maxAPDULengthAccepted, Segmentation segmentationSupported, 
-            ConfirmedRequestService serviceRequest) throws BACnetException {
-        return send(new InetSocketAddress(host, port), maxAPDULengthAccepted, segmentationSupported, serviceRequest);
+    public AckAPDU send(String host, int port, Network network, int maxAPDULengthAccepted,
+            Segmentation segmentationSupported, ConfirmedRequestService serviceRequest) throws BACnetException {
+        return send(new InetSocketAddress(host, port), network, maxAPDULengthAccepted, segmentationSupported,
+                serviceRequest);
     }
     
-    public AckAPDU send(byte[] host, int port, int maxAPDULengthAccepted, Segmentation segmentationSupported,
-            ConfirmedRequestService serviceRequest) throws BACnetException {
+    public AckAPDU send(byte[] host, int port, Network network, int maxAPDULengthAccepted,
+            Segmentation segmentationSupported, ConfirmedRequestService serviceRequest) throws BACnetException {
         try {
-            return send(new InetSocketAddress(InetAddress.getByAddress(host), port), maxAPDULengthAccepted,
+            return send(new InetSocketAddress(InetAddress.getByAddress(host), port), network, maxAPDULengthAccepted,
                     segmentationSupported, serviceRequest);
         }
         catch (UnknownHostException e) {
@@ -170,8 +172,8 @@ public class IpMessageControl extends Thread {
         }
     }
     
-    public AckAPDU send(InetSocketAddress addr, int maxAPDULengthAccepted, Segmentation segmentationSupported,
-            ConfirmedRequestService serviceRequest) throws BACnetException {
+    public AckAPDU send(InetSocketAddress addr, Network network, int maxAPDULengthAccepted,
+            Segmentation segmentationSupported, ConfirmedRequestService serviceRequest) throws BACnetException {
         // Get an invoke id.
         byte id = getNextInvokeId();
         
@@ -190,7 +192,7 @@ public class IpMessageControl extends Thread {
             if (segmentsRequired > 128)
                 throw new BACnetException("Request too big to send to device; too many segments required");
             
-            Key key = waitingRoom.enter(addr, id, false);
+            Key key = waitingRoom.enter(addr, network, id, false);
             try {
                 return sendSegmentedRequest(key, maxAPDULengthAccepted, maxServiceData, serviceRequest.getChoiceId(),
                         serviceData);
@@ -203,14 +205,15 @@ public class IpMessageControl extends Thread {
             // We can send the whole APDU in one shot.
             ConfirmedRequest apdu = new ConfirmedRequest(false, false, true, MAX_SEGMENTS, APDU_LENGTH, id, (byte)0, 0,
                     serviceRequest.getChoiceId(), serviceData);
-            return send(addr, id, timeout, apdu, false);
+            return send(addr, network, id, timeout, apdu, false);
         }
     }
     
-    private void sendResponse(InetSocketAddress addr, ConfirmedRequest request, AcknowledgementService response)
-            throws BACnetException {
+    private void sendResponse(InetSocketAddress addr, Network network, ConfirmedRequest request,
+            AcknowledgementService response) throws BACnetException {
         if (response == null) {
-            sendImpl(new SimpleACK(request.getInvokeId(), request.getServiceRequest().getChoiceId()), false, addr);
+            sendImpl(new SimpleACK(request.getInvokeId(), request.getServiceRequest().getChoiceId()), false, addr,
+                    network);
             return;
         }
         
@@ -228,7 +231,7 @@ public class IpMessageControl extends Thread {
             if (segmentsRequired > request.getMaxSegmentsAccepted() || segmentsRequired > 128)
                 throw new BACnetException("Response too big to send to device; too many segments required");
             
-            Key key = waitingRoom.enter(addr, request.getInvokeId(), true);
+            Key key = waitingRoom.enter(addr, network, request.getInvokeId(), true);
             try {
                 sendSegmentedResponse(key, request.getMaxApduLengthAccepted().getMaxLength(), maxServiceData,
                         response.getChoiceId(), serviceData);
@@ -239,12 +242,12 @@ public class IpMessageControl extends Thread {
         }
         else
             // We can send the whole APDU in one shot.
-            sendImpl(new ComplexACK(false, false, request.getInvokeId(), 0, 0, response), false, addr);
+            sendImpl(new ComplexACK(false, false, request.getInvokeId(), 0, 0, response), false, addr, network);
     }
     
-    private AckAPDU send(InetSocketAddress addr, byte id, int timeout, APDU apdu, boolean server)
+    private AckAPDU send(InetSocketAddress addr, Network network, byte id, int timeout, APDU apdu, boolean server)
             throws BACnetException {
-        Key key = waitingRoom.enter(addr, id, server);
+        Key key = waitingRoom.enter(addr, network, id, server);
         try {
             return send(key, timeout, new APDU[] {apdu});
         }
@@ -256,7 +259,7 @@ public class IpMessageControl extends Thread {
     private AckAPDU send(Key key, int timeout, APDU[] apdu) throws BACnetException {
         byte[][] data = new byte[apdu.length][];
         for (int i=0; i<data.length; i++)
-            data[i] = createMessageData(apdu[i], false);
+            data[i] = createMessageData(apdu[i], false, key.getNetwork());
         
         AckAPDU response = null;
         int attempts = retries + 1;
@@ -285,46 +288,47 @@ public class IpMessageControl extends Thread {
         return response;
     }
     
-    public void sendUnconfirmed(String host, UnconfirmedRequestService serviceRequest)
+    public void sendUnconfirmed(String host, Network network, UnconfirmedRequestService serviceRequest)
             throws BACnetException {
-        sendUnconfirmed(host, port, serviceRequest);
+        sendUnconfirmed(host, port, network, serviceRequest);
     }
     
-    public void sendUnconfirmed(String host, int port, UnconfirmedRequestService serviceRequest)
+    public void sendUnconfirmed(String host, int port, Network network, UnconfirmedRequestService serviceRequest)
             throws BACnetException {
-        sendUnconfirmed(new InetSocketAddress(host, port), serviceRequest);
+        sendUnconfirmed(new InetSocketAddress(host, port), network, serviceRequest);
     }
 
-    public void sendUnconfirmed(byte[] host, int port, UnconfirmedRequestService serviceRequest)
+    public void sendUnconfirmed(byte[] host, int port, Network network, UnconfirmedRequestService serviceRequest)
             throws BACnetException {
         try {
-            sendUnconfirmed(new InetSocketAddress(InetAddress.getByAddress(host), port), serviceRequest);
+            sendUnconfirmed(new InetSocketAddress(InetAddress.getByAddress(host), port), network, serviceRequest);
         }
         catch (UnknownHostException e) {
             throw new BACnetException(e);
         }
     }
 
-    public void sendUnconfirmed(InetSocketAddress addr, UnconfirmedRequestService serviceRequest)
+    public void sendUnconfirmed(InetSocketAddress addr, Network network, UnconfirmedRequestService serviceRequest)
             throws BACnetException {
         UnconfirmedRequest apdu = new UnconfirmedRequest(serviceRequest);
-        byte[] data = createMessageData(apdu, false);
+        byte[] data = createMessageData(apdu, false, network);
         sendImpl(data, addr);
     }
     
-    public void sendBroadcast(UnconfirmedRequestService serviceRequest) throws BACnetException {
-        sendBroadcast(port, serviceRequest);
+    public void sendBroadcast(Network network, UnconfirmedRequestService serviceRequest) throws BACnetException {
+        sendBroadcast(port, network, serviceRequest);
     }
     
-    public void sendBroadcast(int port, UnconfirmedRequestService serviceRequest) throws BACnetException {
+    public void sendBroadcast(int port, Network network, UnconfirmedRequestService serviceRequest)
+            throws BACnetException {
         UnconfirmedRequest apdu = new UnconfirmedRequest(serviceRequest);
-        byte[] data = createMessageData(apdu, true);
+        byte[] data = createMessageData(apdu, true, network);
         sendImpl(data, new InetSocketAddress(broadcastAddress, port));
     }
     
-    private void sendImpl(APDU apdu, boolean broadcast, InetSocketAddress addr)
+    private void sendImpl(APDU apdu, boolean broadcast, InetSocketAddress addr, Network network)
             throws BACnetException {
-        sendImpl(createMessageData(apdu, broadcast), addr);
+        sendImpl(createMessageData(apdu, broadcast, network), addr);
     }
     
     private void sendImpl(byte[] data, InetSocketAddress addr) throws BACnetException {
@@ -337,24 +341,54 @@ public class IpMessageControl extends Thread {
         }
     }
     
-    private byte[] createMessageData(APDU apdu, boolean broadcast) {
+    private byte[] createMessageData(APDU apdu, boolean broadcast, Network network) {
         ByteQueue apduQueue = new ByteQueue();
         apdu.write(apduQueue);
         
         ByteQueue queue = new ByteQueue();
         
         // BACnet virtual link layer detail
+        
         // BACnet/IP
         queue.push(0x81);
+        
         // Original-Unicast-NPDU
         queue.push(broadcast ? 0xb : 0xa);
+        
         // Length including the BACnet/IP identifier, function, length, protocol version, response expected and the
         // apdu
-        BACnetUtils.pushShort(queue, apduQueue.size() + 6);
+        int len = apduQueue.size() + 6;
+        
+        if (network != null)
+            // Inclusion of network destination info increases the length by adding the network number (2),
+            // address length (1), address (n), and the hop count (1)
+            len += network.getNetworkAddress().length + 4;
+        
+        BACnetUtils.pushShort(queue, len);
+        
         // Protocol version, always 1.
         queue.push((byte)1);
-        // Responses are expected for confirmed requests.
-        queue.push((byte)(apdu.expectsReply() ? 4 : 0));
+        
+        // NPCI: Responses are expected for confirmed requests.
+        int npci = 0;
+        if (apdu.expectsReply())
+            npci |= 4;
+        if (network != null)
+            npci |= 32;
+        queue.push((byte)npci);
+        
+        // Add the npdu
+        if (network != null) {
+            // Network number
+            BACnetUtils.pushShort(queue, network.getNetworkNumber());
+            // Address length
+            queue.push(network.getNetworkAddress().length);
+            // Address
+            queue.push(network.getNetworkAddress());
+            // Hop count
+            queue.push((byte)0xff);
+        }
+        
         // Add the apdu
         queue.push(apduQueue);
         
@@ -383,6 +417,7 @@ public class IpMessageControl extends Thread {
         ByteQueue queue;
         InetAddress fromAddr;
         int fromPort;
+        Network fromNetwork;
         
         IncomingMessageExecutor(DatagramPacket p) {
             originalQueue = new ByteQueue(p.getData(), 0, p.getLength());
@@ -430,6 +465,9 @@ public class IpMessageControl extends Thread {
             if (npci.isNetworkMessage())
                 throw new MessageValidationAssertionException("Network messages are not supported");
             
+            if (npci.hasSourceInfo())
+                fromNetwork = new Network(npci.getSourceNetwork(), npci.getSourceAddress());
+            
             // Create the APDU.
             APDU apdu;
             try {
@@ -450,11 +488,11 @@ public class IpMessageControl extends Thread {
                 
                 if (confAPDU.isSegmentedMessage() && confAPDU.getSequenceNumber() > 0)
                     // This is a subsequent part of a segmented message. Notify the waiting room.
-                    waitingRoom.notifyMember(from, invokeId, false, confAPDU);
+                    waitingRoom.notifyMember(from, fromNetwork, invokeId, false, confAPDU);
                 else {
                     if (confAPDU.isSegmentedMessage()) {
                         // This is the initial part of a segmented message. Go and receive the subsequent parts.
-                        Key key = waitingRoom.enter(from, invokeId, true);
+                        Key key = waitingRoom.enter(from, fromNetwork, invokeId, true);
                         try {
                             receiveSegmented(key, confAPDU);
                         }
@@ -468,19 +506,19 @@ public class IpMessageControl extends Thread {
                         confAPDU.parseServiceData();
                         AcknowledgementService ackService = requestHandler.handleConfirmedRequest(
                                 new Address(new UnsignedInteger(fromPort), new OctetString(fromAddr.getAddress())),
-                                invokeId, confAPDU.getServiceRequest());
-                        sendResponse(from, confAPDU, ackService);
+                                fromNetwork, invokeId, confAPDU.getServiceRequest());
+                        sendResponse(from, fromNetwork, confAPDU, ackService);
                     }
                     catch (BACnetErrorException e) {
-                        sendImpl(new Error(invokeId, e.getError()), false, from);
+                        sendImpl(new Error(invokeId, e.getError()), false, from, fromNetwork);
                     }
                     catch (BACnetRejectException e) {
-                        sendImpl(new Reject(invokeId, e.getRejectReason()), false, from);
+                        sendImpl(new Reject(invokeId, e.getRejectReason()), false, from, fromNetwork);
                     }
                     catch (BACnetException e) {
                         sendImpl(new Error(confAPDU.getInvokeId(), new BaseError((byte)127,
                                 new BACnetError(ErrorClass.services, ErrorCode.inconsistentParameters))),
-                                false, from);
+                                false, from, fromNetwork);
                         LocalDevice.getExceptionListener().receivedThrowable(e.getCause());
                     }
                 }
@@ -488,12 +526,12 @@ public class IpMessageControl extends Thread {
             else if (apdu instanceof UnconfirmedRequest) {
                 requestHandler.handleUnconfirmedRequest(
                         new Address(new UnsignedInteger(fromPort), new OctetString(fromAddr.getAddress())),
-                        ((UnconfirmedRequest)apdu).getService());
+                        fromNetwork, ((UnconfirmedRequest)apdu).getService());
             }
             else {
                 // An acknowledgement.
                 AckAPDU ack = (AckAPDU)apdu;
-                waitingRoom.notifyMember(new InetSocketAddress(fromAddr, fromPort),
+                waitingRoom.notifyMember(new InetSocketAddress(fromAddr, fromPort), fromNetwork,
                         ack.getOriginalInvokeId(), ack.isServer(), ack);
             }
         }
@@ -609,7 +647,7 @@ public class IpMessageControl extends Thread {
         //System.out.println("Receiving segmented: window="+ window);
         
         // Send a segment ack. Go with whatever window size was proposed.
-        sendImpl(new SegmentACK(false, server, id, lastSeq, window, true), false, peer);
+        sendImpl(new SegmentACK(false, server, id, lastSeq, window, true), false, peer, key.getNetwork());
         
         // The loop for receiving windows of request parts.
         Segmentable segment;
@@ -628,7 +666,7 @@ public class IpMessageControl extends Thread {
                                 id +", sequenceId="+ (lastSeq + 1));
                     
                     // Return a NAK with the last sequence id received in order and start over.
-                    sendImpl(new SegmentACK(true, server, id, lastSeq, window, true), false, peer);
+                    sendImpl(new SegmentACK(true, server, id, lastSeq, window, true), false, peer, key.getNetwork());
                     segmentWindow.clear(lastSeq + 1);
                 }
                 else if (segmentWindow.fitsInWindow(segment))
@@ -645,7 +683,8 @@ public class IpMessageControl extends Thread {
             // Do we need to send an ack?
             if (!segment.isMoreFollows() || segmentWindow.isLastSegment(lastSeq)) {
                 // Return an acknowledgement
-                sendImpl(new SegmentACK(false, server, id, lastSeq, window, segment.isMoreFollows()), false, peer);
+                sendImpl(new SegmentACK(false, server, id, lastSeq, window, segment.isMoreFollows()), false, peer,
+                        key.getNetwork());
                 segmentWindow.clear(lastSeq + 1);
             }
                 
