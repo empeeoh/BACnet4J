@@ -427,10 +427,10 @@ public class IpMessageControl extends Thread {
         }
         
         // Added for testing with the main method below.
-//        IncomingMessageExecutor() {
-//            
-//        }
-//        
+        IncomingMessageExecutor() {
+            
+        }
+        
         public void run() {
             try {
                 runImpl();
@@ -450,13 +450,18 @@ public class IpMessageControl extends Thread {
                 throw new MessageValidationAssertionException("Protocol id is not BACnet/IP (0x81)");
             
             byte function = queue.pop();
-            if (function != 0xa && function != 0xb)
-                throw new MessageValidationAssertionException("Function is not unicast or broadcast (0xa or 0xb)");
+            if (function != 0xa && function != 0xb && function != 0x4)
+                throw new MessageValidationAssertionException(
+                        "Function is not unicast, broadcast, or forward (0xa, 0xb, or 0x4)");
             
             int length = BACnetUtils.popShort(queue);
             if (length != queue.size() + 4)
                 throw new MessageValidationAssertionException("Length field does not match data: given="+ length
                         +", expected="+ (queue.size() + 4));
+            
+            if (function == 0x4)
+                // A forward. Ignore the next 6 bytes.
+                queue.pop(6);
             
             // Network layer protocol control information. See 6.2.2
             NPCI npci = new NPCI(queue);
@@ -696,15 +701,36 @@ public class IpMessageControl extends Thread {
     }
     
     // Testing 
-//    public static void main(String[] args) throws Exception {
-//        IpMessageControl ipMessageControl = new IpMessageControl();
-//        IncomingMessageExecutor ime = ipMessageControl.new IncomingMessageExecutor();
-//        //ime.queue = new ByteQueue(new byte[] {(byte)0x81, 0xb, 0x0, 0x9, 0x1, (byte)0x81, 0x0, 0x0, 0x1});
-//        //ime.queue = new ByteQueue(new byte[] {(byte)0x81,0xb,0x0,0x18,0x1,0x20,(byte)0xff,(byte)0xff,0x0,(byte)0xff,0x10,0x0,(byte)0xc4,0x2,0x0,0x0,0x65,0x22,0x5,(byte)0xc4,(byte)0x91,0x0,0x21,0x24});
-//        //ime.queue = new ByteQueue(new byte[] {(byte)0x81,0xa,0x0,0x14,0x1,0x0,0x10,0x0,(byte)0xc4,0x2,0x0,0x0,0x65,0x22,0x5,(byte)0xc4,(byte)0x91,0x0,0x21,(byte)0xec});
-//        ime.queue = new ByteQueue(new byte[] {(byte)0x81, 0xa, 0x0, 0x11, 0x1, 0x4, 0x2, 0x75, 0x0, 0xc, 0xc, 0x2, 0x0, 0x0, 0x69 , 0x19, 0x61});
-//        
-//                
-//        ime.runImpl();
-//    }
+    public static void main(String[] args) throws Exception {
+        IpMessageControl ipMessageControl = new IpMessageControl();
+        IncomingMessageExecutor ime = ipMessageControl.new IncomingMessageExecutor();
+        
+//        String input = "[81,b,0,c,1,20,ff,ff,0,ff,10,8]";
+//        String input = "[81,b,0,14,1,0,10,0,c4,2,0,8,98,22,1,e0,91,0,21,8]";
+        String input = "[81,4,0,23,c0,a8,1,5a,ba,c0,1,8,27,28,6,0,40,ae,0,73,8f,10,0,c4,2,0,9,60,22,1,e0,91,0,21,8]";
+//        String input = "[81,4,0,1e,c0,a8,1,5a,ba,c0,1,8,4e,38,1,3,10,0,c4,2,0,9,63,22,1,e0,91,0,21,8]";
+//        String input = "[81,4,0,1e,c0,a8,1,5a,ba,c0,1,8,4e,36,1,1,10,0,c4,2,0,8,99,22,1,e0,91,0,21,8]";
+//        String input = "[81,4,0,1e,c0,a8,1,5a,ba,c0,1,8,4e,38,1,4,10,0,c4,2,0,9,64,22,1,e0,91,0,21,8]";
+//        String input = "[81,4,0,1e,c0,a8,1,5a,ba,c0,1,8,4e,36,1,2,10,0,c4,2,0,8,9a,22,1,e0,91,0,21,8]";
+//        String input = "[81,b,0,1b,1,28,ff,ff,0,27,28,6,0,40,ae,0,73,8f,fe,10,8,a,9,62,1a,9,62]";
+//        String input = "[81,b,0,1b,1,28,ff,ff,0,27,28,6,0,40,ae,0,73,8f,fe,10,8,a,9,61,1a,9,61]";
+//        String input = "[81,b,0,12,1,88,27,28,6,0,40,ae,0,73,8f,0,9c,58]";
+//        String input = "[81,b,0,2b,1,0,10,4,9,8,19,1,2e,c,2,0,8,98,19,0,29,0,3e,c,0,80,0,2e,19,55,3e,44,42,c8,0,0,3f,5b,4,0,0,3f,2f]";
+//        String input = "[81,b,0,2b,1,0,10,4,9,8,19,1,2e,c,2,0,8,98,19,0,29,0,3e,c,0,80,0,2e,19,55,3e,44,42,c8,0,0,3f,5b,4,0,0,3f,2f]";
+        
+        
+        if (input.startsWith("["))
+            input = input.substring(1);
+        if (input.endsWith("]"))
+            input = input.substring(0, input.length() - 1);
+        String[] parts = input.split(",");
+        byte[] bytes = new byte[parts.length];
+        
+        for (int i=0; i<bytes.length; i++)
+            bytes[i] = (byte)Integer.parseInt(parts[i], 16);
+        
+        ime.queue = new ByteQueue(bytes);
+                
+        ime.runImpl();
+    }
 }
