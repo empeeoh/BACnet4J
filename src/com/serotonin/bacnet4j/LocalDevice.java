@@ -45,6 +45,7 @@ import com.serotonin.bacnet4j.type.Encodable;
 import com.serotonin.bacnet4j.type.constructed.Address;
 import com.serotonin.bacnet4j.type.constructed.Destination;
 import com.serotonin.bacnet4j.type.constructed.EventTransitionBits;
+import com.serotonin.bacnet4j.type.constructed.ObjectTypesSupported;
 import com.serotonin.bacnet4j.type.constructed.PropertyReference;
 import com.serotonin.bacnet4j.type.constructed.ReadAccessResult;
 import com.serotonin.bacnet4j.type.constructed.ReadAccessSpecification;
@@ -52,6 +53,7 @@ import com.serotonin.bacnet4j.type.constructed.SequenceOf;
 import com.serotonin.bacnet4j.type.constructed.ServicesSupported;
 import com.serotonin.bacnet4j.type.constructed.TimeStamp;
 import com.serotonin.bacnet4j.type.constructed.ReadAccessResult.Result;
+import com.serotonin.bacnet4j.type.enumerated.DeviceStatus;
 import com.serotonin.bacnet4j.type.enumerated.ErrorClass;
 import com.serotonin.bacnet4j.type.enumerated.ErrorCode;
 import com.serotonin.bacnet4j.type.enumerated.EventState;
@@ -160,6 +162,21 @@ public class LocalDevice implements RequestHandler {
             servicesSupported.setSubscribeCovProperty(false);
             servicesSupported.setGetEventInformation(false);
             configuration.setProperty(PropertyIdentifier.protocolServicesSupported, servicesSupported);
+            
+            // Set up the object types supported.
+            ObjectTypesSupported objectTypesSupported = new ObjectTypesSupported();
+            objectTypesSupported.setAll(true);
+            configuration.setProperty(PropertyIdentifier.protocolObjectTypesSupported, objectTypesSupported);
+            
+            // Set some other required values to defaults
+            configuration.setProperty(PropertyIdentifier.objectName, new CharacterString("BACnet device"));
+            configuration.setProperty(PropertyIdentifier.systemStatus, DeviceStatus.operational);
+            configuration.setProperty(PropertyIdentifier.modelName, new CharacterString("BACnet4J"));
+            configuration.setProperty(PropertyIdentifier.firmwareRevision, new CharacterString("not set"));
+            configuration.setProperty(PropertyIdentifier.applicationSoftwareVersion, new CharacterString("1.0.1"));
+            configuration.setProperty(PropertyIdentifier.protocolVersion, new UnsignedInteger(1));
+            configuration.setProperty(PropertyIdentifier.protocolRevision, new UnsignedInteger(0));
+            configuration.setProperty(PropertyIdentifier.databaseRevision, new UnsignedInteger(0));
         }
         catch (BACnetServiceException e) {
             // Should never happen, but wrap in an unchecked just in case.
