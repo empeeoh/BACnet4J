@@ -1,7 +1,9 @@
 package com.serotonin.bacnet4j.obj;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import com.serotonin.bacnet4j.Network;
 import com.serotonin.bacnet4j.exception.BACnetServiceException;
@@ -13,28 +15,44 @@ import com.serotonin.bacnet4j.type.enumerated.PropertyIdentifier;
 import com.serotonin.bacnet4j.type.primitive.UnsignedInteger;
 
 public class ObjectCovSubscription {
+    private static Set<ObjectType> supportedObjectTypes = new HashSet<ObjectType>();
+    private static Set<PropertyIdentifier> supportedPropertyIdentifiers = new HashSet<PropertyIdentifier>();
+    
+    static {
+        supportedObjectTypes.add(ObjectType.accumulator);
+        supportedObjectTypes.add(ObjectType.binaryInput);
+        supportedObjectTypes.add(ObjectType.binaryOutput);
+        supportedObjectTypes.add(ObjectType.binaryValue);
+        supportedObjectTypes.add(ObjectType.lifeSafetyPoint);
+        supportedObjectTypes.add(ObjectType.multiStateInput);
+        supportedObjectTypes.add(ObjectType.multiStateOutput);
+        supportedObjectTypes.add(ObjectType.multiStateValue);
+        
+        supportedPropertyIdentifiers.add(PropertyIdentifier.presentValue);
+        supportedPropertyIdentifiers.add(PropertyIdentifier.statusFlags);
+    }
+    
+    public static void addSupportedObjectType(ObjectType objectType) {
+        supportedObjectTypes.add(objectType);
+    }
+    
+    public static void addSupportedPropertyIdentifier(PropertyIdentifier propertyIdentifier) {
+        supportedPropertyIdentifiers.add(propertyIdentifier);
+    }
+    
     public static boolean supportedObjectType(ObjectType objectType) {
-        return objectType.equals(ObjectType.accumulator) ||
-                objectType.equals(ObjectType.binaryInput) ||
-                objectType.equals(ObjectType.binaryOutput) ||
-                objectType.equals(ObjectType.binaryValue) ||
-                objectType.equals(ObjectType.lifeSafetyPoint) ||
-                objectType.equals(ObjectType.multiStateInput) ||
-                objectType.equals(ObjectType.multiStateOutput) ||
-                objectType.equals(ObjectType.multiStateValue);
+        return supportedObjectTypes.contains(objectType);
     }
     
     public static boolean sendCovNotification(ObjectType objectType, PropertyIdentifier pid) {
-        if (supportedObjectType(objectType))
-            return pid.equals(PropertyIdentifier.presentValue) ||
-                    pid.equals(PropertyIdentifier.statusFlags);
-        return false;
+        return supportedObjectType(objectType) && supportedPropertyIdentifiers.contains(pid);
     }
+    
     
     public static List<PropertyValue> getValues(BACnetObject obj) {
         List<PropertyValue> values = new ArrayList<PropertyValue>();
-        addValue(obj, values, PropertyIdentifier.presentValue);
-        addValue(obj, values, PropertyIdentifier.statusFlags);
+        for (PropertyIdentifier pid : supportedPropertyIdentifiers)
+            addValue(obj, values, pid);
         return values;
     }
     

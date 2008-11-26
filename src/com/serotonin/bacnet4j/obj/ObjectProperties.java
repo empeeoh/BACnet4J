@@ -152,6 +152,14 @@ public class ObjectProperties {
                 new PropertyTypeDefinition(type, pid, clazz, sequence, required, defaultValue));
     }
     
+    public static void addPropertyTypeDefinition(ObjectType type, PropertyIdentifier pid,
+            Class<? extends Encodable> clazz, boolean sequence, boolean required, Encodable defaultValue) {
+        ObjectPropertyIdentifier opid = new ObjectPropertyIdentifier(type, pid);
+        if (propertyTypes.containsKey(opid))
+            throw new RuntimeException("ObjectType already contains the given PropertyIdentifier");
+        propertyTypes.put(opid, new PropertyTypeDefinition(type, pid, clazz, sequence, required, defaultValue));
+    }
+    
     static {
         // Accumulator
         add(ObjectType.accumulator, PropertyIdentifier.objectIdentifier, ObjectIdentifier.class, false, true, new ObjectIdentifier(ObjectType.accumulator, 0x3fffff));

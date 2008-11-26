@@ -5,6 +5,7 @@ import java.util.Iterator;
 import java.util.Map;
 
 import com.serotonin.bacnet4j.type.Encodable;
+import com.serotonin.bacnet4j.type.constructed.BACnetError;
 import com.serotonin.bacnet4j.type.constructed.ObjectPropertyReference;
 import com.serotonin.bacnet4j.type.constructed.PropertyReference;
 import com.serotonin.bacnet4j.type.enumerated.PropertyIdentifier;
@@ -12,7 +13,7 @@ import com.serotonin.bacnet4j.type.primitive.ObjectIdentifier;
 import com.serotonin.bacnet4j.type.primitive.UnsignedInteger;
 
 public class PropertyValues implements Iterable<ObjectPropertyReference> {
-    private Map<ObjectPropertyReference, Encodable> values = new HashMap<ObjectPropertyReference, Encodable>();
+    private final Map<ObjectPropertyReference, Encodable> values = new HashMap<ObjectPropertyReference, Encodable>();
     
     public void add(ObjectIdentifier oid, PropertyIdentifier pid, UnsignedInteger pin, Encodable value) {
         values.put(new ObjectPropertyReference(oid, pid, pin), value);
@@ -32,7 +33,7 @@ public class PropertyValues implements Iterable<ObjectPropertyReference> {
     
     public String getString(ObjectIdentifier oid, PropertyIdentifier pid, String defaultValue) {
         Encodable value = get(oid, pid);
-        if (value == null)
+        if (value == null || value instanceof BACnetError)
             return defaultValue;
         return value.toString();
     }
