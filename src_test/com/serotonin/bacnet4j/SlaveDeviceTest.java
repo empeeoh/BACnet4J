@@ -47,7 +47,7 @@ public class SlaveDeviceTest {
         mso0.setProperty(PropertyIdentifier.stateText, 2, new CharacterString("Potato"));
         mso0.setProperty(PropertyIdentifier.stateText, 3, new CharacterString("Onion"));
         mso0.setProperty(PropertyIdentifier.stateText, 4, new CharacterString("Broccoli"));
-        mso0.setProperty(PropertyIdentifier.presentValue, new UnsignedInteger(2));
+        mso0.setProperty(PropertyIdentifier.presentValue, new UnsignedInteger(1));
         localDevice.addObject(mso0);
         
         BACnetObject ao0 = new BACnetObject(localDevice, 
@@ -60,13 +60,16 @@ public class SlaveDeviceTest {
         localDevice.initialize();
         
         // Send an iam.
-        localDevice.sendBroadcast(localDevice.getIAm());
+        localDevice.sendBroadcast(47808, localDevice.getIAm());
         
         // Let it go...
         float ai0value = 0;
         float ai1value = 0;
         boolean bi0value = false;
         boolean bi1value = false;
+        
+        Thread.sleep(10000);
+        
         mso0.setProperty(PropertyIdentifier.presentValue, new UnsignedInteger(2));
         while (true) {
             // Change the values.
@@ -82,7 +85,7 @@ public class SlaveDeviceTest {
             bi0.setProperty(PropertyIdentifier.presentValue, bi0value ? BinaryPV.active : BinaryPV.inactive);
             bi1.setProperty(PropertyIdentifier.presentValue, bi1value ? BinaryPV.active : BinaryPV.inactive);
             
-            Thread.sleep(100000);
+            Thread.sleep(600000);
         }
     }
 }
