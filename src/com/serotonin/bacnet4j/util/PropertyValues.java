@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import com.serotonin.bacnet4j.exception.PropertyValueException;
 import com.serotonin.bacnet4j.type.Encodable;
 import com.serotonin.bacnet4j.type.constructed.BACnetError;
 import com.serotonin.bacnet4j.type.constructed.ObjectPropertyReference;
@@ -19,20 +20,29 @@ public class PropertyValues implements Iterable<ObjectPropertyReference> {
         values.put(new ObjectPropertyReference(oid, pid, pin), value);
     }
     
-    public Encodable get(ObjectIdentifier oid, PropertyReference ref) {
+    public Encodable getNoErrorCheck(ObjectIdentifier oid, PropertyReference ref) {
         return values.get(new ObjectPropertyReference(oid, ref.getPropertyIdentifier(), ref.getPropertyArrayIndex()));
     }
     
-    public Encodable get(ObjectIdentifier oid, PropertyIdentifier pid) {
+    public Encodable getNoErrorCheck(ObjectIdentifier oid, PropertyIdentifier pid) {
         return values.get(new ObjectPropertyReference(oid, pid));
     }
     
+    public Encodable get(ObjectIdentifier oid, PropertyIdentifier pid) throws PropertyValueException {
+        Encodable e = getNoErrorCheck(oid, pid);
+        
+        if (e instanceof BACnetError)
+            throw new PropertyValueException((BACnetError)e);
+        
+        return e;
+    }
+    
     public String getString(ObjectIdentifier oid, PropertyIdentifier pid) {
-        return get(oid, pid).toString();
+        return getNoErrorCheck(oid, pid).toString();
     }
     
     public String getString(ObjectIdentifier oid, PropertyIdentifier pid, String defaultValue) {
-        Encodable value = get(oid, pid);
+        Encodable value = getNoErrorCheck(oid, pid);
         if (value == null || value instanceof BACnetError)
             return defaultValue;
         return value.toString();
