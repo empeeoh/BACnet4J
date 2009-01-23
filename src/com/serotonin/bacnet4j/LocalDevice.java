@@ -718,7 +718,8 @@ public class LocalDevice implements RequestHandler {
         Map<ObjectIdentifier, List<PropertyReference>> properties;
         PropertyValues propertyValues = new PropertyValues();
         
-        if (refs.size() > 1 && d.getServicesSupported() != null && d.getServicesSupported().isReadPropertyMultiple()) {
+        if (refs.size() > 1&& d.getServicesSupported() != null && d.getServicesSupported().isReadPropertyMultiple() &&
+                d.getSegmentationSupported().equals(Segmentation.segmentedBoth) ) {
             // If the device supports read property multiple, send them all at once, or at least in partitions.
             List<PropertyReferences> partitions = refs.getPropertiesPartitioned(maxReadMultipleReferences);
             for (PropertyReferences partition : partitions) {
