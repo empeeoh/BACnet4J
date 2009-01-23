@@ -17,4 +17,20 @@ public class AbortReason extends Enumerated {
     public AbortReason(ByteQueue queue) {
         super(queue);
     }
+    
+    @Override
+    public String toString() {
+        int type = intValue();
+        if (type == other.intValue())
+            return "Other";
+        if (type == bufferOverflow.intValue())
+            return "Buffer overflow";
+        if (type == invalidApduInThisState.intValue())
+            return "Invalid APDU in this state";
+        if (type == preemptedByHigherPriorityTask.intValue())
+            return "Preempted by higher priority task";
+        if (type == segmentationNotSupported.intValue())
+            return "Segmentation not supported";
+        return "Unknown abort reason("+ type +")";
+    }
 }

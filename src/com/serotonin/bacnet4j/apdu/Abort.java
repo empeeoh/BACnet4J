@@ -1,5 +1,6 @@
 package com.serotonin.bacnet4j.apdu;
 
+import com.serotonin.bacnet4j.type.enumerated.AbortReason;
 import com.serotonin.util.queue.ByteQueue;
 
 /**
@@ -14,13 +15,13 @@ public class Abort extends AckAPDU {
      * This parameter shall be TRUE when the Abort PDU is sent by a server. This parameter shall be FALSE when the 
      * Abort PDU is sent by a client.
      */
-    private boolean server;
+    private final boolean server;
     
     /**
      * This parameter, of type BACnetAbortReason, contains the reason the transaction with the indicated invoke ID is 
      * being aborted.
      */
-    private int abortReason;
+    private final int abortReason;
     
     public Abort(boolean server, byte originalInvokeId, int abortReason) {
         this.server = server;
@@ -28,14 +29,17 @@ public class Abort extends AckAPDU {
         this.abortReason = abortReason;
     }
     
+    @Override
     public byte getPduType() {
         return TYPE_ID;
     }
 
+    @Override
     public boolean isServer() {
         return server;
     }
 
+    @Override
     public void write(ByteQueue queue) {
         int data = getShiftedTypeId(TYPE_ID) | (server ? 1 : 0);
         queue.push(data);
@@ -58,7 +62,7 @@ public class Abort extends AckAPDU {
         result = PRIME * result + (server ? 1231 : 1237);
         return result;
     }
-
+    
     @Override
     public boolean equals(Object obj) {
         if (this == obj)
@@ -75,6 +79,12 @@ public class Abort extends AckAPDU {
         if (server != other.server)
             return false;
         return true;
+    }
+    
+    @Override
+    public String toString() {
+        return "Abort(server="+ server +", originalInvokeId="+ originalInvokeId +", abortReason="+
+                new AbortReason(abortReason) +")";
     }
 
     @Override
