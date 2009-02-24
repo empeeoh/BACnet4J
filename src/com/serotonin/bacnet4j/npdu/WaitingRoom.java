@@ -123,7 +123,7 @@ public class WaitingRoom {
     
     
     /**
-     * This class is used by network message controllers to manage the blocking of thread sending confirmed messages.
+     * This class is used by network message controllers to manage the blocking of threads sending confirmed messages.
      * The instance itself serves as a monitor upon which the sending thread can wait (with a timeout). When a response
      * is received, the message controller can set it in here, automatically notifying the sending thread that the 
      * response is available.
