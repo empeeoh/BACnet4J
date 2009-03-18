@@ -17,6 +17,15 @@ public class Segmentation extends Enumerated {
         super(queue);
     }
     
+    public boolean hasTransmitSegmentation() {
+        return this.equals(segmentedBoth) || this.equals(segmentedTransmit);
+    }
+    
+    public boolean hasReceiveSegmentation() {
+        return this.equals(segmentedBoth) || this.equals(segmentedReceive);
+    }
+    
+    @Override
     public String toString() {
         int type = intValue();
         if (type == segmentedBoth.intValue())
