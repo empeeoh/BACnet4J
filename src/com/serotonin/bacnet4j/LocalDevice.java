@@ -1,3 +1,25 @@
+/*
+ * ============================================================================
+ * GNU Lesser General Public License
+ * ============================================================================
+ *
+ * Copyright (C) 2006-2009 Serotonin Software Technologies Inc. http://serotoninsoftware.com
+ * @author Matthew Lohbihler
+ * 
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ * 
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307, USA.
+ */
 package com.serotonin.bacnet4j;
 
 import java.io.IOException;
@@ -117,7 +139,8 @@ public class LocalDevice implements RequestHandler {
     private final List<RemoteDevice> remoteDevices = new CopyOnWriteArrayList<RemoteDevice>();
     
     // Misc configuration.
-    private int maxReadMultipleReferences = 200;
+    private int maxReadMultipleReferencesSegmented = 200;
+    private int maxReadMultipleReferencesNonsegmented = 20;
     
     // Event listeners
     private final DeviceEventHandler eventHandler = new DeviceEventHandler();
@@ -208,57 +231,50 @@ public class LocalDevice implements RequestHandler {
     public void setBroadcastAddress(String broadcastAddress) {
         messageControl.setBroadcastAddress(broadcastAddress);
     }
-    
     public String getBroadcastAddress() {
         return messageControl.getBroadcastAddress();
     }
-    
     public void setPort(int port) {
         messageControl.setPort(port);
     }
-    
     public int getPort() {
         return messageControl.getPort();
     }
-    
     public void setTimeout(int timeout) {
         messageControl.setTimeout(timeout);
     }
-    
     public int getTimeout() {
         return messageControl.getTimeout();
     }
-    
     public void setSegTimeout(int segTimeout) {
         messageControl.setSegTimeout(segTimeout);
     }
-    
     public int getSegTimeout() {
         return messageControl.getSegTimeout();
     }
-    
     public void setSegWindow(int segWindow) {
         messageControl.setSegWindow(segWindow);
     }
-    
     public int getSegWindow() {
         return messageControl.getSegWindow();
     }
-    
     public void setRetries(int retries) {
         messageControl.setRetries(retries);
     }
-    
     public int getRetries() {
         return messageControl.getRetries();
     }
-    
-    public int getMaxReadMultipleReferences() {
-        return maxReadMultipleReferences;
+    public int getMaxReadMultipleReferencesSegmented() {
+        return maxReadMultipleReferencesSegmented;
     }
-
-    public void setMaxReadMultipleReferences(int maxReadMultipleReferences) {
-        this.maxReadMultipleReferences = maxReadMultipleReferences;
+    public void setMaxReadMultipleReferencesSegmented(int maxReadMultipleReferencesSegmented) {
+        this.maxReadMultipleReferencesSegmented = maxReadMultipleReferencesSegmented;
+    }
+    public int getMaxReadMultipleReferencesNonsegmented() {
+        return maxReadMultipleReferencesNonsegmented;
+    }
+    public void setMaxReadMultipleReferencesNonsegmented(int maxReadMultipleReferencesNonsegmented) {
+        this.maxReadMultipleReferencesNonsegmented = maxReadMultipleReferencesNonsegmented;
     }
 
     
@@ -718,10 +734,15 @@ public class LocalDevice implements RequestHandler {
         Map<ObjectIdentifier, List<PropertyReference>> properties;
         PropertyValues propertyValues = new PropertyValues();
         
-        if (refs.size() > 1&& d.getServicesSupported() != null && d.getServicesSupported().isReadPropertyMultiple() &&
-                d.getSegmentationSupported().equals(Segmentation.segmentedBoth) ) {
+        if (refs.size() > 1 && d.getServicesSupported() != null && d.getServicesSupported().isReadPropertyMultiple()) {
+            // Read property multiple can be used. Determine the max references
+            int maxRef = maxReadMultipleReferencesNonsegmented;
+            if (d.getSegmentationSupported().hasTransmitSegmentation())
+                // If the device can transmit segmented, we can probably send a lot more references.
+                maxRef = maxReadMultipleReferencesSegmented;
+            
             // If the device supports read property multiple, send them all at once, or at least in partitions.
-            List<PropertyReferences> partitions = refs.getPropertiesPartitioned(maxReadMultipleReferences);
+            List<PropertyReferences> partitions = refs.getPropertiesPartitioned(maxRef);
             for (PropertyReferences partition : partitions) {
                 properties = partition.getProperties();
                 List<ReadAccessSpecification> specs = new ArrayList<ReadAccessSpecification>();
