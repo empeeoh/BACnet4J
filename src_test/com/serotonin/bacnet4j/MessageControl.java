@@ -1,3 +1,25 @@
+/*
+ * ============================================================================
+ * GNU Lesser General Public License
+ * ============================================================================
+ *
+ * Copyright (C) 2006-2009 Serotonin Software Technologies Inc. http://serotoninsoftware.com
+ * @author Matthew Lohbihler
+ * 
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ * 
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307, USA.
+ */
 package com.serotonin.bacnet4j;
 
 import java.io.IOException;
@@ -11,12 +33,12 @@ import com.serotonin.bacnet4j.exception.BACnetRuntimeException;
 
 public class MessageControl extends Thread {
     // Config
-    private int port;
+    private final int port;
     
     // Runtime
     private byte nextMessageId;
     private DatagramSocket socket;
-    private HashMap<Byte, WaitingRoomMember> waitingRoom = new HashMap<Byte, WaitingRoomMember>();
+    private final HashMap<Byte, WaitingRoomMember> waitingRoom = new HashMap<Byte, WaitingRoomMember>();
     
     public MessageControl(int port) {
         this.port = port;
@@ -27,6 +49,7 @@ public class MessageControl extends Thread {
         start();
     }
     
+    @Override
     public void destroy() {
         if (socket != null)
             socket.close();
@@ -82,6 +105,7 @@ public class MessageControl extends Thread {
     }
     
     // For receiving
+    @Override
     public void run() {
         while (!socket.isClosed()) {
             DatagramPacket p = new DatagramPacket(new byte[10], 10);
@@ -138,9 +162,9 @@ public class MessageControl extends Thread {
     }
     
     public static class Message {
-        private byte messageType;
-        private byte messageId;
-        private byte value;
+        private final byte messageType;
+        private final byte messageId;
+        private final byte value;
         
         public Message(byte messageType, byte messageId, byte value) {
             this.messageType = messageType;
