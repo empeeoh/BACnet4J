@@ -1,3 +1,25 @@
+/*
+ * ============================================================================
+ * GNU Lesser General Public License
+ * ============================================================================
+ *
+ * Copyright (C) 2006-2009 Serotonin Software Technologies Inc. http://serotoninsoftware.com
+ * @author Matthew Lohbihler
+ * 
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ * 
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307, USA.
+ */
 package com.serotonin.bacnet4j.type.primitive;
 
 import java.io.UnsupportedEncodingException;
@@ -21,7 +43,7 @@ public class CharacterString extends Primitive {
     }
     
     private byte encoding;
-    private String value;
+    private final String value;
     
     public CharacterString(String value) {
         encoding = Encodings.ANSI_X3_4;
@@ -63,15 +85,18 @@ public class CharacterString extends Primitive {
         value = decode(encoding, bytes);
     }
     
+    @Override
     public void writeImpl(ByteQueue queue) {
         queue.push(encoding);
         queue.push(encode(encoding, value));
     }
 
+    @Override
     protected long getLength() {
         return encode(encoding, value).length + 1;
     }
 
+    @Override
     protected byte getTypeId() {
         return TYPE_ID;
     }
@@ -142,6 +167,7 @@ public class CharacterString extends Primitive {
         return true;
     }
     
+    @Override
     public String toString() {
         return value;
     }

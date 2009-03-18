@@ -1,3 +1,25 @@
+/*
+ * ============================================================================
+ * GNU Lesser General Public License
+ * ============================================================================
+ *
+ * Copyright (C) 2006-2009 Serotonin Software Technologies Inc. http://serotoninsoftware.com
+ * @author Matthew Lohbihler
+ * 
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ * 
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307, USA.
+ */
 package com.serotonin.bacnet4j.type.eventParameter;
 
 import com.serotonin.bacnet4j.type.constructed.BaseType;
@@ -15,9 +37,9 @@ import com.serotonin.util.queue.ByteQueue;
 public class Extended extends EventParameter {
     public static final byte TYPE_ID = 9;
     
-    private UnsignedInteger vendorId;
-    private UnsignedInteger extendedEventType;
-    private SequenceOf<Parameter> parameters;
+    private final UnsignedInteger vendorId;
+    private final UnsignedInteger extendedEventType;
+    private final SequenceOf<Parameter> parameters;
     
     public Extended(UnsignedInteger vendorId, UnsignedInteger extendedEventType, SequenceOf<Parameter> parameters) {
         this.vendorId = vendorId;
@@ -25,12 +47,14 @@ public class Extended extends EventParameter {
         this.parameters = parameters;
     }
     
+    @Override
     protected void writeImpl(ByteQueue queue) {
         vendorId.write(queue, 0);
         extendedEventType.write(queue, 1);
         parameters.write(queue, 2);
     }
     
+    @Override
     protected int getTypeId() {
         return TYPE_ID;
     }
@@ -75,6 +99,7 @@ public class Extended extends EventParameter {
             this.reference = reference;
         }
 
+        @Override
         public void write(ByteQueue queue) {
             if (primitive != null)
                 primitive.write(queue);

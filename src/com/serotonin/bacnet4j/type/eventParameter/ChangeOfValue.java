@@ -1,3 +1,25 @@
+/*
+ * ============================================================================
+ * GNU Lesser General Public License
+ * ============================================================================
+ *
+ * Copyright (C) 2006-2009 Serotonin Software Technologies Inc. http://serotoninsoftware.com
+ * @author Matthew Lohbihler
+ * 
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ * 
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307, USA.
+ */
 package com.serotonin.bacnet4j.type.eventParameter;
 
 import com.serotonin.bacnet4j.type.primitive.BitString;
@@ -8,7 +30,7 @@ import com.serotonin.util.queue.ByteQueue;
 public class ChangeOfValue extends EventParameter {
     public static final byte TYPE_ID = 2;
     
-    private UnsignedInteger timeDelay;
+    private final UnsignedInteger timeDelay;
     private BitString bitmask;
     private Real referencedPropertyIncrement;
     
@@ -22,6 +44,7 @@ public class ChangeOfValue extends EventParameter {
         this.referencedPropertyIncrement = referencedPropertyIncrement;
     }
 
+    @Override
     protected void writeImpl(ByteQueue queue) {
         timeDelay.write(queue, 0);
         writeContextTag(queue, 1, true);
@@ -32,6 +55,7 @@ public class ChangeOfValue extends EventParameter {
         writeContextTag(queue, 1, false);
     }
 
+    @Override
     protected int getTypeId() {
         return TYPE_ID;
     }

@@ -1,3 +1,25 @@
+/*
+ * ============================================================================
+ * GNU Lesser General Public License
+ * ============================================================================
+ *
+ * Copyright (C) 2006-2009 Serotonin Software Technologies Inc. http://serotoninsoftware.com
+ * @author Matthew Lohbihler
+ * 
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ * 
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307, USA.
+ */
 package com.serotonin.bacnet4j.type.eventParameter;
 
 import com.serotonin.bacnet4j.type.primitive.Real;
@@ -7,10 +29,10 @@ import com.serotonin.util.queue.ByteQueue;
 public class OutOfRange extends EventParameter {
     public static final byte TYPE_ID = 5;
     
-    private UnsignedInteger timeDelay;
-    private Real lowLimit;
-    private Real highLimit;
-    private Real deadband;
+    private final UnsignedInteger timeDelay;
+    private final Real lowLimit;
+    private final Real highLimit;
+    private final Real deadband;
     
     public OutOfRange(UnsignedInteger timeDelay, Real lowLimit, Real highLimit, Real deadband) {
         this.timeDelay = timeDelay;
@@ -19,6 +41,7 @@ public class OutOfRange extends EventParameter {
         this.deadband = deadband;
     }
 
+    @Override
     protected void writeImpl(ByteQueue queue) {
         timeDelay.write(queue, 0);
         lowLimit.write(queue, 1);
@@ -26,6 +49,7 @@ public class OutOfRange extends EventParameter {
         deadband.write(queue, 3);
     }
     
+    @Override
     protected int getTypeId() {
         return TYPE_ID;
     }

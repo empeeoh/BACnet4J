@@ -1,3 +1,25 @@
+/*
+ * ============================================================================
+ * GNU Lesser General Public License
+ * ============================================================================
+ *
+ * Copyright (C) 2006-2009 Serotonin Software Technologies Inc. http://serotoninsoftware.com
+ * @author Matthew Lohbihler
+ * 
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ * 
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307, USA.
+ */
 package com.serotonin.bacnet4j.service.acknowledgement;
 
 import com.serotonin.bacnet4j.exception.BACnetException;
@@ -15,8 +37,8 @@ import com.serotonin.util.queue.ByteQueue;
 public class GetEventInformationAck extends AcknowledgementService {
     public static final byte TYPE_ID = 29;
     
-    private SequenceOf<EventSummary> listOfEventSummaries;
-    private Boolean moreEvents;
+    private final SequenceOf<EventSummary> listOfEventSummaries;
+    private final Boolean moreEvents;
     
     public GetEventInformationAck(SequenceOf<EventSummary> listOfEventSummaries, Boolean moreEvents) {
         this.listOfEventSummaries = listOfEventSummaries;
@@ -40,17 +62,17 @@ public class GetEventInformationAck extends AcknowledgementService {
     }
     
     public static class EventSummary extends BaseType {
-        private ObjectIdentifier objectIdentifier;
-        private EventState eventState;
-        private EventTransitionBits acknowledgedTransitions;
-        private TimeStamp eventTimeStamp1;
-        private TimeStamp eventTimeStamp2;
-        private TimeStamp eventTimeStamp3;
-        private NotifyType notifyType;
-        private EventTransitionBits eventEnable;
-        private UnsignedInteger eventPriorities1;
-        private UnsignedInteger eventPriorities2;
-        private UnsignedInteger eventPriorities3;
+        private final ObjectIdentifier objectIdentifier;
+        private final EventState eventState;
+        private final EventTransitionBits acknowledgedTransitions;
+        private final TimeStamp eventTimeStamp1;
+        private final TimeStamp eventTimeStamp2;
+        private final TimeStamp eventTimeStamp3;
+        private final NotifyType notifyType;
+        private final EventTransitionBits eventEnable;
+        private final UnsignedInteger eventPriorities1;
+        private final UnsignedInteger eventPriorities2;
+        private final UnsignedInteger eventPriorities3;
         
         public EventSummary(ObjectIdentifier objectIdentifier, EventState eventState, 
                 EventTransitionBits acknowledgedTransitions, TimeStamp eventTimeStamp1, TimeStamp eventTimeStamp2, 

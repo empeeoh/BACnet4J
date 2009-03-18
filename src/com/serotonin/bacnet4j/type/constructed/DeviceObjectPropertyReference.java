@@ -1,3 +1,25 @@
+/*
+ * ============================================================================
+ * GNU Lesser General Public License
+ * ============================================================================
+ *
+ * Copyright (C) 2006-2009 Serotonin Software Technologies Inc. http://serotoninsoftware.com
+ * @author Matthew Lohbihler
+ * 
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ * 
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307, USA.
+ */
 package com.serotonin.bacnet4j.type.constructed;
 
 import com.serotonin.bacnet4j.exception.BACnetException;
@@ -7,10 +29,10 @@ import com.serotonin.bacnet4j.type.primitive.UnsignedInteger;
 import com.serotonin.util.queue.ByteQueue;
 
 public class DeviceObjectPropertyReference extends BaseType {
-    private ObjectIdentifier objectIdentifier;  // 0
-    private PropertyIdentifier propertyIdentifier;  // 1
-    private UnsignedInteger propertyArrayIndex;  // 2 optional
-    private ObjectIdentifier deviceIdentifier;  // 3 optional
+    private final ObjectIdentifier objectIdentifier;  // 0
+    private final PropertyIdentifier propertyIdentifier;  // 1
+    private final UnsignedInteger propertyArrayIndex;  // 2 optional
+    private final ObjectIdentifier deviceIdentifier;  // 3 optional
 
     public DeviceObjectPropertyReference(ObjectIdentifier objectIdentifier, PropertyIdentifier propertyIdentifier, 
             UnsignedInteger propertyArrayIndex, ObjectIdentifier deviceIdentifier) {
@@ -20,6 +42,7 @@ public class DeviceObjectPropertyReference extends BaseType {
         this.deviceIdentifier = deviceIdentifier;
     }
 
+    @Override
     public void write(ByteQueue queue) {
         write(queue, objectIdentifier, 0);
         write(queue, propertyIdentifier, 1);

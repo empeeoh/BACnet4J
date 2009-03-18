@@ -1,3 +1,25 @@
+/*
+ * ============================================================================
+ * GNU Lesser General Public License
+ * ============================================================================
+ *
+ * Copyright (C) 2006-2009 Serotonin Software Technologies Inc. http://serotoninsoftware.com
+ * @author Matthew Lohbihler
+ * 
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ * 
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307, USA.
+ */
 package com.serotonin.bacnet4j.apdu;
 
 import com.serotonin.util.queue.ByteQueue;
@@ -9,17 +31,19 @@ public class SimpleACK extends AckAPDU {
      * This parameter shall contain the value of the BACnetConfirmedServiceChoice corresponding to the service 
      * contained in the previous BACnet-Confirmed-Service-Request that has resulted in this acknowledgment.
      */
-    private int serviceAckChoice;
+    private final int serviceAckChoice;
     
     public SimpleACK(byte originalInvokeId, int serviceAckChoice) {
         this.originalInvokeId = originalInvokeId;
         this.serviceAckChoice = serviceAckChoice;
     }
     
+    @Override
     public byte getPduType() {
         return TYPE_ID;
     }
 
+    @Override
     public void write(ByteQueue queue) {
         queue.push(getShiftedTypeId(TYPE_ID));
         queue.push(originalInvokeId);

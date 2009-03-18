@@ -1,3 +1,25 @@
+/*
+ * ============================================================================
+ * GNU Lesser General Public License
+ * ============================================================================
+ *
+ * Copyright (C) 2006-2009 Serotonin Software Technologies Inc. http://serotoninsoftware.com
+ * @author Matthew Lohbihler
+ * 
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ * 
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307, USA.
+ */
 package com.serotonin.bacnet4j.apdu;
 
 import com.serotonin.util.queue.ByteQueue;
@@ -9,7 +31,7 @@ public class SegmentACK extends AckAPDU {
      * This parameter shall be TRUE if the Segment-ACK PDU is being sent to indicate a segment received out of order.
      * Otherwise, it shall be FALSE.
      */
-    private boolean negativeAck;
+    private final boolean negativeAck;
     
     /**
      * This parameter shall be TRUE when the SegmentACK PDU is sent by a server, that is, when the SegmentACK PDU is in
@@ -18,7 +40,7 @@ public class SegmentACK extends AckAPDU {
      * This parameter shall be FALSE when the SegmentACK PDU is sent by a client, that is, when the SegmentACK PDU is 
      * in acknowledgment of a segment or segments of a ComplexACK PDU.
      */
-    private boolean server;
+    private final boolean server;
     
     /**
      * This parameter shall contain the 'sequence-number' of a previously received message segment. It is used to 
@@ -28,14 +50,14 @@ public class SegmentACK extends AckAPDU {
      * requests continuation of the segmented message beginning with the segment whose 'sequence-number' is one plus 
      * the value of this parameter, modulo 256.
      */
-    private int sequenceNumber;
+    private final int sequenceNumber;
     
     /**
      * This parameter shall specify as an unsigned binary integer the number of message segments containing 
      * 'original-invokeID' the sender will accept before sending another SegmentACK. See 5.3 for additional details. 
      * The value of the 'actual-windowsize' shall be in the range 1 - 127.
      */
-    private int actualWindowSize;
+    private final int actualWindowSize;
 
     private boolean expectsResponse;
     
@@ -49,6 +71,7 @@ public class SegmentACK extends AckAPDU {
         this.expectsResponse = expectsResponse;
     }
     
+    @Override
     public byte getPduType() {
         return TYPE_ID;
     }
@@ -65,10 +88,12 @@ public class SegmentACK extends AckAPDU {
         return sequenceNumber;
     }
 
+    @Override
     public boolean isServer() {
         return server;
     }
 
+    @Override
     public void write(ByteQueue queue) {
         queue.push(getShiftedTypeId(TYPE_ID) | (negativeAck ? 2 : 0) | (server ? 1 : 0));
         queue.push(originalInvokeId);
@@ -86,6 +111,7 @@ public class SegmentACK extends AckAPDU {
         actualWindowSize = queue.popU1B();
     }
 
+    @Override
     public String toString() {
         return "SegmentACK(negativeAck="+ negativeAck
                 +", server="+ server
