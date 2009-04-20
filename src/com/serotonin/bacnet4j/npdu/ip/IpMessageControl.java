@@ -420,13 +420,14 @@ public class IpMessageControl extends Thread {
     // For receiving
     @Override
     public void run() {
-        // Create some reusable variables.
-        DatagramPacket p = new DatagramPacket(new byte[MESSAGE_LENGTH], MESSAGE_LENGTH);
+        byte[] buffer = new byte[MESSAGE_LENGTH];
+        DatagramPacket p = new DatagramPacket(buffer, buffer.length);
         
         while (!socket.isClosed()) {
             try {
                 socket.receive(p);
                 incomingExecutorService.execute(new IncomingMessageExecutor(p));
+                p.setData(buffer);
             }
             catch (IOException e) {
                 // no op. This happens if the socket gets closed by the destroy method.
@@ -723,36 +724,43 @@ public class IpMessageControl extends Thread {
     }
     
     // Testing 
-    public static void main(String[] args) throws Exception {
-        IpMessageControl ipMessageControl = new IpMessageControl();
-        IncomingMessageExecutor ime = ipMessageControl.new IncomingMessageExecutor();
-        
-//        String input = "[81,b,0,c,1,20,ff,ff,0,ff,10,8]";
-//        String input = "[81,b,0,14,1,0,10,0,c4,2,0,8,98,22,1,e0,91,0,21,8]";
-        String input = "[81,4,0,23,c0,a8,1,5a,ba,c0,1,8,27,28,6,0,40,ae,0,73,8f,10,0,c4,2,0,9,60,22,1,e0,91,0,21,8]";
-//        String input = "[81,4,0,1e,c0,a8,1,5a,ba,c0,1,8,4e,38,1,3,10,0,c4,2,0,9,63,22,1,e0,91,0,21,8]";
-//        String input = "[81,4,0,1e,c0,a8,1,5a,ba,c0,1,8,4e,36,1,1,10,0,c4,2,0,8,99,22,1,e0,91,0,21,8]";
-//        String input = "[81,4,0,1e,c0,a8,1,5a,ba,c0,1,8,4e,38,1,4,10,0,c4,2,0,9,64,22,1,e0,91,0,21,8]";
-//        String input = "[81,4,0,1e,c0,a8,1,5a,ba,c0,1,8,4e,36,1,2,10,0,c4,2,0,8,9a,22,1,e0,91,0,21,8]";
-//        String input = "[81,b,0,1b,1,28,ff,ff,0,27,28,6,0,40,ae,0,73,8f,fe,10,8,a,9,62,1a,9,62]";
-//        String input = "[81,b,0,1b,1,28,ff,ff,0,27,28,6,0,40,ae,0,73,8f,fe,10,8,a,9,61,1a,9,61]";
-//        String input = "[81,b,0,12,1,88,27,28,6,0,40,ae,0,73,8f,0,9c,58]";
-//        String input = "[81,b,0,2b,1,0,10,4,9,8,19,1,2e,c,2,0,8,98,19,0,29,0,3e,c,0,80,0,2e,19,55,3e,44,42,c8,0,0,3f,5b,4,0,0,3f,2f]";
-//        String input = "[81,b,0,2b,1,0,10,4,9,8,19,1,2e,c,2,0,8,98,19,0,29,0,3e,c,0,80,0,2e,19,55,3e,44,42,c8,0,0,3f,5b,4,0,0,3f,2f]";
-        
-        
-        if (input.startsWith("["))
-            input = input.substring(1);
-        if (input.endsWith("]"))
-            input = input.substring(0, input.length() - 1);
-        String[] parts = input.split(",");
-        byte[] bytes = new byte[parts.length];
-        
-        for (int i=0; i<bytes.length; i++)
-            bytes[i] = (byte)Integer.parseInt(parts[i], 16);
-        
-        ime.queue = new ByteQueue(bytes);
-                
-        ime.runImpl();
+//    public static void main(String[] args) throws Exception {
+//        IpMessageControl ipMessageControl = new IpMessageControl();
+//        IncomingMessageExecutor ime = ipMessageControl.new IncomingMessageExecutor();
+//        
+////        String input = "[81,b,0,c,1,20,ff,ff,0,ff,10,8]";
+////        String input = "[81,b,0,14,1,0,10,0,c4,2,0,8,98,22,1,e0,91,0,21,8]";
+//        String input = "[81,4,0,23,c0,a8,1,5a,ba,c0,1,8,27,28,6,0,40,ae,0,73,8f,10,0,c4,2,0,9,60,22,1,e0,91,0,21,8]";
+////        String input = "[81,4,0,1e,c0,a8,1,5a,ba,c0,1,8,4e,38,1,3,10,0,c4,2,0,9,63,22,1,e0,91,0,21,8]";
+////        String input = "[81,4,0,1e,c0,a8,1,5a,ba,c0,1,8,4e,36,1,1,10,0,c4,2,0,8,99,22,1,e0,91,0,21,8]";
+////        String input = "[81,4,0,1e,c0,a8,1,5a,ba,c0,1,8,4e,38,1,4,10,0,c4,2,0,9,64,22,1,e0,91,0,21,8]";
+////        String input = "[81,4,0,1e,c0,a8,1,5a,ba,c0,1,8,4e,36,1,2,10,0,c4,2,0,8,9a,22,1,e0,91,0,21,8]";
+////        String input = "[81,b,0,1b,1,28,ff,ff,0,27,28,6,0,40,ae,0,73,8f,fe,10,8,a,9,62,1a,9,62]";
+////        String input = "[81,b,0,1b,1,28,ff,ff,0,27,28,6,0,40,ae,0,73,8f,fe,10,8,a,9,61,1a,9,61]";
+////        String input = "[81,b,0,12,1,88,27,28,6,0,40,ae,0,73,8f,0,9c,58]";
+////        String input = "[81,b,0,2b,1,0,10,4,9,8,19,1,2e,c,2,0,8,98,19,0,29,0,3e,c,0,80,0,2e,19,55,3e,44,42,c8,0,0,3f,5b,4,0,0,3f,2f]";
+////        String input = "[81,b,0,2b,1,0,10,4,9,8,19,1,2e,c,2,0,8,98,19,0,29,0,3e,c,0,80,0,2e,19,55,3e,44,42,c8,0,0,3f,5b,4,0,0,3f,2f]";
+//        
+//        
+//        if (input.startsWith("["))
+//            input = input.substring(1);
+//        if (input.endsWith("]"))
+//            input = input.substring(0, input.length() - 1);
+//        String[] parts = input.split(",");
+//        byte[] bytes = new byte[parts.length];
+//        
+//        for (int i=0; i<bytes.length; i++)
+//            bytes[i] = (byte)Integer.parseInt(parts[i], 16);
+//        
+//        ime.queue = new ByteQueue(bytes);
+//                
+//        ime.runImpl();
+//    }
+//    
+    public static void main(String[] args) {
+        long start = System.currentTimeMillis();
+        for (int i=0; i<1000000; i++)
+            new DatagramPacket(new byte[MESSAGE_LENGTH], MESSAGE_LENGTH);
+        System.out.println(""+ (System.currentTimeMillis() - start) +"ms");
     }
 }
