@@ -87,8 +87,11 @@ public class AddListElementRequest extends ConfirmedRequestService {
         
         PropertyValue pv = new PropertyValue(propertyIdentifier, propertyArrayIndex, listOfElements, null);
         if (localDevice.getEventHandler().checkAllowPropertyWrite(obj, pv)) {
-            for (Encodable pr : listOfElements)
-                propList.add(pr);
+            for (Encodable pr : listOfElements) {
+                if (!propList.contains(pr))
+                    propList.add(pr);
+            }
+            
             localDevice.getEventHandler().propertyWritten(obj, pv);
         }
         else
@@ -96,7 +99,7 @@ public class AddListElementRequest extends ConfirmedRequestService {
         
         return null;
     }
-
+    
     private BACnetErrorException createException(ErrorClass errorClass, ErrorCode errorCode,
             UnsignedInteger firstFailedElementNumber) {
         return new BACnetErrorException(new ChangeListError(getChoiceId(),
