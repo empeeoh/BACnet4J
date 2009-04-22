@@ -79,6 +79,7 @@ public class IpMessageControl extends Thread {
     
     // Config
     private int port;
+    private String localBindAddress = "0.0.0.0";
     private String broadcastAddress = "255.255.255.255";
     private int timeout = 5000;
     private int segTimeout = 1000;
@@ -95,62 +96,55 @@ public class IpMessageControl extends Thread {
     public RequestHandler getRequestHandler() {
         return requestHandler;
     }
-
     public void setRequestHandler(RequestHandler requestHandler) {
         this.requestHandler = requestHandler;
     }
-
     public void setPort(int port) {
         this.port = port;
     }
-    
     public int getPort() {
         return port;
     }
-
+    public String getLocalBindAddress() {
+        return localBindAddress;
+    }
+    public void setLocalBindAddress(String localBindAddress) {
+        this.localBindAddress = localBindAddress;
+    }
     public void setBroadcastAddress(String  broadcastAddress) {
         this.broadcastAddress = broadcastAddress;
     }
-
     public String getBroadcastAddress() {
         return broadcastAddress;
     }
-
     public void setTimeout(int timeout) {
         this.timeout = timeout;
     }
-    
     public int getTimeout() {
         return timeout;
     }
-
     public void setSegTimeout(int segTimeout) {
         this.segTimeout = segTimeout;
     }
-
     public int getSegTimeout() {
         return segTimeout;
     }
-
     public void setRetries(int retries) {
         this.retries = retries;
     }
-    
     public int getRetries() {
         return retries;
     }
-
     public void setSegWindow(int segWindow) {
         this.segWindow = segWindow;
     }
-
     public int getSegWindow() {
         return segWindow;
     }
 
     public void initialize() throws IOException {
         incomingExecutorService = Executors.newCachedThreadPool();
-        socket = new DatagramSocket(port);
+        socket = new DatagramSocket(port, InetAddress.getByName(localBindAddress));
         start();
     }
     
