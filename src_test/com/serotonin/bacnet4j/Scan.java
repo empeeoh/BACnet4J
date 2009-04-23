@@ -55,8 +55,8 @@ public class Scan {
         }
         
         byte[] ip = new byte[4];
-        ip[0] = (byte)1; // A
-        ip[1] = (byte)163; // B
+        ip[0] = (byte)192; // A
+        ip[1] = (byte)168; // B
         ip[2] = (byte)0; // C
         ip[3] = (byte)0; // D
         
