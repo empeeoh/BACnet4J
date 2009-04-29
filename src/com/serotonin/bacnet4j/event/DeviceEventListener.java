@@ -56,7 +56,7 @@ public interface DeviceEventListener {
      * Allow a listener to veto an attempt by another device to write a property in a local object.
      * @param obj
      * @param pv
-     * @return
+     * @return true if the write should be allowed.
      */
     boolean allowPropertyWrite(BACnetObject obj, PropertyValue pv);
     
@@ -78,7 +78,7 @@ public interface DeviceEventListener {
      * Notification of either an UnconfirmedCovNotificationRequest or a ConfirmedCovNotificationRequest. The latter
      * will be automatically confirmed by the service handler.
      * @param subscriberProcessIdentifier
-     * @param initiatingDeviceIdentifier
+     * @param initiatingDevice
      * @param monitoredObjectIdentifier
      * @param timeRemaining
      * @param listOfValues
@@ -91,7 +91,7 @@ public interface DeviceEventListener {
      * Notification of either an UnconfirmedEventNotificationRequest or a ConfirmedEventNotificationRequest. The latter
      * will be automatically confirmed by the service handler.
      * @param processIdentifier
-     * @param initiatingDeviceIdentifier
+     * @param initiatingDevice
      * @param eventObjectIdentifier
      * @param timeStamp
      * @param notificationClass
