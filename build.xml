@@ -41,4 +41,13 @@
       </fileset>
     </zip>
   </target>
+
+  <target name="doc-zip" description="Create a jar file of the javadocs">
+    <delete file="bacnet4J-doc.zip"/>
+    <zip destfile="bacnet4J-doc.zip">
+      <fileset dir="javadoc">
+        <include name="**/*"/>
+      </fileset>
+    </zip>
+  </target>
 </project>
