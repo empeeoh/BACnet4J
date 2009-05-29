@@ -42,21 +42,30 @@ public class PropertyValues implements Iterable<ObjectPropertyReference> {
         values.put(new ObjectPropertyReference(oid, pid, pin), value);
     }
     
-    public Encodable getNoErrorCheck(ObjectIdentifier oid, PropertyReference ref) {
-        return values.get(new ObjectPropertyReference(oid, ref.getPropertyIdentifier(), ref.getPropertyArrayIndex()));
+    public Encodable getNoErrorCheck(ObjectPropertyReference opr) {
+        return values.get(opr);
     }
     
-    public Encodable getNoErrorCheck(ObjectIdentifier oid, PropertyIdentifier pid) {
-        return values.get(new ObjectPropertyReference(oid, pid));
-    }
-    
-    public Encodable get(ObjectIdentifier oid, PropertyIdentifier pid) throws PropertyValueException {
-        Encodable e = getNoErrorCheck(oid, pid);
+    public Encodable get(ObjectPropertyReference opr) throws PropertyValueException {
+        Encodable e = getNoErrorCheck(opr);
         
         if (e instanceof BACnetError)
             throw new PropertyValueException((BACnetError)e);
         
         return e;
+    }
+    
+    public Encodable getNoErrorCheck(ObjectIdentifier oid, PropertyReference ref) {
+        return getNoErrorCheck(
+                new ObjectPropertyReference(oid, ref.getPropertyIdentifier(), ref.getPropertyArrayIndex()));
+    }
+    
+    public Encodable getNoErrorCheck(ObjectIdentifier oid, PropertyIdentifier pid) {
+        return getNoErrorCheck(new ObjectPropertyReference(oid, pid));
+    }
+    
+    public Encodable get(ObjectIdentifier oid, PropertyIdentifier pid) throws PropertyValueException {
+        return get(new ObjectPropertyReference(oid, pid));
     }
     
     public String getString(ObjectIdentifier oid, PropertyIdentifier pid) {
