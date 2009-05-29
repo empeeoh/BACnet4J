@@ -37,7 +37,7 @@ public class PriorityArray extends SequenceOf<PriorityValue> {
         super(priorityValues);
     }
 
-    public PriorityArray(ByteQueue queue) throws BACnetException {
-        super(queue, PriorityValue.class);
+    public PriorityArray(ByteQueue queue, int contextId) throws BACnetException {
+        super(queue, PriorityValue.class, contextId);
     }
 }
