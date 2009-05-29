@@ -67,7 +67,13 @@ public class ObjectCovSubscription {
     }
     
     public static boolean sendCovNotification(ObjectType objectType, PropertyIdentifier pid) {
-        return supportedObjectType(objectType) && supportedPropertyIdentifiers.contains(pid);
+        if (!supportedObjectType(objectType))
+            return false;
+        
+        if (pid != null && !supportedPropertyIdentifiers.contains(pid))
+            return false;
+        
+        return true;
     }
     
     

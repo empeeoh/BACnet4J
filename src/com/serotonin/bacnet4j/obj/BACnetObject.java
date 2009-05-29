@@ -246,6 +246,11 @@ public class BACnetObject {
             boolean confirmed = issueConfirmedNotifications.booleanValue();
             
             if (sub == null) {
+                // Ensure that this object is valid for COV notifications.
+                if (!ObjectCovSubscription.sendCovNotification(id.getObjectType(), null))
+                    throw new BACnetServiceException(ErrorClass.services, ErrorCode.covSubscriptionFailed,
+                            "Object is invalid for COV notifications");
+                
                 if (confirmed) {
                     // If the peer wants confirmed notifications, it must be in the remote device list.
                     RemoteDevice d = localDevice.getRemoteDevice(from);
