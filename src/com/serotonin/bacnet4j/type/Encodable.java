@@ -225,7 +225,22 @@ abstract public class Encodable {
         popEnd(queue, contextId);
         return result;
     }
-    
+
+    protected static <T extends Encodable> T readSequenceType(ByteQueue queue, Class<T> clazz, int contextId)
+            throws BACnetException {
+        popStart(queue, contextId);
+        T result;
+        try {
+            result = clazz.getConstructor(new Class[] {ByteQueue.class, Integer.TYPE}).newInstance(
+                    new Object[] {queue, contextId});
+        }
+        catch (Exception e) {
+            throw new BACnetException(e);
+        }
+        popEnd(queue, contextId);
+        return result;
+    }
+
     protected static <T extends Encodable> SequenceOf<T> readOptionalSequenceOf(ByteQueue queue, Class<T> clazz, 
             int contextId) throws BACnetException {
         if (readStart(queue) != contextId)
@@ -259,6 +274,8 @@ abstract public class Encodable {
             throw new BACnetErrorException(ErrorClass.property, ErrorCode.propertyIsNotAList);
         if (propertyArrayIndex == null && def.isSequence())
             return readSequenceOf(queue, def.getClazz(), contextId);
+        if (propertyArrayIndex == null && SequenceOf.class.isAssignableFrom(def.getClazz()))
+            return readSequenceType(queue, def.getClazz(), contextId);
         
         return readWrapped(queue, def.getClazz(), contextId);
     }
