@@ -26,14 +26,11 @@ import java.util.List;
 
 import com.serotonin.bacnet4j.LocalDevice;
 import com.serotonin.bacnet4j.RemoteDevice;
-import com.serotonin.bacnet4j.type.constructed.Address;
+import com.serotonin.bacnet4j.service.unconfirmed.WhoIsRequest;
 import com.serotonin.bacnet4j.type.constructed.SequenceOf;
 import com.serotonin.bacnet4j.type.enumerated.ObjectType;
 import com.serotonin.bacnet4j.type.enumerated.PropertyIdentifier;
-import com.serotonin.bacnet4j.type.enumerated.Segmentation;
 import com.serotonin.bacnet4j.type.primitive.ObjectIdentifier;
-import com.serotonin.bacnet4j.type.primitive.OctetString;
-import com.serotonin.bacnet4j.type.primitive.UnsignedInteger;
 import com.serotonin.bacnet4j.util.PropertyReferences;
 
 /**
@@ -46,15 +43,15 @@ public class DiscoveryTest {
         localDevice.initialize();
         
         // Who is
-        //localDevice.sendBroadcast(new WhoIsRequest(null, null));
+        localDevice.sendBroadcast(2068, new WhoIsRequest(null, null));
 //        localDevice.sendUnconfirmed(
 //                new Address(new UnsignedInteger(47808), new OctetString(new byte[] {(byte)206, (byte)210, 100, (byte)134})), 
 //                new WhoIsRequest(new UnsignedInteger(105), new UnsignedInteger(105)));
-        RemoteDevice rd = new RemoteDevice(105, new Address(new UnsignedInteger(47808), 
-                new OctetString(new byte[] {(byte)206, (byte)210, 100, (byte)134})), null);
-        rd.setSegmentationSupported(Segmentation.segmentedBoth);
-        rd.setMaxAPDULengthAccepted(1476);
-        localDevice.addRemoteDevice(rd);
+//        RemoteDevice rd = new RemoteDevice(105, new Address(new UnsignedInteger(47808), 
+//                new OctetString(new byte[] {(byte)206, (byte)210, 100, (byte)134})), null);
+//        rd.setSegmentationSupported(Segmentation.segmentedBoth);
+//        rd.setMaxAPDULengthAccepted(1476);
+//        localDevice.addRemoteDevice(rd);
         
         // Wait a bit for responses to come in.
         Thread.sleep(1000);

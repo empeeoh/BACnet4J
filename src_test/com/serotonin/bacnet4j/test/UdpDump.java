@@ -26,8 +26,6 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetSocketAddress;
 
-import com.serotonin.util.ArrayUtils;
-
 public class UdpDump {
     public static void main(String args[]) throws Exception {
         int port = 0xbac0;
@@ -64,8 +62,9 @@ public class UdpDump {
             packet = new DatagramPacket(new byte[1497], 1497);
             socket.receive(packet);
             
-            System.out.println(packet.getAddress() +":"+ packet.getPort() +", length="+ packet.getLength());
-            System.out.println(ArrayUtils.toHexString(packet.getData(), packet.getOffset(), packet.getLength()));
+            //System.out.println(packet.getAddress() +":"+ packet.getPort() +", length="+ packet.getLength());
+            //System.out.println(ArrayUtils.toHexString(packet.getData(), packet.getOffset(), packet.getLength()));
+            System.out.println(new String(packet.getData()));
         }
     }
 }
