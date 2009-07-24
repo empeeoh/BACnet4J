@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.serotonin.bacnet4j.exception.BACnetServiceException;
+import com.serotonin.bacnet4j.type.AmbiguousValue;
 import com.serotonin.bacnet4j.type.Encodable;
 import com.serotonin.bacnet4j.type.constructed.AccumulatorRecord;
 import com.serotonin.bacnet4j.type.constructed.ActionList;
@@ -771,11 +772,11 @@ public class ObjectProperties {
         add(ObjectType.schedule, PropertyIdentifier.objectIdentifier, ObjectIdentifier.class, false, true, new ObjectIdentifier(ObjectType.schedule, 0x3fffff));
         add(ObjectType.schedule, PropertyIdentifier.objectName, CharacterString.class, false, true, null);
         add(ObjectType.schedule, PropertyIdentifier.objectType, ObjectType.class, false, true, ObjectType.schedule);
-        add(ObjectType.schedule, PropertyIdentifier.presentValue, Encodable.class, false, true, null);
+        add(ObjectType.schedule, PropertyIdentifier.presentValue, AmbiguousValue.class, false, true, null);
         add(ObjectType.schedule, PropertyIdentifier.description, CharacterString.class, false, false, null);
         add(ObjectType.schedule, PropertyIdentifier.effectivePeriod, DateRange.class, false, true, null);
         add(ObjectType.schedule, PropertyIdentifier.weeklySchedule, DailySchedule.class, true, false, null);
-        add(ObjectType.schedule, PropertyIdentifier.scheduleDefault, Encodable.class, false, true, null);
+        add(ObjectType.schedule, PropertyIdentifier.scheduleDefault, AmbiguousValue.class, false, true, null);
         add(ObjectType.schedule, PropertyIdentifier.exceptionSchedule, SpecialEvent.class, true, false, null);
         add(ObjectType.schedule, PropertyIdentifier.listOfObjectPropertyReferences, DeviceObjectPropertyReference.class, true, true, null);
         add(ObjectType.schedule, PropertyIdentifier.priorityForWriting, UnsignedInteger.class, false, true, null);
