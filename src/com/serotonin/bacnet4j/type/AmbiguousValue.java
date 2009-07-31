@@ -5,7 +5,13 @@ import com.serotonin.bacnet4j.type.primitive.Boolean;
 import com.serotonin.util.queue.ByteQueue;
 
 public class AmbiguousValue extends Encodable {
-    private ByteQueue data = new ByteQueue();
+    private final ByteQueue data = new ByteQueue();
+    
+    public AmbiguousValue(ByteQueue queue) throws BACnetException {
+        TagData tagData = new TagData();
+        peekTagData(queue, tagData);
+        readAmbiguousData(queue, tagData);
+    }
     
     public AmbiguousValue(ByteQueue queue, int contextId) throws BACnetException {
         popStart(queue, contextId);
@@ -22,10 +28,12 @@ public class AmbiguousValue extends Encodable {
         popEnd(queue, contextId);
     }
 
+    @Override
     public void write(ByteQueue queue, int contextId) {
         throw new RuntimeException("Don't write ambigous values, convert to actual types first");
     }
 
+    @Override
     public void write(ByteQueue queue) {
         throw new RuntimeException("Don't write ambigous values, convert to actual types first");
     }
@@ -64,6 +72,7 @@ public class AmbiguousValue extends Encodable {
         }
     }
     
+    @Override
     public String toString() {
         return "Ambiguous("+ data +")";
     }
