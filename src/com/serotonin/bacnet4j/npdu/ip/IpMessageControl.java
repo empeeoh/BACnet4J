@@ -145,6 +145,7 @@ public class IpMessageControl extends Thread {
     public void initialize() throws IOException {
         incomingExecutorService = Executors.newCachedThreadPool();
         socket = new DatagramSocket(port, InetAddress.getByName(localBindAddress));
+        socket.setBroadcast(true);
         start();
     }
     
