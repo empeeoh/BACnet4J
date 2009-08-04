@@ -34,11 +34,11 @@ public class SetpointReference extends BaseType {
 
     @Override
     public void write(ByteQueue queue) {
-        writeOptional(queue, setpointReference);
+        writeOptional(queue, setpointReference, 0);
     }
     
     public SetpointReference(ByteQueue queue) throws BACnetException {
-        setpointReference = read(queue, ObjectPropertyReference.class);
+        setpointReference = readOptional(queue, ObjectPropertyReference.class, 0);
     }
 
     @Override
