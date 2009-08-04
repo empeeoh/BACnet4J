@@ -160,7 +160,11 @@ abstract public class Encodable {
         type.write(queue);
     }
     
+    @SuppressWarnings("unchecked")
     protected static <T extends Encodable> T read(ByteQueue queue, Class<T> clazz) throws BACnetException {
+        if (clazz == Primitive.class)
+            return (T)Primitive.createPrimitive(queue);
+        
         try {
             return clazz.getConstructor(new Class[] {ByteQueue.class}).newInstance(new Object[] {queue});
         }
@@ -279,21 +283,6 @@ abstract public class Encodable {
         
         return readWrapped(queue, def.getClazz(), contextId);
     }
-    
-//    protected static Encodable readEncodable(ByteQueue queue, ObjectType objectType, 
-//            PropertyIdentifier propertyIdentifier, int contextId) throws BACnetException {
-//        if (!matchNonEndTag(queue, contextId))
-//            throw new BACnetErrorException(ErrorClass.property, ErrorCode.missingRequiredParameter);
-//        
-//        PropertyTypeDefinition def = ObjectProperties.getPropertyTypeDefinition(objectType, propertyIdentifier);
-//        if (def == null)
-//            return new AmbiguousValue(queue, contextId);
-//        
-//        if (def.isSequence())
-//            return readSequenceOf(queue, def.getClazz(), contextId);
-//        else
-//            return readWrapped(queue, def.getClazz(), contextId);
-//    }
     
     protected static Encodable readOptionalEncodable(ByteQueue queue, ObjectType objectType, 
             PropertyIdentifier propertyIdentifier, int contextId) throws BACnetException {
