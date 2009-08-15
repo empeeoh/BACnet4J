@@ -25,6 +25,7 @@ package com.serotonin.bacnet4j.type.constructed;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
 
 import com.serotonin.bacnet4j.exception.BACnetException;
 import com.serotonin.bacnet4j.type.Encodable;
@@ -98,6 +99,26 @@ public class SequenceOf<E extends Encodable> extends BaseType implements Iterabl
         // Trim null values at the end.
         while (!values.isEmpty() && values.get(values.size() - 1) == null)
             values.remove(values.size() - 1);
+    }
+    
+    public void remove(E value) {
+        if (value == null)
+            return;
+        
+        for (int i=0; i<values.size(); i++) {
+            if (ObjectUtils.isEqual(values.get(i), value)) {
+                remove(i+1);
+                break;
+            }
+        }
+    }
+    
+    public void removeAll(E value) {
+        for (ListIterator<E> it = values.listIterator(); it.hasNext(); ) {
+            E e = it.next();
+            if (ObjectUtils.isEqual(e, value))
+                it.remove();
+        }
     }
     
     public boolean contains(E value) {
