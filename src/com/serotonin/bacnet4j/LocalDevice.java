@@ -369,7 +369,7 @@ public class LocalDevice implements RequestHandler {
             throw new BACnetServiceException(ErrorClass.object, ErrorCode.unknownObject);
         
         // Remove the reference in the device's object list for this id.
-        getObjectList().add(id);
+        getObjectList().remove(id);
     }
     
     @SuppressWarnings("unchecked")
