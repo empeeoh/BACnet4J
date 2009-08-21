@@ -67,6 +67,7 @@ import com.serotonin.bacnet4j.type.Encodable;
 import com.serotonin.bacnet4j.type.constructed.Address;
 import com.serotonin.bacnet4j.type.constructed.Destination;
 import com.serotonin.bacnet4j.type.constructed.EventTransitionBits;
+import com.serotonin.bacnet4j.type.constructed.ObjectPropertyReference;
 import com.serotonin.bacnet4j.type.constructed.ObjectTypesSupported;
 import com.serotonin.bacnet4j.type.constructed.PropertyReference;
 import com.serotonin.bacnet4j.type.constructed.ReadAccessResult;
@@ -94,6 +95,7 @@ import com.serotonin.bacnet4j.type.primitive.UnsignedInteger;
 import com.serotonin.bacnet4j.util.PropertyReferences;
 import com.serotonin.bacnet4j.util.PropertyValues;
 import com.serotonin.util.ObjectUtils;
+import com.serotonin.util.Tuple;
 
 /**
  * Enhancements:
@@ -734,6 +736,30 @@ public class LocalDevice implements RequestHandler {
         PropertyValues values = readProperties(d, properties);
         
         d.setName(values.getString(d.getObjectIdentifier(), PropertyIdentifier.objectName));
+    }
+    
+    /**
+     * This version of the readProperties method will preserve the order of properties given in the list in the results.
+     * @param d the device to which to send the request
+     * @param oprs the list of property references to request
+     * @return a list of the original property reference objects wrapped with their values
+     * @throws BACnetException
+     */
+    public List<Tuple<ObjectPropertyReference, Encodable>> readProperties(RemoteDevice d,
+            List<ObjectPropertyReference> oprs) throws BACnetException {
+        PropertyReferences refs = new PropertyReferences();
+        for (ObjectPropertyReference opr : oprs)
+            refs.add(opr.getObjectIdentifier(), opr.getPropertyIdentifier());
+        
+        PropertyValues pvs = readProperties(d, refs);
+
+        // Read the properties in the same order.
+        List<Tuple<ObjectPropertyReference, Encodable>> results = 
+            new ArrayList<Tuple<ObjectPropertyReference,Encodable>>();
+        for (ObjectPropertyReference opr : oprs)
+            results.add(new Tuple<ObjectPropertyReference, Encodable>(opr, pvs.getNoErrorCheck(opr)));
+        
+        return results;
     }
 
     public PropertyValues readProperties(RemoteDevice d, PropertyReferences refs) throws BACnetException {
