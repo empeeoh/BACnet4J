@@ -64,6 +64,26 @@ public class SpecialEvent extends BaseType {
         write(queue, eventPriority, 3);
     }
     
+    public boolean isCalendarReference() {
+        return calendar.getContextId() == 1;
+    }
+    
+    public CalendarEntry getCalendarEntry() {
+        return (CalendarEntry)calendar.getDatum();
+    }
+    
+    public ObjectIdentifier getCalendarReference() {
+        return (ObjectIdentifier)calendar.getDatum();
+    }
+    
+    public SequenceOf<TimeValue> getListOfTimeValues() {
+        return listOfTimeValues;
+    }
+
+    public UnsignedInteger getEventPriority() {
+        return eventPriority;
+    }
+
     public SpecialEvent(ByteQueue queue) throws BACnetException {
         calendar = new Choice(queue, classes);
         listOfTimeValues = readSequenceOf(queue, TimeValue.class, 2);

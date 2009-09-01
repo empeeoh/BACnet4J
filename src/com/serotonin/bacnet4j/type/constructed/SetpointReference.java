@@ -41,6 +41,10 @@ public class SetpointReference extends BaseType {
         setpointReference = readOptional(queue, ObjectPropertyReference.class, 0);
     }
 
+    public ObjectPropertyReference getSetpointReference() {
+        return setpointReference;
+    }
+
     @Override
     public int hashCode() {
         final int PRIME = 31;

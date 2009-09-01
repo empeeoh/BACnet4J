@@ -60,6 +60,14 @@ public class ClientCov extends BaseType {
             throw new BACnetErrorException(ErrorClass.property, ErrorCode.invalidParameterDataType);
     }
 
+    public Real getRealIncrement() {
+        return realIncrement;
+    }
+
+    public Null getDefaultIncrement() {
+        return defaultIncrement;
+    }
+
     @Override
     public int hashCode() {
         final int PRIME = 31;

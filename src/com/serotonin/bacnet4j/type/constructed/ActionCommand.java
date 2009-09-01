@@ -81,6 +81,42 @@ public class ActionCommand extends BaseType {
         writeSuccessful = read(queue, Boolean.class, 8);
     }
 
+    public ObjectIdentifier getDeviceIdentifier() {
+        return deviceIdentifier;
+    }
+
+    public ObjectIdentifier getObjectIdentifier() {
+        return objectIdentifier;
+    }
+
+    public PropertyIdentifier getPropertyIdentifier() {
+        return propertyIdentifier;
+    }
+
+    public UnsignedInteger getPropertyArrayIndex() {
+        return propertyArrayIndex;
+    }
+
+    public Encodable getPropertyValue() {
+        return propertyValue;
+    }
+
+    public UnsignedInteger getPriority() {
+        return priority;
+    }
+
+    public UnsignedInteger getPostDelay() {
+        return postDelay;
+    }
+
+    public Boolean getQuitOnFailure() {
+        return quitOnFailure;
+    }
+
+    public Boolean getWriteSuccessful() {
+        return writeSuccessful;
+    }
+
     @Override
     public int hashCode() {
         final int PRIME = 31;

@@ -50,6 +50,18 @@ public class VtSession extends BaseType {
         remoteVtAddress = read(queue, Address.class);
     }
 
+    public UnsignedInteger getLocalVtSessionId() {
+        return localVtSessionId;
+    }
+
+    public UnsignedInteger getRemoteVtSessionId() {
+        return remoteVtSessionId;
+    }
+
+    public Address getRemoteVtAddress() {
+        return remoteVtAddress;
+    }
+
     @Override
     public int hashCode() {
         final int PRIME = 31;

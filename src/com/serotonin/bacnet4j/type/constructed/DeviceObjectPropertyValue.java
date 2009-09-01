@@ -62,6 +62,26 @@ public class DeviceObjectPropertyValue extends BaseType {
         value = readEncodable(queue, objectIdentifier.getObjectType(), propertyIdentifier, null, 4);
     }
 
+    public ObjectIdentifier getDeviceIdentifier() {
+        return deviceIdentifier;
+    }
+
+    public ObjectIdentifier getObjectIdentifier() {
+        return objectIdentifier;
+    }
+
+    public PropertyIdentifier getPropertyIdentifier() {
+        return propertyIdentifier;
+    }
+
+    public UnsignedInteger getArrayIndex() {
+        return arrayIndex;
+    }
+
+    public Encodable getValue() {
+        return value;
+    }
+
     @Override
     public int hashCode() {
         final int PRIME = 31;

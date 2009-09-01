@@ -72,6 +72,22 @@ public class AccumulatorRecord extends BaseType {
         }
     }
 
+    public DateTime getTimestamp() {
+        return timestamp;
+    }
+
+    public UnsignedInteger getPresentValue() {
+        return presentValue;
+    }
+
+    public UnsignedInteger getAccumulatedValue() {
+        return accumulatedValue;
+    }
+
+    public AccumulatorStatus getAccumulatorStatus() {
+        return accumulatorStatus;
+    }
+
     @Override
     public int hashCode() {
         final int PRIME = 31;

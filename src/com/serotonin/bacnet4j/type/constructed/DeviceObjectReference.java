@@ -46,6 +46,14 @@ public class DeviceObjectReference extends BaseType {
         objectIdentifier = read(queue, ObjectIdentifier.class, 1);
     }
 
+    public ObjectIdentifier getDeviceIdentifier() {
+        return deviceIdentifier;
+    }
+
+    public ObjectIdentifier getObjectIdentifier() {
+        return objectIdentifier;
+    }
+
     @Override
     public int hashCode() {
         final int PRIME = 31;

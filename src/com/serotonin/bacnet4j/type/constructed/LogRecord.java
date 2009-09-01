@@ -119,6 +119,62 @@ public class LogRecord extends BaseType {
         writeOptional(queue, statusFlags, 2);
     }
     
+    public DateTime getTimestamp() {
+        return timestamp;
+    }
+
+    public StatusFlags getStatusFlags() {
+        return statusFlags;
+    }
+    
+    public LogStatus getLogStatus() {
+        return (LogStatus)choice.getDatum();
+    }
+    
+    public Boolean getBoolean() {
+        return (Boolean)choice.getDatum();
+    }
+    
+    public Real getReal() {
+        return (Real)choice.getDatum();
+    }
+    
+    public Real getTimeChange() {
+        return (Real)choice.getDatum();
+    }
+    
+    public Enumerated getEnumerated() {
+        return (Enumerated)choice.getDatum();
+    }
+    
+    public UnsignedInteger getUnsignedInteger() {
+        return (UnsignedInteger)choice.getDatum();
+    }
+    
+    public SignedInteger getSignedInteger() {
+        return (SignedInteger)choice.getDatum();
+    }
+    
+    public BitString getBitString() {
+        return (BitString)choice.getDatum();
+    }
+    
+    public Null getNull() {
+        return (Null)choice.getDatum();
+    }
+    
+    public BACnetError getBACnetError() {
+        return (BACnetError)choice.getDatum();
+    }
+    
+    public BaseType getBaseType() {
+        return (BaseType)choice.getDatum();
+    }
+    
+    public int getChoiceType() {
+        return choice.getContextId();
+    }
+
     public LogRecord(ByteQueue queue) throws BACnetException {
         timestamp = read(queue, DateTime.class, 0);
         choice = new Choice(queue, classes, 1);

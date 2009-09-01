@@ -46,6 +46,14 @@ public class SessionKey extends BaseType {
         peerAddress = read(queue, Address.class);
     }
 
+    public OctetString getSessionKey() {
+        return sessionKey;
+    }
+
+    public Address getPeerAddress() {
+        return peerAddress;
+    }
+
     @Override
     public int hashCode() {
         final int PRIME = 31;

@@ -46,6 +46,14 @@ public class Prescale extends BaseType {
         moduloDivide = read(queue, UnsignedInteger.class, 1);
     }
 
+    public UnsignedInteger getMultiplier() {
+        return multiplier;
+    }
+
+    public UnsignedInteger getModuloDivide() {
+        return moduloDivide;
+    }
+
     @Override
     public int hashCode() {
         final int PRIME = 31;

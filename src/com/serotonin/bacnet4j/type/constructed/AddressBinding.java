@@ -46,6 +46,14 @@ public class AddressBinding extends BaseType {
         deviceAddress = read(queue, Address.class);
     }
 
+    public ObjectIdentifier getDeviceObjectIdentifier() {
+        return deviceObjectIdentifier;
+    }
+
+    public Address getDeviceAddress() {
+        return deviceAddress;
+    }
+
     @Override
     public int hashCode() {
         final int PRIME = 31;

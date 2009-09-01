@@ -46,6 +46,14 @@ public class RecipientProcess extends BaseType {
         processIdentifier = read(queue, UnsignedInteger.class, 1);
     }
 
+    public Recipient getRecipient() {
+        return recipient;
+    }
+
+    public UnsignedInteger getProcessIdentifier() {
+        return processIdentifier;
+    }
+
     @Override
     public int hashCode() {
         final int PRIME = 31;

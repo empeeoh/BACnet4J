@@ -57,6 +57,18 @@ public class Scale extends BaseType {
     public Scale(ByteQueue queue) throws BACnetException {
         scale = new Choice(queue, classes);
     }
+    
+    public boolean isReal() {
+        return scale.getContextId() == 0;
+    }
+    
+    public Real getReal() {
+        return (Real)scale.getDatum();
+    }
+
+    public SignedInteger getSignedInteger() {
+        return (SignedInteger)scale.getDatum();
+    }
 
     @Override
     public int hashCode() {

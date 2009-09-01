@@ -60,6 +60,26 @@ public class PriorityValue extends BaseType {
     public PriorityValue(BaseType constructedValue) {
         this.constructedValue = constructedValue;
     }
+    
+    public Null getNullValue() {
+        return nullValue;
+    }
+
+    public Real getRealValue() {
+        return realValue;
+    }
+
+    public BinaryPV getBinaryValue() {
+        return binaryValue;
+    }
+
+    public UnsignedInteger getIntegerValue() {
+        return integerValue;
+    }
+
+    public Encodable getConstructedValue() {
+        return constructedValue;
+    }
 
     @Override
     public void write(ByteQueue queue) {

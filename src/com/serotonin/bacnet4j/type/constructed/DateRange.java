@@ -46,6 +46,14 @@ public class DateRange extends BaseType {
         endDate = read(queue, Date.class);
     }
 
+    public Date getStartDate() {
+        return startDate;
+    }
+
+    public Date getEndDate() {
+        return endDate;
+    }
+
     @Override
     public int hashCode() {
         final int PRIME = 31;

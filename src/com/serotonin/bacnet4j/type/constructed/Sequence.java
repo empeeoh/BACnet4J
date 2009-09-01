@@ -33,7 +33,7 @@ import com.serotonin.bacnet4j.type.SequenceDefinition.ElementSpecification;
 import com.serotonin.util.queue.ByteQueue;
 
 public class Sequence extends BaseType {
-    private SequenceDefinition definition;
+    private final SequenceDefinition definition;
     private final Map<String, Encodable> values;
     
     public Sequence(SequenceDefinition definition, Map<String, Encodable> values) {
@@ -61,6 +61,7 @@ public class Sequence extends BaseType {
     }
     
     public Sequence(SequenceDefinition definition, ByteQueue queue) throws BACnetException {
+        this.definition = definition;
         values = new HashMap<String, Encodable>();
         List<ElementSpecification> specs = definition.getElements();
         for (int i=0; i<specs.size(); i++) {
@@ -82,6 +83,14 @@ public class Sequence extends BaseType {
             else
                 values.put(spec.getId(), read(queue, spec.getClazz()));
         }
+    }
+
+    public SequenceDefinition getDefinition() {
+        return definition;
+    }
+
+    public Map<String, Encodable> getValues() {
+        return values;
     }
 
     @Override

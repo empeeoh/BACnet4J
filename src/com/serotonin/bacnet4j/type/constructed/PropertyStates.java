@@ -85,6 +85,14 @@ public class PropertyStates extends BaseType {
     public PropertyStates(int type, BaseType state) {
         this.state = new Choice(type, state);
     }
+    
+    public int getType() {
+        return state.getContextId();
+    }
+    
+    public BaseType getState() {
+        return (BaseType)state.getDatum();
+    }
 
     @Override
     public void write(ByteQueue queue) {

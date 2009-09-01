@@ -47,6 +47,14 @@ public class TimeValue extends BaseType {
         value = read(queue, Primitive.class);
     }
 
+    public Time getTime() {
+        return time;
+    }
+
+    public Primitive getValue() {
+        return value;
+    }
+
     @Override
     public int hashCode() {
         final int PRIME = 31;

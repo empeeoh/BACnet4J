@@ -62,6 +62,26 @@ public class ObjectPropertyValue extends BaseType {
         priority = readOptional(queue, UnsignedInteger.class, 4);
     }
 
+    public ObjectIdentifier getObjectIdentifier() {
+        return objectIdentifier;
+    }
+
+    public PropertyIdentifier getPropertyIdentifier() {
+        return propertyIdentifier;
+    }
+
+    public UnsignedInteger getPropertyArrayIndex() {
+        return propertyArrayIndex;
+    }
+
+    public Encodable getValue() {
+        return value;
+    }
+
+    public UnsignedInteger getPriority() {
+        return priority;
+    }
+
     @Override
     public int hashCode() {
         final int PRIME = 31;

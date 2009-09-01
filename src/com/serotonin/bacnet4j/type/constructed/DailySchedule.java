@@ -32,6 +32,10 @@ public class DailySchedule extends BaseType {
         this.daySchedule = daySchedule;
     }
 
+    public SequenceOf<TimeValue> getDaySchedule() {
+        return daySchedule;
+    }
+
     @Override
     public void write(ByteQueue queue) {
         write(queue, daySchedule, 0);
