@@ -68,6 +68,18 @@ public class ConfirmedPrivateTransferAck extends AcknowledgementService {
         resultBlock = readVendorSpecific(queue, vendorId, serviceNumber, vendorServiceResolutions, 2);
     }
 
+    public UnsignedInteger getVendorId() {
+        return vendorId;
+    }
+
+    public UnsignedInteger getServiceNumber() {
+        return serviceNumber;
+    }
+
+    public Encodable getResultBlock() {
+        return resultBlock;
+    }
+
     @Override
     public int hashCode() {
         final int PRIME = 31;

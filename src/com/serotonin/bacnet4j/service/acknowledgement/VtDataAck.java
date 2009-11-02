@@ -54,6 +54,14 @@ public class VtDataAck extends AcknowledgementService {
         acceptedOctetCount = readOptional(queue, UnsignedInteger.class, 1);
     }
     
+    public Boolean getAllNewDataAccepted() {
+        return allNewDataAccepted;
+    }
+
+    public UnsignedInteger getAcceptedOctetCount() {
+        return acceptedOctetCount;
+    }
+
     @Override
     public int hashCode() {
         final int PRIME = 31;

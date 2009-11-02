@@ -52,6 +52,14 @@ public class AtomicWriteFileAck extends AcknowledgementService {
         fileStart = read(queue, SignedInteger.class, recordAccess ? 1 : 0);
     }
 
+    public boolean isRecordAccess() {
+        return recordAccess;
+    }
+
+    public SignedInteger getFileStart() {
+        return fileStart;
+    }
+
     @Override
     public int hashCode() {
         final int PRIME = 31;

@@ -49,6 +49,10 @@ public class VtOpenAck extends AcknowledgementService {
         remoteVTSessionIdentifier = read(queue, UnsignedInteger.class);
     }
 
+    public UnsignedInteger getRemoteVTSessionIdentifier() {
+        return remoteVTSessionIdentifier;
+    }
+
     @Override
     public int hashCode() {
         final int PRIME = 31;

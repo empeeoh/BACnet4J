@@ -52,6 +52,10 @@ public class GetAlarmSummaryAck extends AcknowledgementService {
     GetAlarmSummaryAck(ByteQueue queue) throws BACnetException {
         values = readSequenceOf(queue, AlarmSummary.class);
     }
+
+    public SequenceOf<AlarmSummary> getValues() {
+        return values;
+    }
     
     public static class AlarmSummary extends BaseType {
         private final ObjectIdentifier objectIdentifier;
@@ -76,6 +80,18 @@ public class GetAlarmSummaryAck extends AcknowledgementService {
             objectIdentifier = read(queue, ObjectIdentifier.class);
             alarmState = read(queue, EventState.class);
             acknowledgedTransitions = read(queue, EventTransitionBits.class);
+        }
+
+        public ObjectIdentifier getObjectIdentifier() {
+            return objectIdentifier;
+        }
+
+        public EventState getAlarmState() {
+            return alarmState;
+        }
+
+        public EventTransitionBits getAcknowledgedTransitions() {
+            return acknowledgedTransitions;
         }
 
         @Override

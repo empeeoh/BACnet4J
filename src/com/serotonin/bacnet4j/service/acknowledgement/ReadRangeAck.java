@@ -80,6 +80,34 @@ public class ReadRangeAck extends AcknowledgementService {
         firstSequenceNumber = readOptional(queue, UnsignedInteger.class, 6);
     }
 
+    public ObjectIdentifier getObjectIdentifier() {
+        return objectIdentifier;
+    }
+
+    public PropertyIdentifier getPropertyIdentifier() {
+        return propertyIdentifier;
+    }
+
+    public UnsignedInteger getPropertyArrayIndex() {
+        return propertyArrayIndex;
+    }
+
+    public ResultFlags getResultFlags() {
+        return resultFlags;
+    }
+
+    public UnsignedInteger getItemCount() {
+        return itemCount;
+    }
+
+    public SequenceOf<? extends Encodable> getItemData() {
+        return itemData;
+    }
+
+    public UnsignedInteger getFirstSequenceNumber() {
+        return firstSequenceNumber;
+    }
+
     @Override
     public int hashCode() {
         final int PRIME = 31;

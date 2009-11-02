@@ -53,13 +53,17 @@ public class GetEnrollmentSummaryAck extends AcknowledgementService {
     GetEnrollmentSummaryAck(ByteQueue queue) throws BACnetException {
         values = readSequenceOf(queue, EnrollmentSummary.class);
     }
+
+    public SequenceOf<EnrollmentSummary> getValues() {
+        return values;
+    }
     
     public static class EnrollmentSummary extends BaseType {
         private final ObjectIdentifier objectIdentifier;
         private final EventType eventType;
         private final EventState eventState;
         private final UnsignedInteger priority;
-        private UnsignedInteger notificationClass; // optional
+        private final UnsignedInteger notificationClass; // optional
         
         public EnrollmentSummary(ObjectIdentifier objectIdentifier, EventType eventType, EventState eventState, UnsignedInteger priority, UnsignedInteger notificationClass) {
             this.objectIdentifier = objectIdentifier;
@@ -85,6 +89,28 @@ public class GetEnrollmentSummaryAck extends AcknowledgementService {
             priority = read(queue, UnsignedInteger.class);
             if (peekTagNumber(queue) == UnsignedInteger.TYPE_ID)
                 notificationClass = read(queue, UnsignedInteger.class);
+            else
+                notificationClass = null;
+        }
+
+        public ObjectIdentifier getObjectIdentifier() {
+            return objectIdentifier;
+        }
+
+        public EventType getEventType() {
+            return eventType;
+        }
+
+        public EventState getEventState() {
+            return eventState;
+        }
+
+        public UnsignedInteger getPriority() {
+            return priority;
+        }
+
+        public UnsignedInteger getNotificationClass() {
+            return notificationClass;
         }
 
         @Override

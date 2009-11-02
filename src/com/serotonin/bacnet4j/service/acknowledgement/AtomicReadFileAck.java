@@ -37,16 +37,18 @@ public class AtomicReadFileAck extends AcknowledgementService {
     public static final byte TYPE_ID = 6;
     
     private final Boolean endOfFile;
-    private SignedInteger fileStartPosition;
-    private OctetString fileData;
-    private UnsignedInteger returnedRecordCount;
-    private SequenceOf<OctetString> fileRecordData;
+    private final SignedInteger fileStartPosition;
+    private final OctetString fileData;
+    private final UnsignedInteger returnedRecordCount;
+    private final SequenceOf<OctetString> fileRecordData;
     
     public AtomicReadFileAck(Boolean endOfFile, SignedInteger fileStartPosition, OctetString fileData) {
         super();
         this.endOfFile = endOfFile;
         this.fileStartPosition = fileStartPosition;
         this.fileData = fileData;
+        returnedRecordCount = null;
+        fileRecordData = null;
     }
 
     public AtomicReadFileAck(Boolean endOfFile, SignedInteger fileStartPosition, UnsignedInteger returnedRecordCount, 
@@ -54,6 +56,7 @@ public class AtomicReadFileAck extends AcknowledgementService {
         super();
         this.endOfFile = endOfFile;
         this.fileStartPosition = fileStartPosition;
+        fileData = null;
         this.returnedRecordCount = returnedRecordCount;
         this.fileRecordData = fileRecordData;
     }
@@ -86,17 +89,40 @@ public class AtomicReadFileAck extends AcknowledgementService {
         if (popStart(queue) == 0) {
             fileStartPosition = read(queue, SignedInteger.class);
             fileData = read(queue, OctetString.class);
+            returnedRecordCount = null;
+            fileRecordData = null;
             popEnd(queue, 0);
         }
         else {
             fileStartPosition = read(queue, SignedInteger.class);
             returnedRecordCount = read(queue, UnsignedInteger.class);
+            fileData = null;
             List<OctetString> records = new ArrayList<OctetString>();
             for (int i=0; i<returnedRecordCount.intValue(); i++)
                 records.add(read(queue, OctetString.class));
             fileRecordData = new SequenceOf<OctetString>(records);
             popEnd(queue, 1);
         }
+    }
+
+    public Boolean getEndOfFile() {
+        return endOfFile;
+    }
+
+    public SignedInteger getFileStartPosition() {
+        return fileStartPosition;
+    }
+
+    public OctetString getFileData() {
+        return fileData;
+    }
+
+    public UnsignedInteger getReturnedRecordCount() {
+        return returnedRecordCount;
+    }
+
+    public SequenceOf<OctetString> getFileRecordData() {
+        return fileRecordData;
     }
 
     @Override

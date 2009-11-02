@@ -50,6 +50,10 @@ public class ReadPropertyConditionalAck extends AcknowledgementService {
         listOfReadAccessResults = readSequenceOf(queue, ReadAccessResult.class);
     }
 
+    public SequenceOf<ReadAccessResult> getListOfReadAccessResults() {
+        return listOfReadAccessResults;
+    }
+
     @Override
     public int hashCode() {
         final int PRIME = 31;

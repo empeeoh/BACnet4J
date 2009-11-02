@@ -49,6 +49,10 @@ public class AuthenticateAck extends AcknowledgementService {
         modifiedRandomNumber = read(queue, UnsignedInteger.class);
     }
 
+    public UnsignedInteger getModifiedRandomNumber() {
+        return modifiedRandomNumber;
+    }
+
     @Override
     public int hashCode() {
         final int PRIME = 31;

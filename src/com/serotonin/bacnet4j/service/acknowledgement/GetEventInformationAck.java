@@ -60,6 +60,14 @@ public class GetEventInformationAck extends AcknowledgementService {
         listOfEventSummaries = readSequenceOf(queue, EventSummary.class, 0);
         moreEvents = read(queue, Boolean.class, 1);
     }
+
+    public SequenceOf<EventSummary> getListOfEventSummaries() {
+        return listOfEventSummaries;
+    }
+
+    public Boolean getMoreEvents() {
+        return moreEvents;
+    }
     
     public static class EventSummary extends BaseType {
         private final ObjectIdentifier objectIdentifier;
@@ -126,6 +134,50 @@ public class GetEventInformationAck extends AcknowledgementService {
             eventPriorities2 = read(queue, UnsignedInteger.class);
             eventPriorities3 = read(queue, UnsignedInteger.class);
             popEnd(queue, 6);
+        }
+
+        public ObjectIdentifier getObjectIdentifier() {
+            return objectIdentifier;
+        }
+
+        public EventState getEventState() {
+            return eventState;
+        }
+
+        public EventTransitionBits getAcknowledgedTransitions() {
+            return acknowledgedTransitions;
+        }
+
+        public TimeStamp getEventTimeStamp1() {
+            return eventTimeStamp1;
+        }
+
+        public TimeStamp getEventTimeStamp2() {
+            return eventTimeStamp2;
+        }
+
+        public TimeStamp getEventTimeStamp3() {
+            return eventTimeStamp3;
+        }
+
+        public NotifyType getNotifyType() {
+            return notifyType;
+        }
+
+        public EventTransitionBits getEventEnable() {
+            return eventEnable;
+        }
+
+        public UnsignedInteger getEventPriorities1() {
+            return eventPriorities1;
+        }
+
+        public UnsignedInteger getEventPriorities2() {
+            return eventPriorities2;
+        }
+
+        public UnsignedInteger getEventPriorities3() {
+            return eventPriorities3;
         }
 
         @Override
