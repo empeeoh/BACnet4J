@@ -22,8 +22,10 @@
  */
 package com.serotonin.bacnet4j.type.constructed;
 
+import com.serotonin.bacnet4j.Network;
 import com.serotonin.bacnet4j.exception.BACnetException;
 import com.serotonin.bacnet4j.type.primitive.OctetString;
+import com.serotonin.bacnet4j.type.primitive.Unsigned16;
 import com.serotonin.bacnet4j.type.primitive.UnsignedInteger;
 import com.serotonin.util.IpAddressUtils;
 import com.serotonin.util.queue.ByteQueue;
@@ -35,6 +37,19 @@ public class Address extends BaseType {
     public Address(UnsignedInteger networkNumber, OctetString macAddress) {
         this.networkNumber = networkNumber;
         this.macAddress = macAddress;
+    }
+    
+    public Address(Network network, byte[] ipAddress, int port) {
+        if (network == null)
+            networkNumber = new Unsigned16(0);
+        else
+            networkNumber = new Unsigned16(network.getNetworkNumber());
+        
+        byte[] ipMacAddress = new byte[ipAddress.length + 2];
+        System.arraycopy(ipAddress, 0, ipMacAddress, 0, ipAddress.length);
+        ipMacAddress[ipAddress.length] = (byte)(port >> 8);
+        ipMacAddress[ipAddress.length + 1] = (byte)port;
+        macAddress = new OctetString (ipMacAddress);
     }
 
     @Override
