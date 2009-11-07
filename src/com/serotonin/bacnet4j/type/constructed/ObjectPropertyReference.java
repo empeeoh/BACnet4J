@@ -69,6 +69,12 @@ public class ObjectPropertyReference extends BaseType {
     public UnsignedInteger getPropertyArrayIndex() {
         return propertyArrayIndex;
     }
+    
+    @Override
+    public String toString () {
+        return "ObjectPropertyReference(objectIdentifier="+ objectIdentifier +", propertyIdentifier="+
+                propertyIdentifier +", propertyArrayIndex="+ propertyArrayIndex +")";
+    }
 
     @Override
     public int hashCode() {

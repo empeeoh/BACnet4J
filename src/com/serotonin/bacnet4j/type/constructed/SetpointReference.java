@@ -46,6 +46,11 @@ public class SetpointReference extends BaseType {
     }
 
     @Override
+    public String toString () {
+        return "SetpointReference(setpointReference="+ setpointReference +")";
+    }
+    
+    @Override
     public int hashCode() {
         final int PRIME = 31;
         int result = 1;

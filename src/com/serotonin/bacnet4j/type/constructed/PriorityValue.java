@@ -80,6 +80,24 @@ public class PriorityValue extends BaseType {
     public Encodable getConstructedValue() {
         return constructedValue;
     }
+    
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("PriorityValue(");
+        if (nullValue != null)
+            sb.append("nullValue=").append(nullValue);
+        else if (realValue != null)
+            sb.append("realValue=").append(realValue);
+        else if (binaryValue != null)
+            sb.append("binaryValue=").append(binaryValue);
+        else if (integerValue != null)
+            sb.append("integerValue=").append(integerValue);
+        else if (constructedValue != null)
+            sb.append("constructedValue=").append(constructedValue);
+        sb.append(")");
+        return sb.toString();
+    }
 
     @Override
     public void write(ByteQueue queue) {
