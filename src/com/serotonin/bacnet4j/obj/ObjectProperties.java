@@ -64,6 +64,10 @@ import com.serotonin.bacnet4j.type.constructed.VtSession;
 import com.serotonin.bacnet4j.type.enumerated.Action;
 import com.serotonin.bacnet4j.type.enumerated.BinaryPV;
 import com.serotonin.bacnet4j.type.enumerated.DeviceStatus;
+import com.serotonin.bacnet4j.type.enumerated.DoorAlarmState;
+import com.serotonin.bacnet4j.type.enumerated.DoorSecuredStatus;
+import com.serotonin.bacnet4j.type.enumerated.DoorStatus;
+import com.serotonin.bacnet4j.type.enumerated.DoorValue;
 import com.serotonin.bacnet4j.type.enumerated.EngineeringUnits;
 import com.serotonin.bacnet4j.type.enumerated.ErrorClass;
 import com.serotonin.bacnet4j.type.enumerated.ErrorCode;
@@ -73,6 +77,7 @@ import com.serotonin.bacnet4j.type.enumerated.FileAccessMethod;
 import com.serotonin.bacnet4j.type.enumerated.LifeSafetyMode;
 import com.serotonin.bacnet4j.type.enumerated.LifeSafetyOperation;
 import com.serotonin.bacnet4j.type.enumerated.LifeSafetyState;
+import com.serotonin.bacnet4j.type.enumerated.LockStatus;
 import com.serotonin.bacnet4j.type.enumerated.Maintenance;
 import com.serotonin.bacnet4j.type.enumerated.NotifyType;
 import com.serotonin.bacnet4j.type.enumerated.ObjectType;
@@ -184,6 +189,40 @@ public class ObjectProperties {
     }
     
     static {
+        // Access door
+        add(ObjectType.accessDoor, PropertyIdentifier.objectIdentifier, ObjectIdentifier.class, false, true, new ObjectIdentifier(ObjectType.accessDoor, 0x3fffff));
+        add(ObjectType.accessDoor, PropertyIdentifier.objectName, CharacterString.class, false, true, null);
+        add(ObjectType.accessDoor, PropertyIdentifier.objectType, ObjectType.class, false, true, ObjectType.accessDoor);
+        add(ObjectType.accessDoor, PropertyIdentifier.presentValue, DoorValue.class, false, true, null);
+        add(ObjectType.accessDoor, PropertyIdentifier.description, CharacterString.class, false, false, null);
+        add(ObjectType.accessDoor, PropertyIdentifier.statusFlags, StatusFlags.class, false, true, new StatusFlags(false, false, false, true));
+        add(ObjectType.accessDoor, PropertyIdentifier.eventState, EventState.class, false, true, EventState.normal);
+        add(ObjectType.accessDoor, PropertyIdentifier.reliability, Reliability.class, false, false, null);
+        add(ObjectType.accessDoor, PropertyIdentifier.outOfService, Boolean.class, false, true, new Boolean(true));
+        add(ObjectType.accessDoor, PropertyIdentifier.priorityArray, PriorityArray.class, false, true, new PriorityArray());
+        add(ObjectType.accessDoor, PropertyIdentifier.relinquishDefault, Real.class, false, true, new Real(0));
+        add(ObjectType.accessDoor, PropertyIdentifier.doorStatus, DoorStatus.class, false, false, null);
+        add(ObjectType.accessDoor, PropertyIdentifier.lockStatus, LockStatus.class, false, false, null);
+        add(ObjectType.accessDoor, PropertyIdentifier.securedStatus, DoorSecuredStatus.class, false, false, null);
+        add(ObjectType.accessDoor, PropertyIdentifier.doorMembers, DeviceObjectReference.class, true, false, null);
+        add(ObjectType.accessDoor, PropertyIdentifier.doorPulseTime, UnsignedInteger.class, false, true, null);
+        add(ObjectType.accessDoor, PropertyIdentifier.doorExtendedPulseTime, UnsignedInteger.class, false, true, null);
+        add(ObjectType.accessDoor, PropertyIdentifier.doorUnlockDelayTime, UnsignedInteger.class, false, false, null);
+        add(ObjectType.accessDoor, PropertyIdentifier.doorOpenTooLongTime, UnsignedInteger.class, false, true, null);
+        add(ObjectType.accessDoor, PropertyIdentifier.doorAlarmState, DoorAlarmState.class, false, false, null);
+        add(ObjectType.accessDoor, PropertyIdentifier.maskedAlarmValues, DoorAlarmState.class, true, false, null);
+        add(ObjectType.accessDoor, PropertyIdentifier.maintenanceRequired, Maintenance.class, false, false, null);
+        add(ObjectType.accessDoor, PropertyIdentifier.timeDelay, UnsignedInteger.class, false, false, null);
+        add(ObjectType.accessDoor, PropertyIdentifier.notificationClass, UnsignedInteger.class, false, false, null);
+        add(ObjectType.accessDoor, PropertyIdentifier.alarmValues, DoorAlarmState.class, true, false, null);
+        add(ObjectType.accessDoor, PropertyIdentifier.faultValues, DoorAlarmState.class, true, false, null);
+        add(ObjectType.accessDoor, PropertyIdentifier.eventEnable, EventTransitionBits.class, false, false, null);
+        add(ObjectType.accessDoor, PropertyIdentifier.ackedTransitions, EventTransitionBits.class, false, false, null);
+        add(ObjectType.accessDoor, PropertyIdentifier.notifyType, NotifyType.class, false, false, null);
+        add(ObjectType.accessDoor, PropertyIdentifier.eventTimeStamps, TimeStamp.class, true, false, null);
+        add(ObjectType.accessDoor, PropertyIdentifier.profileName, CharacterString.class, false, false, null);
+        
+        
         // Accumulator
         add(ObjectType.accumulator, PropertyIdentifier.objectIdentifier, ObjectIdentifier.class, false, true, new ObjectIdentifier(ObjectType.accumulator, 0x3fffff));
         add(ObjectType.accumulator, PropertyIdentifier.objectName, CharacterString.class, false, true, null);

@@ -29,6 +29,7 @@ import com.serotonin.bacnet4j.exception.BACnetException;
 import com.serotonin.bacnet4j.type.Encodable;
 import com.serotonin.bacnet4j.type.enumerated.BinaryPV;
 import com.serotonin.bacnet4j.type.enumerated.DeviceStatus;
+import com.serotonin.bacnet4j.type.enumerated.DoorAlarmState;
 import com.serotonin.bacnet4j.type.enumerated.EngineeringUnits;
 import com.serotonin.bacnet4j.type.enumerated.EventState;
 import com.serotonin.bacnet4j.type.enumerated.EventType;
@@ -61,6 +62,8 @@ public class PropertyStates extends BaseType {
         classes.add(UnsignedInteger.class);
         classes.add(LifeSafetyMode.class);
         classes.add(LifeSafetyState.class);
+        classes.add(null);
+        classes.add(DoorAlarmState.class);
     }
     
     public interface Types {
@@ -78,6 +81,7 @@ public class PropertyStates extends BaseType {
         int UNSIGNED = 11;
         int LIFE_SAFETY_MODE = 12;
         int LIFE_SAFETY_STATE = 13;
+        int DOOR_ALARM_STATE = 15;
     }
     
     private final Choice state;

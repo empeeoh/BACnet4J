@@ -27,7 +27,7 @@ import com.serotonin.util.queue.ByteQueue;
 
 public class ObjectTypesSupported extends BitString {
     public ObjectTypesSupported() {
-        super(new boolean[25]);
+        super(new boolean[26]);
     }
 
     public ObjectTypesSupported(ByteQueue queue) {
@@ -232,5 +232,13 @@ public class ObjectTypesSupported extends BitString {
 
     public void setPulseConverter(boolean pulseConverter) {
         getValue()[24] = pulseConverter;
+    }
+    
+    public boolean isAccessDoor() {
+        return getValue()[25];
+    }
+    
+    public void setAccessDoor(boolean accessDoor) {
+        getValue()[25] = accessDoor;
     }
 }

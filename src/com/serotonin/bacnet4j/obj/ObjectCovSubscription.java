@@ -41,6 +41,7 @@ public class ObjectCovSubscription {
     private static Set<PropertyIdentifier> supportedPropertyIdentifiers = new HashSet<PropertyIdentifier>();
     
     static {
+        supportedObjectTypes.add(ObjectType.accessDoor);
         supportedObjectTypes.add(ObjectType.accumulator);
         supportedObjectTypes.add(ObjectType.binaryInput);
         supportedObjectTypes.add(ObjectType.binaryOutput);
@@ -52,6 +53,7 @@ public class ObjectCovSubscription {
         
         supportedPropertyIdentifiers.add(PropertyIdentifier.presentValue);
         supportedPropertyIdentifiers.add(PropertyIdentifier.statusFlags);
+        supportedPropertyIdentifiers.add(PropertyIdentifier.doorAlarmState);
     }
     
     public static void addSupportedObjectType(ObjectType objectType) {
@@ -86,9 +88,12 @@ public class ObjectCovSubscription {
     
     private static void addValue(BACnetObject obj, List<PropertyValue> values, PropertyIdentifier pid) {
         try {
-            Encodable value = obj.getProperty(pid);
-            if (value != null)
-                values.add(new PropertyValue(pid, value));
+            // Ensure that the obj has the given property. The addition of doorAlarmState requires this.
+            if (ObjectProperties.getPropertyTypeDefinition(obj.getId().getObjectType(), pid) != null) {
+                Encodable value = obj.getProperty(pid);
+                if (value != null)
+                    values.add(new PropertyValue(pid, value));
+            }
         }
         catch (BACnetServiceException e) {
             // Should never happen, so wrap in a RuntimeException

@@ -213,6 +213,16 @@ public class PropertyIdentifier extends Enumerated {
     public static final PropertyIdentifier valueBeforeChange = new PropertyIdentifier(190);
     public static final PropertyIdentifier valueSet = new PropertyIdentifier(191);
     public static final PropertyIdentifier valueChangeTime = new PropertyIdentifier(192);
+    public static final PropertyIdentifier doorAlarmState = new PropertyIdentifier(226);
+    public static final PropertyIdentifier doorExtendedPulseTime = new PropertyIdentifier(227);
+    public static final PropertyIdentifier doorMembers = new PropertyIdentifier(228);
+    public static final PropertyIdentifier doorOpenTooLongTime = new PropertyIdentifier(229);
+    public static final PropertyIdentifier doorPulseTime = new PropertyIdentifier(230);
+    public static final PropertyIdentifier doorStatus = new PropertyIdentifier(231);
+    public static final PropertyIdentifier doorUnlockDelayTime = new PropertyIdentifier(232);
+    public static final PropertyIdentifier lockStatus = new PropertyIdentifier(233);
+    public static final PropertyIdentifier maskedAlarmValues = new PropertyIdentifier(234);
+    public static final PropertyIdentifier securedStatus = new PropertyIdentifier(235);
 
     public PropertyIdentifier(int value) {
         super(value);
