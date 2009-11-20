@@ -68,6 +68,15 @@ public class PropertyValues implements Iterable<ObjectPropertyReference> {
         return get(new ObjectPropertyReference(oid, pid));
     }
     
+    public Encodable getNullOnError(ObjectIdentifier oid, PropertyIdentifier pid) {
+        Encodable e = getNoErrorCheck(new ObjectPropertyReference(oid, pid));
+        
+        if (e instanceof BACnetError)
+            return null;
+        
+        return e;
+    }
+    
     public String getString(ObjectIdentifier oid, PropertyIdentifier pid) {
         return getNoErrorCheck(oid, pid).toString();
     }

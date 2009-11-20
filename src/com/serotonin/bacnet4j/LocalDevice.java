@@ -724,18 +724,24 @@ public class LocalDevice implements RequestHandler {
     }
     
     public void getExtendedDeviceInformation(RemoteDevice d) throws BACnetException {
+        ObjectIdentifier oid = d.getObjectIdentifier();
+        
         // Get the device's supported services
         ReadPropertyAck supportedServicesAck = (ReadPropertyAck)send(d, new ReadPropertyRequest(
-                d.getObjectIdentifier(), PropertyIdentifier.protocolServicesSupported));
+                oid, PropertyIdentifier.protocolServicesSupported));
         d.setServicesSupported((ServicesSupported)supportedServicesAck.getValue());
         
         // Uses the readProperties method here because this list will probably be extended.
         PropertyReferences properties = new PropertyReferences();
-        properties.add(d.getObjectIdentifier(), PropertyIdentifier.objectName);
+        properties.add(oid, PropertyIdentifier.objectName);
+        properties.add(oid, PropertyIdentifier.protocolVersion);
+        properties.add(oid, PropertyIdentifier.protocolRevision);
         
         PropertyValues values = readProperties(d, properties);
         
-        d.setName(values.getString(d.getObjectIdentifier(), PropertyIdentifier.objectName));
+        d.setName(values.getString(oid, PropertyIdentifier.objectName));
+        d.setProtocolVersion((UnsignedInteger)values.getNullOnError(oid, PropertyIdentifier.protocolVersion));
+        d.setProtocolRevision((UnsignedInteger)values.getNullOnError(oid, PropertyIdentifier.protocolRevision));
     }
     
     /**

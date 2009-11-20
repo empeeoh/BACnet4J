@@ -32,6 +32,7 @@ import com.serotonin.bacnet4j.type.constructed.ServicesSupported;
 import com.serotonin.bacnet4j.type.enumerated.ObjectType;
 import com.serotonin.bacnet4j.type.enumerated.Segmentation;
 import com.serotonin.bacnet4j.type.primitive.ObjectIdentifier;
+import com.serotonin.bacnet4j.type.primitive.UnsignedInteger;
 
 public class RemoteDevice {
     private final int instanceNumber;
@@ -41,6 +42,8 @@ public class RemoteDevice {
     private Segmentation segmentationSupported;
     private int vendorId;
     private String name;
+    private UnsignedInteger protocolVersion;
+    private UnsignedInteger protocolRevision;
     private ServicesSupported servicesSupported;
     private final Map<ObjectIdentifier, RemoteObject> objects = new HashMap<ObjectIdentifier, RemoteObject>();
     private Object userData;
@@ -130,6 +133,22 @@ public class RemoteDevice {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public UnsignedInteger getProtocolVersion() {
+        return protocolVersion;
+    }
+
+    public void setProtocolVersion(UnsignedInteger protocolVersion) {
+        this.protocolVersion = protocolVersion;
+    }
+
+    public UnsignedInteger getProtocolRevision() {
+        return protocolRevision;
+    }
+
+    public void setProtocolRevision(UnsignedInteger protocolRevision) {
+        this.protocolRevision = protocolRevision;
     }
 
     public ServicesSupported getServicesSupported() {

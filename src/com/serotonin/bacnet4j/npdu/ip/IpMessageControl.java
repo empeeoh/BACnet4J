@@ -527,8 +527,11 @@ public class IpMessageControl extends Thread {
                     // Handle the request.
                     try {
                         confAPDU.parseServiceData();
+//                        AcknowledgementService ackService = requestHandler.handleConfirmedRequest(
+//                                new Address(new UnsignedInteger(fromPort), new OctetString(fromAddr.getAddress())),
+//                                fromNetwork, invokeId, confAPDU.getServiceRequest());
                         AcknowledgementService ackService = requestHandler.handleConfirmedRequest(
-                                new Address(new UnsignedInteger(fromPort), new OctetString(fromAddr.getAddress())),
+                                new Address(fromNetwork, fromAddr.getAddress(), fromPort),
                                 fromNetwork, invokeId, confAPDU.getServiceRequest());
                         sendResponse(from, fromNetwork, confAPDU, ackService);
                     }
@@ -738,14 +741,21 @@ public class IpMessageControl extends Thread {
 
 //        String input = "81|0a|00|17|01|20|ff|ff |00|ff|10|07|3d|09|00|65|69 |62|74|65|6d|70|31";
 //        String input = "81 |0a|00|1d|01|00|10|01|c4|02|00|04 |40|c4|00|00|00|02|75|09|00|65|69 |62|74|65|6d|70|31";
-        String input = "81|0a|00|1d|01|20|ff|ff |00|ff|10|07|0a|04|40|1a|04|40 |3d|09|00|65|69|62|74|65|6d |70|31";
+        //String input = "81|0a|00|1d|01|20|ff|ff |00|ff|10|07|0a|04|40|1a|04|40 |3d|09|00|65|69|62|74|65|6d |70|31";
+        
+        // WhoIs sent by Delta equipment.
+        //String input = "81 0b 00 1b 01 28 ff ff 00 27 d8 06 00 18 71 73 0d 8a fe 10 08 0a 11 5e 1a c3 4f";
+        
+        // IAm response
+        String input = "81 0b 00 1b 01 28 ff ff 00 c4 80 01 04 fc 10 00 c4 02 00 76 c4 21 80 91 03 21 08";
         
         if (input.startsWith("["))
             input = input.substring(1);
         if (input.endsWith("]"))
             input = input.substring(0, input.length() - 1);
         //String[] parts = input.split(",");
-        String[] parts = input.split("\\|");
+        //String[] parts = input.split("\\|");
+        String[] parts = input.split(" ");
         byte[] bytes = new byte[parts.length];
         
         for (int i=0; i<bytes.length; i++)
