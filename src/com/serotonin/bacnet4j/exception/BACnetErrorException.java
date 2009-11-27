@@ -33,14 +33,17 @@ public class BACnetErrorException extends BACnetException {
     private final BaseError error;
     
     public BACnetErrorException(byte choice, ErrorClass errorClass, ErrorCode errorCode) {
+        super(errorClass.toString() +": "+ errorCode.toString());
         error = new BaseError(choice, new BACnetError(errorClass, errorCode));
     }
     
     public BACnetErrorException(byte choice, BACnetServiceException e) {
+        super(e);
         error = new BaseError(choice, new BACnetError(e.getErrorClass(), e.getErrorCode()));
     }
     
     public BACnetErrorException(ErrorClass errorClass, ErrorCode errorCode) {
+        super(errorClass.toString() +": "+ errorCode.toString());
         error = new BaseError((byte)127, new BACnetError(errorClass, errorCode));
     }
     
