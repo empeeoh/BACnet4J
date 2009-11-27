@@ -29,7 +29,7 @@ public class DeserializationTest {
     }
     
     static void test2() throws Exception {
-        WhoHasRequest req = new WhoHasRequest(null, null, new CharacterString("ELEC"));
+        WhoHasRequest req = new WhoHasRequest(null, new CharacterString("ELEC"));
         ByteQueue queue = new ByteQueue();
         req.write(queue);
         System.out.println(queue);
@@ -37,7 +37,7 @@ public class DeserializationTest {
     }
     
     static void test3() throws Exception {
-        WhoHasRequest req = new WhoHasRequest(null, null, new ObjectIdentifier(ObjectType.accessDoor, 5));
+        WhoHasRequest req = new WhoHasRequest(null, new ObjectIdentifier(ObjectType.accessDoor, 5));
         ByteQueue queue = new ByteQueue();
         req.write(queue);
         System.out.println(queue);
@@ -45,7 +45,8 @@ public class DeserializationTest {
     }
     
     static void test5() throws Exception {
-        WhoHasRequest req = new WhoHasRequest(new UnsignedInteger(0), new UnsignedInteger(4194303),
+        WhoHasRequest req = new WhoHasRequest(
+                new WhoHasRequest.Limits(new UnsignedInteger(0), new UnsignedInteger(4194303)),
                 new CharacterString("ELEC"));
         ByteQueue queue = new ByteQueue();
         req.write(queue);
@@ -54,7 +55,8 @@ public class DeserializationTest {
     }
     
     static void test6() throws Exception {
-        WhoHasRequest req = new WhoHasRequest(new UnsignedInteger(0), new UnsignedInteger(4194303),
+        WhoHasRequest req = new WhoHasRequest(
+                new WhoHasRequest.Limits(new UnsignedInteger(0), new UnsignedInteger(4194303)),
                 new ObjectIdentifier(ObjectType.accessDoor, 5));
         ByteQueue queue = new ByteQueue();
         req.write(queue);

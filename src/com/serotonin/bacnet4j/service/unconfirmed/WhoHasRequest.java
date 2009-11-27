@@ -53,27 +53,13 @@ public class WhoHasRequest extends UnconfirmedRequestService {
     private final Limits limits;
     private final Choice object;
     
-    public WhoHasRequest(UnsignedInteger deviceInstanceRangeLowLimit, UnsignedInteger deviceInstanceRangeHighLimit,
-            ObjectIdentifier identifier) {
-        if (deviceInstanceRangeLowLimit == null && deviceInstanceRangeHighLimit != null ||
-                deviceInstanceRangeLowLimit != null && deviceInstanceRangeHighLimit == null)
-            throw new RuntimeException("Either both the low and high limits must be set, or neither");
-        if (deviceInstanceRangeLowLimit != null)
-            limits = new Limits(deviceInstanceRangeLowLimit, deviceInstanceRangeHighLimit);
-        else
-            limits = null;
+    public WhoHasRequest(Limits limits, ObjectIdentifier identifier) {
+        this.limits = limits;
         object = new Choice(2, identifier);
     }
 
-    public WhoHasRequest(UnsignedInteger deviceInstanceRangeLowLimit, UnsignedInteger deviceInstanceRangeHighLimit,
-            CharacterString name) {
-        if (deviceInstanceRangeLowLimit == null && deviceInstanceRangeHighLimit != null ||
-                deviceInstanceRangeLowLimit != null && deviceInstanceRangeHighLimit == null)
-            throw new RuntimeException("Either both the low and high limits must be set, or neither");
-        if (deviceInstanceRangeLowLimit != null)
-            limits = new Limits(deviceInstanceRangeLowLimit, deviceInstanceRangeHighLimit);
-        else
-            limits = null;
+    public WhoHasRequest(Limits limits, CharacterString name) {
+        this.limits = limits;
         object = new Choice(3, name);
     }
     
@@ -125,7 +111,7 @@ public class WhoHasRequest extends UnconfirmedRequestService {
         object = new Choice(queue, classes);
     }
     
-    public class Limits extends BaseType {
+    public static class Limits extends BaseType {
         private UnsignedInteger deviceInstanceRangeLowLimit;
         private UnsignedInteger deviceInstanceRangeHighLimit;
         
@@ -141,6 +127,8 @@ public class WhoHasRequest extends UnconfirmedRequestService {
         }
         
         public Limits(UnsignedInteger deviceInstanceRangeLowLimit, UnsignedInteger deviceInstanceRangeHighLimit) {
+            if (deviceInstanceRangeLowLimit == null || deviceInstanceRangeHighLimit == null)
+                throw new RuntimeException("Both the low and high limits must be set");
             this.deviceInstanceRangeLowLimit = deviceInstanceRangeLowLimit;
             this.deviceInstanceRangeHighLimit = deviceInstanceRangeHighLimit;
         }
