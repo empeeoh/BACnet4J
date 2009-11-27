@@ -53,16 +53,30 @@ public class WhoHasRequest extends UnconfirmedRequestService {
     private final Limits limits;
     private final Choice object;
     
-    public WhoHasRequest(Limits limits, ObjectIdentifier identifier) {
-        this.limits = limits;
+    public WhoHasRequest(UnsignedInteger deviceInstanceRangeLowLimit, UnsignedInteger deviceInstanceRangeHighLimit,
+            ObjectIdentifier identifier) {
+        if (deviceInstanceRangeLowLimit == null && deviceInstanceRangeHighLimit != null ||
+                deviceInstanceRangeLowLimit != null && deviceInstanceRangeHighLimit == null)
+            throw new RuntimeException("Either both the low and high limits must be set, or neither");
+        if (deviceInstanceRangeLowLimit != null)
+            limits = new Limits(deviceInstanceRangeLowLimit, deviceInstanceRangeHighLimit);
+        else
+            limits = null;
         object = new Choice(2, identifier);
     }
 
-    public WhoHasRequest(Limits limits, CharacterString name) {
-        this.limits = limits;
+    public WhoHasRequest(UnsignedInteger deviceInstanceRangeLowLimit, UnsignedInteger deviceInstanceRangeHighLimit,
+            CharacterString name) {
+        if (deviceInstanceRangeLowLimit == null && deviceInstanceRangeHighLimit != null ||
+                deviceInstanceRangeLowLimit != null && deviceInstanceRangeHighLimit == null)
+            throw new RuntimeException("Either both the low and high limits must be set, or neither");
+        if (deviceInstanceRangeLowLimit != null)
+            limits = new Limits(deviceInstanceRangeLowLimit, deviceInstanceRangeHighLimit);
+        else
+            limits = null;
         object = new Choice(3, name);
     }
-
+    
     @Override
     public byte getChoiceId() {
         return TYPE_ID;
@@ -105,24 +119,46 @@ public class WhoHasRequest extends UnconfirmedRequestService {
         write(queue, object);
     }
     
-    WhoHasRequest(ByteQueue queue) throws BACnetException {
-        limits = readOptional(queue, Limits.class, 0);
+    public WhoHasRequest(ByteQueue queue) throws BACnetException {
+        Limits l = new Limits(queue);
+        limits = l.getDeviceInstanceRangeLowLimit() == null ? null : l;
         object = new Choice(queue, classes);
     }
     
-    public static class Limits extends BaseType {
-        private final UnsignedInteger deviceInstanceRangeLowLimit;
-        private final UnsignedInteger deviceInstanceRangeHighLimit;
+    public class Limits extends BaseType {
+        private UnsignedInteger deviceInstanceRangeLowLimit;
+        private UnsignedInteger deviceInstanceRangeHighLimit;
         
         @Override
         public void write(ByteQueue queue) {
             write(queue, deviceInstanceRangeLowLimit, 0);
-            write(queue, deviceInstanceRangeHighLimit, 0);
+            write(queue, deviceInstanceRangeHighLimit, 1);
         }
         
-        public Limits(ByteQueue queue) throws BACnetException {
-            deviceInstanceRangeLowLimit = read(queue, UnsignedInteger.class, 0);
-            deviceInstanceRangeHighLimit = read(queue, UnsignedInteger.class, 1);
+        Limits(ByteQueue queue) throws BACnetException {
+            deviceInstanceRangeLowLimit = readOptional(queue, UnsignedInteger.class, 0);
+            deviceInstanceRangeHighLimit = readOptional(queue, UnsignedInteger.class, 1);
+        }
+        
+        public Limits(UnsignedInteger deviceInstanceRangeLowLimit, UnsignedInteger deviceInstanceRangeHighLimit) {
+            this.deviceInstanceRangeLowLimit = deviceInstanceRangeLowLimit;
+            this.deviceInstanceRangeHighLimit = deviceInstanceRangeHighLimit;
+        }
+
+        public UnsignedInteger getDeviceInstanceRangeLowLimit() {
+            return deviceInstanceRangeLowLimit;
+        }
+
+        public void setDeviceInstanceRangeLowLimit(UnsignedInteger deviceInstanceRangeLowLimit) {
+            this.deviceInstanceRangeLowLimit = deviceInstanceRangeLowLimit;
+        }
+
+        public UnsignedInteger getDeviceInstanceRangeHighLimit() {
+            return deviceInstanceRangeHighLimit;
+        }
+
+        public void setDeviceInstanceRangeHighLimit(UnsignedInteger deviceInstanceRangeHighLimit) {
+            this.deviceInstanceRangeHighLimit = deviceInstanceRangeHighLimit;
         }
     }
 
