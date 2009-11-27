@@ -4,7 +4,11 @@
  */
 package com.serotonin.bacnet4j.test;
 
-import com.serotonin.bacnet4j.type.primitive.Real;
+import com.serotonin.bacnet4j.service.unconfirmed.WhoHasRequest;
+import com.serotonin.bacnet4j.type.enumerated.ObjectType;
+import com.serotonin.bacnet4j.type.primitive.CharacterString;
+import com.serotonin.bacnet4j.type.primitive.ObjectIdentifier;
+import com.serotonin.bacnet4j.type.primitive.UnsignedInteger;
 import com.serotonin.util.queue.ByteQueue;
 
 /**
@@ -18,9 +22,43 @@ public class DeserializationTest {
 //    }
     
     public static void main(String[] args) throws Exception {
-        Real real = new Real(1.23F);
+        test2();
+        test3();
+        test5();
+        test6();
+    }
+    
+    static void test2() throws Exception {
+        WhoHasRequest req = new WhoHasRequest(null, null, new CharacterString("ELEC"));
         ByteQueue queue = new ByteQueue();
-        real.write(queue);
+        req.write(queue);
         System.out.println(queue);
+        new WhoHasRequest(queue);
+    }
+    
+    static void test3() throws Exception {
+        WhoHasRequest req = new WhoHasRequest(null, null, new ObjectIdentifier(ObjectType.accessDoor, 5));
+        ByteQueue queue = new ByteQueue();
+        req.write(queue);
+        System.out.println(queue);
+        new WhoHasRequest(queue);
+    }
+    
+    static void test5() throws Exception {
+        WhoHasRequest req = new WhoHasRequest(new UnsignedInteger(0), new UnsignedInteger(4194303),
+                new CharacterString("ELEC"));
+        ByteQueue queue = new ByteQueue();
+        req.write(queue);
+        System.out.println(queue);
+        new WhoHasRequest(queue);
+    }
+    
+    static void test6() throws Exception {
+        WhoHasRequest req = new WhoHasRequest(new UnsignedInteger(0), new UnsignedInteger(4194303),
+                new ObjectIdentifier(ObjectType.accessDoor, 5));
+        ByteQueue queue = new ByteQueue();
+        req.write(queue);
+        System.out.println(queue);
+        new WhoHasRequest(queue);
     }
 }
