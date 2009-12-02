@@ -42,8 +42,10 @@ import com.serotonin.bacnet4j.type.constructed.DateTime;
 import com.serotonin.bacnet4j.type.constructed.Destination;
 import com.serotonin.bacnet4j.type.constructed.DeviceObjectPropertyReference;
 import com.serotonin.bacnet4j.type.constructed.DeviceObjectReference;
+import com.serotonin.bacnet4j.type.constructed.EventLogRecord;
 import com.serotonin.bacnet4j.type.constructed.EventTransitionBits;
 import com.serotonin.bacnet4j.type.constructed.LimitEnable;
+import com.serotonin.bacnet4j.type.constructed.LogMultipleRecord;
 import com.serotonin.bacnet4j.type.constructed.LogRecord;
 import com.serotonin.bacnet4j.type.constructed.ObjectPropertyReference;
 import com.serotonin.bacnet4j.type.constructed.ObjectTypesSupported;
@@ -57,6 +59,7 @@ import com.serotonin.bacnet4j.type.constructed.SequenceOf;
 import com.serotonin.bacnet4j.type.constructed.ServicesSupported;
 import com.serotonin.bacnet4j.type.constructed.SessionKey;
 import com.serotonin.bacnet4j.type.constructed.SetpointReference;
+import com.serotonin.bacnet4j.type.constructed.ShedLevel;
 import com.serotonin.bacnet4j.type.constructed.SpecialEvent;
 import com.serotonin.bacnet4j.type.constructed.StatusFlags;
 import com.serotonin.bacnet4j.type.constructed.TimeStamp;
@@ -78,7 +81,9 @@ import com.serotonin.bacnet4j.type.enumerated.LifeSafetyMode;
 import com.serotonin.bacnet4j.type.enumerated.LifeSafetyOperation;
 import com.serotonin.bacnet4j.type.enumerated.LifeSafetyState;
 import com.serotonin.bacnet4j.type.enumerated.LockStatus;
+import com.serotonin.bacnet4j.type.enumerated.LoggingType;
 import com.serotonin.bacnet4j.type.enumerated.Maintenance;
+import com.serotonin.bacnet4j.type.enumerated.NodeType;
 import com.serotonin.bacnet4j.type.enumerated.NotifyType;
 import com.serotonin.bacnet4j.type.enumerated.ObjectType;
 import com.serotonin.bacnet4j.type.enumerated.Polarity;
@@ -87,7 +92,9 @@ import com.serotonin.bacnet4j.type.enumerated.ProgramRequest;
 import com.serotonin.bacnet4j.type.enumerated.ProgramState;
 import com.serotonin.bacnet4j.type.enumerated.PropertyIdentifier;
 import com.serotonin.bacnet4j.type.enumerated.Reliability;
+import com.serotonin.bacnet4j.type.enumerated.RestartReason;
 import com.serotonin.bacnet4j.type.enumerated.Segmentation;
+import com.serotonin.bacnet4j.type.enumerated.ShedState;
 import com.serotonin.bacnet4j.type.enumerated.SilencedState;
 import com.serotonin.bacnet4j.type.enumerated.VtClass;
 import com.serotonin.bacnet4j.type.eventParameter.EventParameter;
@@ -496,6 +503,7 @@ public class ObjectProperties {
         add(ObjectType.device, PropertyIdentifier.protocolServicesSupported, ServicesSupported.class, false, true, null);
         add(ObjectType.device, PropertyIdentifier.protocolObjectTypesSupported, ObjectTypesSupported.class, false, true, null);
         add(ObjectType.device, PropertyIdentifier.objectList, ObjectIdentifier.class, true, true, null);
+        add(ObjectType.device, PropertyIdentifier.structuredObjectList, ObjectIdentifier.class, true, false, null);
         add(ObjectType.device, PropertyIdentifier.maxApduLengthAccepted, UnsignedInteger.class, false, true, null);
         add(ObjectType.device, PropertyIdentifier.segmentationSupported, Segmentation.class, false, true, null);
         add(ObjectType.device, PropertyIdentifier.vtClassesSupported, VtClass.class, true, false, null);
@@ -518,15 +526,22 @@ public class ObjectProperties {
         add(ObjectType.device, PropertyIdentifier.backupFailureTimeout, Unsigned16.class, false, true, null);
         add(ObjectType.device, PropertyIdentifier.activeCovSubscriptions, CovSubscription.class, true, true, new SequenceOf<CovSubscription>());
         add(ObjectType.device, PropertyIdentifier.maxSegmentsAccepted, UnsignedInteger.class, false, true, null);
+        add(ObjectType.device, PropertyIdentifier.utcTimeSynchronizationRecipients, Recipient.class, true, false, null);
+        add(ObjectType.device, PropertyIdentifier.timeSynchronizationInterval, UnsignedInteger.class, false, false, null);
+        add(ObjectType.device, PropertyIdentifier.alignIntervals, Boolean.class, false, false, null);
+        add(ObjectType.device, PropertyIdentifier.intervalOffset, UnsignedInteger.class, false, false, null);
         add(ObjectType.device, PropertyIdentifier.slaveProxyEnable, Boolean.class, true, false, null);
         add(ObjectType.device, PropertyIdentifier.autoSlaveDiscovery, Boolean.class, true, false, null);
         add(ObjectType.device, PropertyIdentifier.slaveAddressBinding, AddressBinding.class, true, false, null);
         add(ObjectType.device, PropertyIdentifier.manualSlaveAddressBinding, AddressBinding.class, true, false, null);
+        add(ObjectType.device, PropertyIdentifier.lastRestartReason, RestartReason.class, false, false, null);
+        add(ObjectType.device, PropertyIdentifier.restartNotificationRecipients, Recipient.class, true, false, null);
+        add(ObjectType.device, PropertyIdentifier.timeOfDeviceRestart, TimeStamp.class, false, false, null);
         add(ObjectType.device, PropertyIdentifier.profileName, CharacterString.class, false, false, null);
         
         
         // Event enrollment
-        add(ObjectType.eventEnrollment, PropertyIdentifier.objectIdentifier, ObjectIdentifier.class, false, true, new ObjectIdentifier(ObjectType.analogInput, 0x3fffff));
+        add(ObjectType.eventEnrollment, PropertyIdentifier.objectIdentifier, ObjectIdentifier.class, false, true, new ObjectIdentifier(ObjectType.eventEnrollment, 0x3fffff));
         add(ObjectType.eventEnrollment, PropertyIdentifier.objectName, CharacterString.class, false, true, null);
         add(ObjectType.eventEnrollment, PropertyIdentifier.objectType, ObjectType.class, false, true, ObjectType.eventEnrollment);
         add(ObjectType.eventEnrollment, PropertyIdentifier.description, CharacterString.class, false, false, null);
@@ -540,6 +555,33 @@ public class ObjectProperties {
         add(ObjectType.eventEnrollment, PropertyIdentifier.notificationClass, UnsignedInteger.class, false, false, null);
         add(ObjectType.eventEnrollment, PropertyIdentifier.eventTimeStamps, TimeStamp.class, true, true, null);
         add(ObjectType.eventEnrollment, PropertyIdentifier.profileName, CharacterString.class, false, false, null);
+        
+        
+        // Event log
+        add(ObjectType.eventLog, PropertyIdentifier.objectIdentifier, ObjectIdentifier.class, false, true, new ObjectIdentifier(ObjectType.eventLog, 0x3fffff));
+        add(ObjectType.eventLog, PropertyIdentifier.objectName, CharacterString.class, false, true, null);
+        add(ObjectType.eventLog, PropertyIdentifier.objectType, ObjectType.class, false, true, ObjectType.eventLog);
+        add(ObjectType.eventLog, PropertyIdentifier.description, CharacterString.class, false, false, null);
+        add(ObjectType.eventLog, PropertyIdentifier.statusFlags, StatusFlags.class, false, true, new StatusFlags(false, false, false, true));
+        add(ObjectType.eventLog, PropertyIdentifier.eventState, EventState.class, false, true, EventState.normal);
+        add(ObjectType.eventLog, PropertyIdentifier.reliability, Reliability.class, false, false, null);
+        add(ObjectType.eventLog, PropertyIdentifier.enable, Boolean.class, false, true, null);
+        add(ObjectType.eventLog, PropertyIdentifier.startTime, DateTime.class, false, false, null);
+        add(ObjectType.eventLog, PropertyIdentifier.stopTime, DateTime.class, false, false, null);
+        add(ObjectType.eventLog, PropertyIdentifier.stopWhenFull, Boolean.class, false, true, null);
+        add(ObjectType.eventLog, PropertyIdentifier.bufferSize, UnsignedInteger.class, false, true, null);
+        add(ObjectType.eventLog, PropertyIdentifier.logBuffer, EventLogRecord.class, true, true, new SequenceOf<EventLogRecord>());
+        add(ObjectType.eventLog, PropertyIdentifier.recordCount, UnsignedInteger.class, false, true, null);
+        add(ObjectType.eventLog, PropertyIdentifier.totalRecordCount, UnsignedInteger.class, false, true, null);
+        add(ObjectType.eventLog, PropertyIdentifier.notificationThreshold, UnsignedInteger.class, false, false, null);
+        add(ObjectType.eventLog, PropertyIdentifier.recordsSinceNotification, UnsignedInteger.class, false, false, null);
+        add(ObjectType.eventLog, PropertyIdentifier.lastNotifyRecord, UnsignedInteger.class, false, false, null);
+        add(ObjectType.eventLog, PropertyIdentifier.notificationClass, UnsignedInteger.class, false, false, null);
+        add(ObjectType.eventLog, PropertyIdentifier.eventEnable, EventTransitionBits.class, false, false, null);
+        add(ObjectType.eventLog, PropertyIdentifier.ackedTransitions, EventTransitionBits.class, false, false, null);
+        add(ObjectType.eventLog, PropertyIdentifier.notifyType, NotifyType.class, false, false, null);
+        add(ObjectType.eventLog, PropertyIdentifier.eventTimeStamps, TimeStamp.class, true, false, null);
+        add(ObjectType.eventLog, PropertyIdentifier.profileName, CharacterString.class, false, false, null);
         
         
         // File
@@ -572,7 +614,7 @@ public class ObjectProperties {
         add(ObjectType.lifeSafetyPoint, PropertyIdentifier.objectName, CharacterString.class, false, true, null);
         add(ObjectType.lifeSafetyPoint, PropertyIdentifier.objectType, ObjectType.class, false, true, ObjectType.lifeSafetyPoint);
         add(ObjectType.lifeSafetyPoint, PropertyIdentifier.presentValue, LifeSafetyState.class, false, true, LifeSafetyState.quiet);
-        add(ObjectType.lifeSafetyPoint, PropertyIdentifier.trackingValue, LifeSafetyState.class, false, false, null);
+        add(ObjectType.lifeSafetyPoint, PropertyIdentifier.trackingValue, LifeSafetyState.class, false, true, null);
         add(ObjectType.lifeSafetyPoint, PropertyIdentifier.description, CharacterString.class, false, false, null);
         add(ObjectType.lifeSafetyPoint, PropertyIdentifier.deviceType, CharacterString.class, false, false, null);
         add(ObjectType.lifeSafetyPoint, PropertyIdentifier.statusFlags, StatusFlags.class, false, true, new StatusFlags(false, false, false, true));
@@ -605,7 +647,7 @@ public class ObjectProperties {
         add(ObjectType.lifeSafetyZone, PropertyIdentifier.objectName, CharacterString.class, false, true, null);
         add(ObjectType.lifeSafetyZone, PropertyIdentifier.objectType, ObjectType.class, false, true, ObjectType.lifeSafetyZone);
         add(ObjectType.lifeSafetyZone, PropertyIdentifier.presentValue, LifeSafetyState.class, false, true, LifeSafetyState.quiet);
-        add(ObjectType.lifeSafetyZone, PropertyIdentifier.trackingValue, LifeSafetyState.class, false, false, null);
+        add(ObjectType.lifeSafetyZone, PropertyIdentifier.trackingValue, LifeSafetyState.class, false, true, null);
         add(ObjectType.lifeSafetyZone, PropertyIdentifier.description, CharacterString.class, false, false, null);
         add(ObjectType.lifeSafetyZone, PropertyIdentifier.deviceType, CharacterString.class, false, false, null);
         add(ObjectType.lifeSafetyZone, PropertyIdentifier.statusFlags, StatusFlags.class, false, true, new StatusFlags(false, false, false, true));
@@ -630,6 +672,35 @@ public class ObjectProperties {
         add(ObjectType.lifeSafetyZone, PropertyIdentifier.memberOf, DeviceObjectReference.class, true, false, null);
         add(ObjectType.lifeSafetyZone, PropertyIdentifier.profileName, CharacterString.class, false, false, null);
         
+        
+        // Load control
+        add(ObjectType.loadControl, PropertyIdentifier.objectIdentifier, ObjectIdentifier.class, false, true, new ObjectIdentifier(ObjectType.loadControl, 0x3fffff));
+        add(ObjectType.loadControl, PropertyIdentifier.objectName, CharacterString.class, false, true, null);
+        add(ObjectType.loadControl, PropertyIdentifier.objectType, ObjectType.class, false, true, ObjectType.loadControl);
+        add(ObjectType.loadControl, PropertyIdentifier.description, CharacterString.class, false, false, null);
+        add(ObjectType.loadControl, PropertyIdentifier.presentValue, ShedState.class, false, true, ShedState.shedInactive);
+        add(ObjectType.loadControl, PropertyIdentifier.stateDescription, CharacterString.class, false, false, null);
+        add(ObjectType.loadControl, PropertyIdentifier.statusFlags, StatusFlags.class, false, true, new StatusFlags(false, false, false, true));
+        add(ObjectType.loadControl, PropertyIdentifier.eventState, EventState.class, false, true, EventState.normal);
+        add(ObjectType.loadControl, PropertyIdentifier.reliability, Reliability.class, false, true, null);
+        add(ObjectType.loadControl, PropertyIdentifier.requestedShedLevel, ShedLevel.class, false, true, null);
+        add(ObjectType.loadControl, PropertyIdentifier.startTime, DateTime.class, false, true, null);
+        add(ObjectType.loadControl, PropertyIdentifier.shedDuration, UnsignedInteger.class, false, true, null);
+        add(ObjectType.loadControl, PropertyIdentifier.dutyWindow, UnsignedInteger.class, false, true, null);
+        add(ObjectType.loadControl, PropertyIdentifier.enable, Boolean.class, false, true, null);
+        add(ObjectType.loadControl, PropertyIdentifier.fullDutyBaseline, Real.class, false, false, null);
+        add(ObjectType.loadControl, PropertyIdentifier.expectedShedLevel, ShedLevel.class, false, true, null);
+        add(ObjectType.loadControl, PropertyIdentifier.actualShedLevel, ShedLevel.class, false, true, null);
+        add(ObjectType.loadControl, PropertyIdentifier.shedLevels, UnsignedInteger.class, true, true, null);
+        add(ObjectType.loadControl, PropertyIdentifier.shedLevelDescriptions, CharacterString.class, true, true, null);
+        add(ObjectType.loadControl, PropertyIdentifier.notificationClass, UnsignedInteger.class, false, false, null);
+        add(ObjectType.loadControl, PropertyIdentifier.timeDelay, UnsignedInteger.class, false, false, null);
+        add(ObjectType.loadControl, PropertyIdentifier.eventEnable, EventTransitionBits.class, false, false, null);
+        add(ObjectType.loadControl, PropertyIdentifier.ackedTransitions, EventTransitionBits.class, false, false, null);
+        add(ObjectType.loadControl, PropertyIdentifier.notifyType, NotifyType.class, false, false, null);
+        add(ObjectType.loadControl, PropertyIdentifier.eventTimeStamps, TimeStamp.class, true, false, null);
+        add(ObjectType.loadControl, PropertyIdentifier.profileName, CharacterString.class, false, false, null);
+
         
         // Loop
         add(ObjectType.loop, PropertyIdentifier.objectIdentifier, ObjectIdentifier.class, false, true, new ObjectIdentifier(ObjectType.loop, 0x3fffff));
@@ -664,6 +735,7 @@ public class ObjectProperties {
         add(ObjectType.loop, PropertyIdentifier.timeDelay, UnsignedInteger.class, false, false, null);
         add(ObjectType.loop, PropertyIdentifier.notificationClass, UnsignedInteger.class, false, false, null);
         add(ObjectType.loop, PropertyIdentifier.errorLimit, Real.class, false, false, null);
+        add(ObjectType.loop, PropertyIdentifier.deadband, Real.class, false, false, null);
         add(ObjectType.loop, PropertyIdentifier.eventEnable, EventTransitionBits.class, false, false, null);
         add(ObjectType.loop, PropertyIdentifier.ackedTransitions, EventTransitionBits.class, false, false, null);
         add(ObjectType.loop, PropertyIdentifier.notifyType, NotifyType.class, false, false, null);
@@ -822,7 +894,19 @@ public class ObjectProperties {
         add(ObjectType.schedule, PropertyIdentifier.statusFlags, StatusFlags.class, false, true, new StatusFlags(false, false, false, true));
         add(ObjectType.schedule, PropertyIdentifier.reliability, Reliability.class, false, true, null);
         add(ObjectType.schedule, PropertyIdentifier.outOfService, Boolean.class, false, true, new Boolean(true));
-        add(ObjectType.schedule, PropertyIdentifier.profileName, CharacterString.class, false,  true, null);
+        add(ObjectType.schedule, PropertyIdentifier.profileName, CharacterString.class, false, true, null);
+        
+        
+        // Structured View
+        add(ObjectType.structuredView, PropertyIdentifier.objectIdentifier, ObjectIdentifier.class, false, true, new ObjectIdentifier(ObjectType.structuredView, 0x3fffff));
+        add(ObjectType.structuredView, PropertyIdentifier.objectName, CharacterString.class, false, true, null);
+        add(ObjectType.structuredView, PropertyIdentifier.objectType, ObjectType.class, false, true, ObjectType.structuredView);
+        add(ObjectType.structuredView, PropertyIdentifier.description, CharacterString.class, false, false, null);
+        add(ObjectType.structuredView, PropertyIdentifier.nodeType, NodeType.class, false, false, null);
+        add(ObjectType.structuredView, PropertyIdentifier.nodeSubtype, CharacterString.class, false, false, null);
+        add(ObjectType.structuredView, PropertyIdentifier.subordinateList, DeviceObjectReference.class, true, true, null);
+        add(ObjectType.structuredView, PropertyIdentifier.subordinateAnnotations, CharacterString.class, true, false, null);
+        add(ObjectType.structuredView, PropertyIdentifier.profileName, CharacterString.class, false, false, null);
         
         
         // Trend log
@@ -830,7 +914,7 @@ public class ObjectProperties {
         add(ObjectType.trendLog, PropertyIdentifier.objectName, CharacterString.class, false, true, null);
         add(ObjectType.trendLog, PropertyIdentifier.objectType, ObjectType.class, false, true, ObjectType.trendLog);
         add(ObjectType.trendLog, PropertyIdentifier.description, CharacterString.class, false, false, null);
-        add(ObjectType.trendLog, PropertyIdentifier.logEnable, Boolean.class, false, true, null);
+        add(ObjectType.trendLog, PropertyIdentifier.enable, Boolean.class, false, true, null);
         add(ObjectType.trendLog, PropertyIdentifier.startTime, DateTime.class, false, false, null);
         add(ObjectType.trendLog, PropertyIdentifier.stopTime, DateTime.class, false, false, null);
         add(ObjectType.trendLog, PropertyIdentifier.logDeviceObjectProperty, DeviceObjectPropertyReference.class, false, false, null);
@@ -839,7 +923,7 @@ public class ObjectProperties {
         add(ObjectType.trendLog, PropertyIdentifier.clientCovIncrement, ClientCov.class, false, false, null);
         add(ObjectType.trendLog, PropertyIdentifier.stopWhenFull, Boolean.class, false, true, null);
         add(ObjectType.trendLog, PropertyIdentifier.bufferSize, UnsignedInteger.class, false, true, null);
-        add(ObjectType.trendLog, PropertyIdentifier.logBuffer, LogRecord.class, true, true, null);
+        add(ObjectType.trendLog, PropertyIdentifier.logBuffer, LogRecord.class, true, true, new SequenceOf<LogRecord>());
         add(ObjectType.trendLog, PropertyIdentifier.recordCount, UnsignedInteger.class, false, true, null);
         add(ObjectType.trendLog, PropertyIdentifier.totalRecordCount, UnsignedInteger.class, false, true, null);
         add(ObjectType.trendLog, PropertyIdentifier.notificationThreshold, UnsignedInteger.class, false, false, null);
@@ -852,5 +936,44 @@ public class ObjectProperties {
         add(ObjectType.trendLog, PropertyIdentifier.notifyType, NotifyType.class, false, false, null);
         add(ObjectType.trendLog, PropertyIdentifier.eventTimeStamps, TimeStamp.class, true, false, null);
         add(ObjectType.trendLog, PropertyIdentifier.profileName, CharacterString.class, false, false, null);
+        add(ObjectType.trendLog, PropertyIdentifier.loggingType, LoggingType.class, false, true, null);
+        add(ObjectType.trendLog, PropertyIdentifier.alignIntervals, Boolean.class, false, false, null);
+        add(ObjectType.trendLog, PropertyIdentifier.intervalOffset, UnsignedInteger.class, false, false, null);
+        add(ObjectType.trendLog, PropertyIdentifier.trigger, Boolean.class, false, false, null);
+        add(ObjectType.trendLog, PropertyIdentifier.statusFlags, StatusFlags.class, false, true, new StatusFlags(false, false, false, true));
+        add(ObjectType.trendLog, PropertyIdentifier.reliability, Reliability.class, false, false, null);
+        
+        
+        // Trend log multiple
+        add(ObjectType.trendLogMultiple, PropertyIdentifier.objectIdentifier, ObjectIdentifier.class, false, true, new ObjectIdentifier(ObjectType.trendLogMultiple, 0x3fffff));
+        add(ObjectType.trendLogMultiple, PropertyIdentifier.objectName, CharacterString.class, false, true, null);
+        add(ObjectType.trendLogMultiple, PropertyIdentifier.objectType, ObjectType.class, false, true, ObjectType.trendLogMultiple);
+        add(ObjectType.trendLogMultiple, PropertyIdentifier.description, CharacterString.class, false, false, null);
+        add(ObjectType.trendLogMultiple, PropertyIdentifier.statusFlags, StatusFlags.class, false, true, new StatusFlags(false, false, false, true));
+        add(ObjectType.trendLogMultiple, PropertyIdentifier.eventState, EventState.class, false, true, EventState.normal);
+        add(ObjectType.trendLogMultiple, PropertyIdentifier.reliability, Reliability.class, false, false, null);
+        add(ObjectType.trendLogMultiple, PropertyIdentifier.enable, Boolean.class, false, true, null);
+        add(ObjectType.trendLogMultiple, PropertyIdentifier.startTime, DateTime.class, false, false, null);
+        add(ObjectType.trendLogMultiple, PropertyIdentifier.stopTime, DateTime.class, false, false, null);
+        add(ObjectType.trendLogMultiple, PropertyIdentifier.logDeviceObjectProperty, DeviceObjectPropertyReference.class, true, true, new SequenceOf<DeviceObjectPropertyReference>());
+        add(ObjectType.trendLogMultiple, PropertyIdentifier.loggingType, LoggingType.class, false, true, null);
+        add(ObjectType.trendLogMultiple, PropertyIdentifier.logInterval, UnsignedInteger.class, false, true, null);
+        add(ObjectType.trendLogMultiple, PropertyIdentifier.alignIntervals, Boolean.class, false, false, null);
+        add(ObjectType.trendLogMultiple, PropertyIdentifier.intervalOffset, UnsignedInteger.class, false, false, null);
+        add(ObjectType.trendLogMultiple, PropertyIdentifier.trigger, Boolean.class, false, false, null);
+        add(ObjectType.trendLogMultiple, PropertyIdentifier.stopWhenFull, Boolean.class, false, true, null);
+        add(ObjectType.trendLogMultiple, PropertyIdentifier.bufferSize, UnsignedInteger.class, false, true, null);
+        add(ObjectType.trendLogMultiple, PropertyIdentifier.logBuffer, LogMultipleRecord.class, true, true, new SequenceOf<LogMultipleRecord>());
+        add(ObjectType.trendLogMultiple, PropertyIdentifier.recordCount, UnsignedInteger.class, false, true, null);
+        add(ObjectType.trendLogMultiple, PropertyIdentifier.totalRecordCount, UnsignedInteger.class, false, true, null);
+        add(ObjectType.trendLogMultiple, PropertyIdentifier.notificationThreshold, UnsignedInteger.class, false, false, null);
+        add(ObjectType.trendLogMultiple, PropertyIdentifier.recordsSinceNotification, UnsignedInteger.class, false, false, null);
+        add(ObjectType.trendLogMultiple, PropertyIdentifier.lastNotifyRecord, UnsignedInteger.class, false, false, null);
+        add(ObjectType.trendLogMultiple, PropertyIdentifier.notificationClass, UnsignedInteger.class, false, false, null);
+        add(ObjectType.trendLogMultiple, PropertyIdentifier.eventEnable, EventTransitionBits.class, false, false, null);
+        add(ObjectType.trendLogMultiple, PropertyIdentifier.ackedTransitions, EventTransitionBits.class, false, false, null);
+        add(ObjectType.trendLogMultiple, PropertyIdentifier.notifyType, NotifyType.class, false, false, null);
+        add(ObjectType.trendLogMultiple, PropertyIdentifier.eventTimeStamps, TimeStamp.class, true, false, null);
+        add(ObjectType.trendLogMultiple, PropertyIdentifier.profileName, CharacterString.class, false, false, null);
     }
 }

@@ -33,6 +33,7 @@ public class ErrorClass extends Enumerated {
     public static final ErrorClass security = new ErrorClass(4);
     public static final ErrorClass services = new ErrorClass(5);
     public static final ErrorClass vt = new ErrorClass(6);
+    public static final ErrorClass communication = new ErrorClass(7);
 
     public ErrorClass(int value) {
         super(value);
@@ -59,6 +60,8 @@ public class ErrorClass extends Enumerated {
             return "Services";
         if (type == vt.intValue())
             return "VT";
+        if (type == communication.intValue())
+            return "Communication";
         return "Unknown: "+ type;
     }
 }

@@ -154,7 +154,7 @@ public class PropertyIdentifier extends Enumerated {
     public static final PropertyIdentifier eventTimeStamps = new PropertyIdentifier(130);
     public static final PropertyIdentifier logBuffer = new PropertyIdentifier(131);
     public static final PropertyIdentifier logDeviceObjectProperty = new PropertyIdentifier(132);
-    public static final PropertyIdentifier logEnable = new PropertyIdentifier(133);
+    public static final PropertyIdentifier enable = new PropertyIdentifier(133);
     public static final PropertyIdentifier logInterval = new PropertyIdentifier(134);
     public static final PropertyIdentifier maximumValue = new PropertyIdentifier(135);
     public static final PropertyIdentifier minimumValue = new PropertyIdentifier(136);
@@ -213,6 +213,29 @@ public class PropertyIdentifier extends Enumerated {
     public static final PropertyIdentifier valueBeforeChange = new PropertyIdentifier(190);
     public static final PropertyIdentifier valueSet = new PropertyIdentifier(191);
     public static final PropertyIdentifier valueChangeTime = new PropertyIdentifier(192);
+    public static final PropertyIdentifier alignIntervals = new PropertyIdentifier(193);
+    public static final PropertyIdentifier intervalOffset = new PropertyIdentifier(195);
+    public static final PropertyIdentifier lastRestartReason = new PropertyIdentifier(196);
+    public static final PropertyIdentifier loggingType = new PropertyIdentifier(197);
+    public static final PropertyIdentifier restartNotificationRecipients = new PropertyIdentifier(202);
+    public static final PropertyIdentifier timeOfDeviceRestart = new PropertyIdentifier(203);
+    public static final PropertyIdentifier timeSynchronizationInterval = new PropertyIdentifier(204);
+    public static final PropertyIdentifier trigger = new PropertyIdentifier(205);
+    public static final PropertyIdentifier utcTimeSynchronizationRecipients = new PropertyIdentifier(206);
+    public static final PropertyIdentifier nodeSubtype = new PropertyIdentifier(207);
+    public static final PropertyIdentifier nodeType = new PropertyIdentifier(208);
+    public static final PropertyIdentifier structuredObjectList = new PropertyIdentifier(209);
+    public static final PropertyIdentifier subordinateAnnotations = new PropertyIdentifier(210);
+    public static final PropertyIdentifier subordinateList = new PropertyIdentifier(211);
+    public static final PropertyIdentifier actualShedLevel = new PropertyIdentifier(212);
+    public static final PropertyIdentifier dutyWindow = new PropertyIdentifier(213);
+    public static final PropertyIdentifier expectedShedLevel = new PropertyIdentifier(214);
+    public static final PropertyIdentifier fullDutyBaseline = new PropertyIdentifier(215);
+    public static final PropertyIdentifier requestedShedLevel = new PropertyIdentifier(218);
+    public static final PropertyIdentifier shedDuration = new PropertyIdentifier(219);
+    public static final PropertyIdentifier shedLevelDescriptions = new PropertyIdentifier(220);
+    public static final PropertyIdentifier shedLevels = new PropertyIdentifier(221);
+    public static final PropertyIdentifier stateDescription = new PropertyIdentifier(221);
     public static final PropertyIdentifier doorAlarmState = new PropertyIdentifier(226);
     public static final PropertyIdentifier doorExtendedPulseTime = new PropertyIdentifier(227);
     public static final PropertyIdentifier doorMembers = new PropertyIdentifier(228);
@@ -491,8 +514,8 @@ public class PropertyIdentifier extends Enumerated {
             return "Log buffer";
         if (type == logDeviceObjectProperty.intValue())
             return "Log device object property";
-        if (type == logEnable.intValue())
-            return "Log enable";
+        if (type == enable.intValue())
+            return "enable";
         if (type == logInterval.intValue())
             return "Log interval";
         if (type == maximumValue.intValue())
@@ -609,6 +632,72 @@ public class PropertyIdentifier extends Enumerated {
             return "Value set";
         if (type == valueChangeTime.intValue())
             return "Value change time";
+        if (type == alignIntervals.intValue())
+            return "Align Intervals";
+        if (type == intervalOffset.intValue())
+            return "Interval Offset";
+        if (type == lastRestartReason.intValue())
+            return "Last Restart Reason";
+        if (type == loggingType.intValue())
+            return "Logging Type";
+        if (type == restartNotificationRecipients.intValue())
+            return "Restart Notification Recipients";
+        if (type == timeOfDeviceRestart.intValue())
+            return "Time Of Device Restart";
+        if (type == timeSynchronizationInterval.intValue())
+            return "Time Synchronization Interval";
+        if (type == trigger.intValue())
+            return "Trigger";
+        if (type == utcTimeSynchronizationRecipients.intValue())
+            return "UTC Time Synchronization Recipients";
+        if (type == nodeSubtype.intValue())
+            return "Node Subtype";
+        if (type == nodeType.intValue())
+            return "Node Type";
+        if (type == structuredObjectList.intValue())
+            return "Structured Object List";
+        if (type == subordinateAnnotations.intValue())
+            return "Subordinate Annotations";
+        if (type == subordinateList.intValue())
+            return "Subordinate List";
+        if (type == actualShedLevel.intValue())
+            return "Actual Shed Level";
+        if (type == dutyWindow.intValue())
+            return "Duty Window";
+        if (type == expectedShedLevel.intValue())
+            return "Expected Shed Level";
+        if (type == fullDutyBaseline.intValue())
+            return "Full Duty Baseline";
+        if (type == requestedShedLevel.intValue())
+            return "Requested Shed Level";
+        if (type == shedDuration.intValue())
+            return "Shed Duration";
+        if (type == shedLevelDescriptions.intValue())
+            return "Shed Level Descriptions";
+        if (type == shedLevels.intValue())
+            return "Shed Levels";
+        if (type == stateDescription.intValue())
+            return "State Description";
+        if (type == doorAlarmState.intValue())
+            return "Door Alarm State";
+        if (type == doorExtendedPulseTime.intValue())
+            return "Door Extended Pulse Time";
+        if (type == doorMembers.intValue())
+            return "Door Members";
+        if (type == doorOpenTooLongTime.intValue())
+            return "Door Open Too Long Time";
+        if (type == doorPulseTime.intValue())
+            return "Door Pulse Time";
+        if (type == doorStatus.intValue())
+            return "Door Status";
+        if (type == doorUnlockDelayTime.intValue())
+            return "Door Unlock Delay Time";
+        if (type == lockStatus.intValue())
+            return "Lock Status";
+        if (type == maskedAlarmValues.intValue())
+            return "Masked Alarm Values";
+        if (type == securedStatus.intValue())
+            return "Secured Status";
         return "Unknown: "+ type;
     }
 }

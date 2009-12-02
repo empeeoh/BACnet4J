@@ -76,8 +76,36 @@ public class ErrorCode extends Enumerated {
     public static final ErrorCode duplicateName = new ErrorCode(48);
     public static final ErrorCode duplicateObjectId = new ErrorCode(49);
     public static final ErrorCode propertyIsNotAnArray = new ErrorCode(50);
+    public static final ErrorCode abortBufferOverflow = new ErrorCode(51);
+    public static final ErrorCode abortInvalidApduInThisState = new ErrorCode(52);
+    public static final ErrorCode abortPreemptedByHigherPriorityTask = new ErrorCode(53);
+    public static final ErrorCode abortSegmentationNotSupported = new ErrorCode(54);
+    public static final ErrorCode abortProprietary = new ErrorCode(55);
+    public static final ErrorCode abortOther = new ErrorCode(56);
+    public static final ErrorCode invalidTag = new ErrorCode(57);
+    public static final ErrorCode networkDown = new ErrorCode(58);
+    public static final ErrorCode rejectBufferOverflow = new ErrorCode(59);
+    public static final ErrorCode rejectInconsistentParameters = new ErrorCode(60);
+    public static final ErrorCode rejectInvalidParameterDataType = new ErrorCode(61);
+    public static final ErrorCode rejectInvalidTag = new ErrorCode(62);
+    public static final ErrorCode rejectMissingRequiredParameter = new ErrorCode(63);
+    public static final ErrorCode rejectParameterOutOfRange = new ErrorCode(64);
+    public static final ErrorCode rejectTooManyArguments = new ErrorCode(65);
+    public static final ErrorCode rejectUndefinedEnumeration = new ErrorCode(66);
+    public static final ErrorCode rejectUnrecognizedService = new ErrorCode(67);
+    public static final ErrorCode rejectProprietary = new ErrorCode(68);
+    public static final ErrorCode rejectOther = new ErrorCode(69);
+    public static final ErrorCode unknownDevice = new ErrorCode(70);
+    public static final ErrorCode unknownRoute = new ErrorCode(71);
+    public static final ErrorCode valueNotInitialized = new ErrorCode(72);
+    public static final ErrorCode invalidEventState = new ErrorCode(73);
+    public static final ErrorCode noAlarmConfigured = new ErrorCode(74);
+    public static final ErrorCode logBufferFull = new ErrorCode(75);
+    public static final ErrorCode loggedValuePurged = new ErrorCode(76);
+    public static final ErrorCode noPropertySpecified = new ErrorCode(77);
+    public static final ErrorCode notConfiguredForTriggeredLogging = new ErrorCode(78);
+    public static final ErrorCode communicationDisabled = new ErrorCode(83);
     
-
     public ErrorCode(int value) {
         super(value);
     }
@@ -189,6 +217,64 @@ public class ErrorCode extends Enumerated {
             return "Duplicate object id";
         if (type == propertyIsNotAnArray.intValue())
             return "Property is not an array";
+        if (type == abortBufferOverflow.intValue())
+            return "Abort Buffer Overflow";
+        if (type == abortInvalidApduInThisState.intValue())
+            return "Abort Invalid Apdu In This State";
+        if (type == abortPreemptedByHigherPriorityTask.intValue())
+            return "Abort Preempted By Higher Priority Task";
+        if (type == abortSegmentationNotSupported.intValue())
+            return "Abort Segmentation Not Supported";
+        if (type == abortProprietary.intValue())
+            return "Abort Proprietary";
+        if (type == abortOther.intValue())
+            return "Abort Other";
+        if (type == invalidTag.intValue())
+            return "Invalid Tag";
+        if (type == networkDown.intValue())
+            return "Network Down";
+        if (type == rejectBufferOverflow.intValue())
+            return "Reject Buffer Overflow";
+        if (type == rejectInconsistentParameters.intValue())
+            return "Reject Inconsistent Parameters";
+        if (type == rejectInvalidParameterDataType.intValue())
+            return "Reject Invalid Parameter Data Type";
+        if (type == rejectInvalidTag.intValue())
+            return "Reject Invalid Tag";
+        if (type == rejectMissingRequiredParameter.intValue())
+            return "Reject Missing Required Parameter";
+        if (type == rejectParameterOutOfRange.intValue())
+            return "Reject Parameter Out Of Range";
+        if (type == rejectTooManyArguments.intValue())
+            return "Reject Too Many Arguments";
+        if (type == rejectUndefinedEnumeration.intValue())
+            return "Reject Undefined Enumeration";
+        if (type == rejectUnrecognizedService.intValue())
+            return "Reject Unrecognized Service";
+        if (type == rejectProprietary.intValue())
+            return "Reject Proprietary";
+        if (type == rejectOther.intValue())
+            return "Reject Other";
+        if (type == unknownDevice.intValue())
+            return "Unknown Device";
+        if (type == unknownRoute.intValue())
+            return "Unknown Route";
+        if (type == valueNotInitialized.intValue())
+            return "Value Not Initialized";
+        if (type == invalidEventState.intValue())
+            return "Invalid Event State";
+        if (type == noAlarmConfigured.intValue())
+            return "No Alarm Configured";
+        if (type == logBufferFull.intValue())
+            return "Log Buffer Full";
+        if (type == loggedValuePurged.intValue())
+            return "Logged Value Purged";
+        if (type == noPropertySpecified.intValue())
+            return "No Property Specified";
+        if (type == notConfiguredForTriggeredLogging.intValue())
+            return "Not Configured For Triggered Logging";
+        if (type == communicationDisabled.intValue())
+            return "Communication Disabled";
         return "Unknown: "+ type;
     }
 }

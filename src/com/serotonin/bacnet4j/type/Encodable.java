@@ -1,5 +1,6 @@
 package com.serotonin.bacnet4j.type;
 
+import java.util.List;
 import java.util.Map;
 
 import com.serotonin.bacnet4j.base.BACnetUtils;
@@ -8,6 +9,7 @@ import com.serotonin.bacnet4j.exception.BACnetException;
 import com.serotonin.bacnet4j.obj.ObjectProperties;
 import com.serotonin.bacnet4j.obj.PropertyTypeDefinition;
 import com.serotonin.bacnet4j.service.VendorServiceKey;
+import com.serotonin.bacnet4j.type.constructed.Choice;
 import com.serotonin.bacnet4j.type.constructed.Sequence;
 import com.serotonin.bacnet4j.type.constructed.SequenceOf;
 import com.serotonin.bacnet4j.type.enumerated.ErrorClass;
@@ -241,6 +243,16 @@ abstract public class Encodable {
         catch (Exception e) {
             throw new BACnetException(e);
         }
+        popEnd(queue, contextId);
+        return result;
+    }
+    
+    protected static SequenceOf<Choice> readSequenceOfChoice(ByteQueue queue, List<Class<? extends Encodable>> classes,
+            int contextId) throws BACnetException {
+        popStart(queue, contextId);
+        SequenceOf<Choice> result = new SequenceOf<Choice>();
+        while (readEnd(queue) != contextId)
+            result.add(new Choice(queue, classes));
         popEnd(queue, contextId);
         return result;
     }

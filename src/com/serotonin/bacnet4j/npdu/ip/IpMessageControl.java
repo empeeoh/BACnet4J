@@ -81,10 +81,10 @@ public class IpMessageControl extends Thread {
     private int port;
     private String localBindAddress = "0.0.0.0";
     private String broadcastAddress = "255.255.255.255";
-    private int timeout = 5000;
-    private int segTimeout = 1000;
+    private int timeout = 6000;
+    private int segTimeout = 5000;
     private int segWindow = 5;
-    private int retries = 2;
+    private int retries = 3;
     private RequestHandler requestHandler;
     
     // Runtime

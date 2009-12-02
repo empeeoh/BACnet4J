@@ -27,7 +27,7 @@ import com.serotonin.util.queue.ByteQueue;
 
 public class ObjectTypesSupported extends BitString {
     public ObjectTypesSupported() {
-        super(new boolean[26]);
+        super(new boolean[31]);
     }
 
     public ObjectTypesSupported(ByteQueue queue) {
@@ -234,11 +234,43 @@ public class ObjectTypesSupported extends BitString {
         getValue()[24] = pulseConverter;
     }
     
-    public boolean isAccessDoor() {
+    public boolean isEventLog() {
         return getValue()[25];
     }
     
+    public void setEventLog(boolean eventLog) {
+        getValue()[25] = eventLog;
+    }
+    
+    public boolean isTrendLogMultiple() {
+        return getValue()[27];
+    }
+    
+    public void setTrendLogMultiple(boolean trendLogMultiple) {
+        getValue()[27] = trendLogMultiple;
+    }
+    
+    public boolean isLoadControl() {
+        return getValue()[28];
+    }
+    
+    public void setLoadControl(boolean loadControl) {
+        getValue()[28] = loadControl;
+    }
+    
+    public boolean isStructuredView() {
+        return getValue()[29];
+    }
+    
+    public void setStructuredView(boolean structuredView) {
+        getValue()[29] = structuredView;
+    }
+    
+    public boolean isAccessDoor() {
+        return getValue()[30];
+    }
+    
     public void setAccessDoor(boolean accessDoor) {
-        getValue()[25] = accessDoor;
+        getValue()[30] = accessDoor;
     }
 }

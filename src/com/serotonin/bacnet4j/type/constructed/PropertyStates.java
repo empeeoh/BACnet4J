@@ -40,6 +40,7 @@ import com.serotonin.bacnet4j.type.enumerated.ProgramError;
 import com.serotonin.bacnet4j.type.enumerated.ProgramRequest;
 import com.serotonin.bacnet4j.type.enumerated.ProgramState;
 import com.serotonin.bacnet4j.type.enumerated.Reliability;
+import com.serotonin.bacnet4j.type.enumerated.RestartReason;
 import com.serotonin.bacnet4j.type.primitive.Boolean;
 import com.serotonin.bacnet4j.type.primitive.UnsignedInteger;
 import com.serotonin.util.queue.ByteQueue;
@@ -62,7 +63,7 @@ public class PropertyStates extends BaseType {
         classes.add(UnsignedInteger.class);
         classes.add(LifeSafetyMode.class);
         classes.add(LifeSafetyState.class);
-        classes.add(null);
+        classes.add(RestartReason.class);
         classes.add(DoorAlarmState.class);
     }
     
@@ -81,6 +82,7 @@ public class PropertyStates extends BaseType {
         int UNSIGNED = 11;
         int LIFE_SAFETY_MODE = 12;
         int LIFE_SAFETY_STATE = 13;
+        int RESTART_REASON = 14;
         int DOOR_ALARM_STATE = 15;
     }
     

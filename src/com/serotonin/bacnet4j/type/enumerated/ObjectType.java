@@ -51,6 +51,10 @@ public class ObjectType extends Enumerated {
     public static final ObjectType lifeSafetyZone = new ObjectType(22);
     public static final ObjectType accumulator = new ObjectType(23);
     public static final ObjectType pulseConverter = new ObjectType(24);
+    public static final ObjectType eventLog = new ObjectType(25);
+    public static final ObjectType trendLogMultiple = new ObjectType(27);
+    public static final ObjectType loadControl = new ObjectType(28);
+    public static final ObjectType structuredView = new ObjectType(29);
     public static final ObjectType accessDoor = new ObjectType(30);
 
     public ObjectType(int value) {
@@ -114,6 +118,14 @@ public class ObjectType extends Enumerated {
             return "Accumulator";
         if (type == pulseConverter.intValue())
             return "Pulse Converter";
+        if (type == eventLog.intValue())
+            return "Event Log";
+        if (type == trendLogMultiple.intValue())
+            return "Trend Log Multiple";
+        if (type == loadControl.intValue())
+            return "Load Control";
+        if (type == structuredView.intValue())
+            return "Structured View";
         if (type == accessDoor.intValue())
             return "Access Door";
         return "Vendor Specific ("+ type +")";
