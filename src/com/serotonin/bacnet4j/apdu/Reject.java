@@ -92,6 +92,11 @@ public class Reject extends AckAPDU {
     }
 
     @Override
+    public String toString() {
+        return "Reject(originalInvokeId="+ originalInvokeId +", rejectReason="+ rejectReason +")";
+    }
+
+    @Override
     public boolean expectsReply() {
         return false;
     }
