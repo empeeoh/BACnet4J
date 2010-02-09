@@ -340,6 +340,7 @@ public class IpMessageControl extends Thread {
             throws BACnetException {
         UnconfirmedRequest apdu = new UnconfirmedRequest(serviceRequest);
         byte[] data = createMessageData(apdu, true, network);
+        //System.out.println(ArrayUtils.toHexString(data));
         sendImpl(data, new InetSocketAddress(broadcastAddress, port));
     }
     
@@ -409,6 +410,7 @@ public class IpMessageControl extends Thread {
         // Add the apdu
         queue.push(apduQueue);
         
+        //System.out.println("APUD message: apdu="+ apdu +", broadcast="+ broadcast +", network="+ network +", data="+ queue);
         return queue.popAll();
     }
     
@@ -595,7 +597,7 @@ public class IpMessageControl extends Thread {
     
     private AckAPDU sendSegmented(Key key, int maxAPDULengthAccepted, int maxServiceData, ByteQueue serviceData,
             Segmentable segmentTemplate) throws BACnetException {
-        System.out.println("Send segmented: "+ (serviceData.size() / maxServiceData + 1) +" segments required");
+        //System.out.println("Send segmented: "+ (serviceData.size() / maxServiceData + 1) +" segments required");
         
         // Send an initial message to negotiate communication terms.
         ByteQueue segData = new ByteQueue(maxServiceData);
@@ -604,7 +606,7 @@ public class IpMessageControl extends Thread {
         segData.push(data);
         
         APDU apdu = segmentTemplate.clone(true, 0, segmentTemplate.getProposedWindowSize(), segData);
-        System.out.println("Sending segment 0");
+        //System.out.println("Sending segment 0");
         AckAPDU response = send(key, segTimeout, new APDU[] {apdu});
         if (!(response instanceof SegmentACK))
             return response;
@@ -628,15 +630,15 @@ public class IpMessageControl extends Thread {
         // Send the data in windows of size given by the recipient.
         while (apduQueue.size() > 0) {
             APDU[] window = new APDU[Math.min(apduQueue.size(), actualSegWindow)];
-            System.out.println("Sending "+ window.length +" segments");
+            //System.out.println("Sending "+ window.length +" segments");
             for (int i=0; i<window.length; i++)
                 window[i] = apduQueue.poll();
             
             response = send(key, segTimeout, window);
             if (response instanceof SegmentACK) {
                 ack = (SegmentACK)response;
-                if (ack.isNegativeAck())
-                    System.out.println("NAK received: "+ ack);
+                //if (ack.isNegativeAck())
+                //    System.out.println("NAK received: "+ ack);
                 int receivedSeq = ack.getSequenceNumber() & 0xff;
                 while (apduQueue.size() > 0 &&
                         (((Segmentable)apduQueue.peek()).getSequenceNumber() & 0xff) <= receivedSeq)
@@ -747,15 +749,17 @@ public class IpMessageControl extends Thread {
         //String input = "81 0b 00 1b 01 28 ff ff 00 27 d8 06 00 18 71 73 0d 8a fe 10 08 0a 11 5e 1a c3 4f";
         
         // IAm response
-        String input = "81 0b 00 1b 01 28 ff ff 00 c4 80 01 04 fc 10 00 c4 02 00 76 c4 21 80 91 03 21 08";
+        // String input = "81 0b 00 1b 01 28 ff ff 00 c4 80 01 04 fc 10 00 c4 02 00 76 c4 21 80 91 03 21 08";
+        //String input = "[81,b,0,18,1,20,ff,ff,0,ff,10,0,c4,2,1,2c,c8,22,5,c0,91,3,21,4d]";
+        String input = "81,a,0,17,1,4,2,75,1,e,c,2,1,2c,c8,1e,9,4d,9,62,9,8b,1f";
         
         if (input.startsWith("["))
             input = input.substring(1);
         if (input.endsWith("]"))
             input = input.substring(0, input.length() - 1);
-        //String[] parts = input.split(",");
+        String[] parts = input.split(",");
         //String[] parts = input.split("\\|");
-        String[] parts = input.split(" ");
+        //String[] parts = input.split(" ");
         byte[] bytes = new byte[parts.length];
         
         for (int i=0; i<bytes.length; i++)
