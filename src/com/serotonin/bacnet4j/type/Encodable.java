@@ -16,6 +16,7 @@ import com.serotonin.bacnet4j.type.enumerated.ErrorClass;
 import com.serotonin.bacnet4j.type.enumerated.ErrorCode;
 import com.serotonin.bacnet4j.type.enumerated.ObjectType;
 import com.serotonin.bacnet4j.type.enumerated.PropertyIdentifier;
+import com.serotonin.bacnet4j.type.primitive.Null;
 import com.serotonin.bacnet4j.type.primitive.Primitive;
 import com.serotonin.bacnet4j.type.primitive.UnsignedInteger;
 import com.serotonin.util.queue.ByteQueue;
@@ -285,6 +286,19 @@ abstract public class Encodable {
         PropertyTypeDefinition def = ObjectProperties.getPropertyTypeDefinition(objectType, propertyIdentifier);
         if (def == null)
             return new AmbiguousValue(queue, contextId);
+        
+        if (ObjectProperties.isCommandable(objectType, propertyIdentifier)) {
+            // If the object is commandable, it could be set to Null, so we need to treat it as ambiguous.
+            AmbiguousValue amb = new AmbiguousValue(queue, contextId);
+            try {
+                // Try converting to the definition value.
+                return amb.convertTo(def.getClazz());
+            }
+            catch (BACnetException e) {}
+            
+            // Convert it to Null.
+            return amb.convertTo(Null.class);
+        }
         
         if (propertyArrayIndex != null && !def.isSequence())
             throw new BACnetErrorException(ErrorClass.property, ErrorCode.propertyIsNotAList);

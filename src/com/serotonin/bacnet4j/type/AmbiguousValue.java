@@ -83,7 +83,7 @@ public class AmbiguousValue extends Encodable {
     }
     
     public <T extends Encodable> T convertTo(Class<T> clazz) throws BACnetException {
-        return read(data, clazz);
+        return read(new ByteQueue(data.peekAll()), clazz);
     }
 
     @Override

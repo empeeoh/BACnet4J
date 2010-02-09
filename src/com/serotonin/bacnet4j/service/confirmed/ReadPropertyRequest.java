@@ -80,7 +80,7 @@ public class ReadPropertyRequest extends ConfirmedRequestService {
         Encodable prop;
         try {
             BACnetObject obj = localDevice.getObjectRequired(objectIdentifier);
-            prop = obj.getPropertyRequired(propertyIdentifier, propertyArrayIndex);
+            prop = obj.getProperty(propertyIdentifier, propertyArrayIndex);
         }
         catch (BACnetServiceException e) {
             throw new BACnetErrorException(getChoiceId(), e);

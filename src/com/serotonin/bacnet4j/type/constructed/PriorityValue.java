@@ -81,6 +81,22 @@ public class PriorityValue extends BaseType {
         return constructedValue;
     }
     
+    public boolean isNull() {
+        return nullValue != null;
+    }
+    
+    public Encodable getValue() {
+        if (nullValue != null)
+            return nullValue;
+        if (realValue != null)
+            return realValue;
+        if (binaryValue != null)
+            return binaryValue;
+        if (integerValue != null)
+            return integerValue;
+        return constructedValue;
+    }
+    
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();

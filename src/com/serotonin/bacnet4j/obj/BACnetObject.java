@@ -37,14 +37,21 @@ import com.serotonin.bacnet4j.service.confirmed.ConfirmedCovNotificationRequest;
 import com.serotonin.bacnet4j.service.unconfirmed.UnconfirmedCovNotificationRequest;
 import com.serotonin.bacnet4j.type.Encodable;
 import com.serotonin.bacnet4j.type.constructed.Address;
+import com.serotonin.bacnet4j.type.constructed.BaseType;
+import com.serotonin.bacnet4j.type.constructed.PriorityArray;
+import com.serotonin.bacnet4j.type.constructed.PriorityValue;
 import com.serotonin.bacnet4j.type.constructed.PropertyValue;
 import com.serotonin.bacnet4j.type.constructed.SequenceOf;
+import com.serotonin.bacnet4j.type.enumerated.BinaryPV;
 import com.serotonin.bacnet4j.type.enumerated.ErrorClass;
 import com.serotonin.bacnet4j.type.enumerated.ErrorCode;
+import com.serotonin.bacnet4j.type.enumerated.ObjectType;
 import com.serotonin.bacnet4j.type.enumerated.PropertyIdentifier;
 import com.serotonin.bacnet4j.type.primitive.Boolean;
 import com.serotonin.bacnet4j.type.primitive.CharacterString;
+import com.serotonin.bacnet4j.type.primitive.Null;
 import com.serotonin.bacnet4j.type.primitive.ObjectIdentifier;
+import com.serotonin.bacnet4j.type.primitive.Real;
 import com.serotonin.bacnet4j.type.primitive.UnsignedInteger;
 import com.serotonin.util.ObjectUtils;
 
@@ -174,6 +181,10 @@ public class BACnetObject {
     public void setProperty(PropertyIdentifier pid, Encodable value) throws BACnetServiceException {
         ObjectProperties.validateValue(id.getObjectType(), pid, value);
         setPropertyImpl(pid, value);
+        
+        // If the reinquish default was set, make sure the present value gets updated as necessary.
+        if (pid.equals(PropertyIdentifier.relinquishDefault))
+            setCommandableImpl((PriorityArray)getProperty(PropertyIdentifier.priorityArray));
     }
     
     @SuppressWarnings("unchecked")
@@ -188,27 +199,57 @@ public class BACnetObject {
     }
     
     public void setProperty(PropertyValue value) throws BACnetServiceException {
-        if (value.getValue() == null) {
+        PropertyIdentifier pid = value.getPropertyIdentifier();
+        
+        if (pid.intValue() == PropertyIdentifier.objectIdentifier.intValue())
+            throw new BACnetServiceException(ErrorClass.property, ErrorCode.writeAccessDenied);
+        if (pid.intValue() == PropertyIdentifier.objectType.intValue())
+            throw new BACnetServiceException(ErrorClass.property, ErrorCode.writeAccessDenied);
+        if (pid.intValue() == PropertyIdentifier.priorityArray.intValue())
+            throw new BACnetServiceException(ErrorClass.property, ErrorCode.writeAccessDenied);
+        if (pid.intValue() == PropertyIdentifier.relinquishDefault.intValue())
+            throw new BACnetServiceException(ErrorClass.property, ErrorCode.writeAccessDenied);
+        
+        if (ObjectProperties.isCommandable((ObjectType)getProperty(PropertyIdentifier.objectType), pid))
+            setCommandable(value.getValue(), value.getPriority());
+        else if (value.getValue() == null) {
             if (value.getPropertyArrayIndex() == null)
                 removeProperty(value.getPropertyIdentifier());
             else
                 removeProperty(value.getPropertyIdentifier(), value.getPropertyArrayIndex());
         }
         else {
-            PropertyIdentifier pid = value.getPropertyIdentifier();
-            
-            if (pid.intValue() == PropertyIdentifier.objectIdentifier.intValue())
-                throw new BACnetServiceException(ErrorClass.property, ErrorCode.writeAccessDenied);
-            if (pid.intValue() == PropertyIdentifier.objectType.intValue())
-                throw new BACnetServiceException(ErrorClass.property, ErrorCode.writeAccessDenied);
-            if (value.getPriority() != null)
-                throw new BACnetServiceException(ErrorClass.property, ErrorCode.writeAccessDenied);
-            
             if (value.getPropertyArrayIndex() != null)
                 setProperty(pid, value.getPropertyArrayIndex().intValue(), value.getValue());
             else
                 setProperty(pid, value.getValue());
         }
+    }
+    
+    public void setCommandable(Encodable value, UnsignedInteger priority) throws BACnetServiceException {
+        int pri = 16;
+        if (priority != null)
+            pri = priority.intValue();
+        
+        PriorityArray priorityArray = (PriorityArray)getProperty(PropertyIdentifier.priorityArray);
+        priorityArray.set(pri, createCommandValue(value));
+        setCommandableImpl(priorityArray);
+    }
+    
+    private void setCommandableImpl(PriorityArray priorityArray) throws BACnetServiceException {
+        PriorityValue priorityValue = null;
+        for (PriorityValue priv : priorityArray) {
+            if (!priv.isNull()) {
+                priorityValue = priv;
+                break;
+            }
+        }
+        
+        Encodable newValue = getProperty(PropertyIdentifier.relinquishDefault);
+        if (priorityValue != null)
+            newValue = priorityValue.getValue();
+        
+        setPropertyImpl(PropertyIdentifier.presentValue, newValue);
     }
     
     private void setPropertyImpl(PropertyIdentifier pid, Encodable value) {
@@ -231,6 +272,20 @@ public class BACnetObject {
                 }
             }
         }
+    }
+    
+    private PriorityValue createCommandValue(Encodable value) throws BACnetServiceException {
+        if (value instanceof Null)
+            return new PriorityValue((Null)value);
+        
+        ObjectType type = (ObjectType)getProperty(PropertyIdentifier.objectType);
+        if (type.equals(ObjectType.accessDoor))
+            return new PriorityValue((BaseType)value);
+        if (type.equals(ObjectType.analogOutput) || type.equals(ObjectType.analogValue))
+            return new PriorityValue((Real)value);
+        if (type.equals(ObjectType.binaryOutput) || type.equals(ObjectType.binaryValue))
+            return new PriorityValue((BinaryPV)value);
+        return new PriorityValue((UnsignedInteger)value);
     }
     
     

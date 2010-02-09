@@ -109,12 +109,19 @@ import com.serotonin.bacnet4j.type.primitive.Unsigned16;
 import com.serotonin.bacnet4j.type.primitive.UnsignedInteger;
 
 public class ObjectProperties {
-    private static final Map<ObjectPropertyIdentifier, PropertyTypeDefinition> propertyTypes = 
-            new HashMap<ObjectPropertyIdentifier, PropertyTypeDefinition>();
+    private static final Map<ObjectType, List<PropertyTypeDefinition>> propertyTypes = 
+        new HashMap<ObjectType, List<PropertyTypeDefinition>>();    
     
     public static PropertyTypeDefinition getPropertyTypeDefinition(ObjectType objectType, 
             PropertyIdentifier propertyIdentifier) {
-        return propertyTypes.get(new ObjectPropertyIdentifier(objectType, propertyIdentifier));
+        List<PropertyTypeDefinition> list = propertyTypes.get(objectType);
+        if (list == null)
+            return null;
+        for (PropertyTypeDefinition def : list) {
+            if (def.getPropertyIdentifier().equals(propertyIdentifier))
+                return def;
+        }
+        return null;
     }
     
     public static PropertyTypeDefinition getPropertyTypeDefinitionRequired(ObjectType objectType, 
@@ -162,16 +169,27 @@ public class ObjectProperties {
         return getPropertyTypeDefinitions(objectType, 2);
     }
     
+    public static boolean isCommandable(ObjectType type, PropertyIdentifier pid) {
+        if (!pid.equals(PropertyIdentifier.presentValue))
+            return false;
+        return type.equals(ObjectType.analogOutput) || type.equals(ObjectType.analogValue) ||
+                type.equals(ObjectType.binaryOutput) || type.equals(ObjectType.binaryValue) || 
+                type.equals(ObjectType.multiStateOutput) || type.equals(ObjectType.multiStateValue) ||
+                type.equals(ObjectType.accessDoor); 
+    }
+    
+    
+    
     /**
      * @param objectType
      * @param include 0 = all, 1 = required, 2 = optional
      * @return
      */
     private static List<PropertyTypeDefinition> getPropertyTypeDefinitions(ObjectType objectType, int include) {
-        int type = objectType.intValue();
         List<PropertyTypeDefinition> result = new ArrayList<PropertyTypeDefinition>();
-        for (PropertyTypeDefinition def : propertyTypes.values()) {
-            if (def.getObjectType().intValue() == type) {
+        List<PropertyTypeDefinition> list = propertyTypes.get(objectType);
+        if (list != null) {
+            for (PropertyTypeDefinition def : list) {
                 if (include == 0 || (include == 1 && def.isRequired()) || (include == 2 && def.isOptional()))
                     result.add(def);
             }
@@ -183,16 +201,36 @@ public class ObjectProperties {
     
     private static void add(ObjectType type, PropertyIdentifier pid, Class<? extends Encodable> clazz, 
             boolean sequence, boolean required, Encodable defaultValue) {
-        propertyTypes.put(new ObjectPropertyIdentifier(type, pid), 
-                new PropertyTypeDefinition(type, pid, clazz, sequence, required, defaultValue));
+        List<PropertyTypeDefinition> list = propertyTypes.get(type);
+        if (list == null) {
+            list = new ArrayList<PropertyTypeDefinition>();
+            propertyTypes.put(type, list);
+        }
+        
+        // Check for existing entries.
+        for (PropertyTypeDefinition def : list) {
+            if (def.getPropertyIdentifier().equals(pid)) {
+                list.remove(def);
+                break;
+            }
+        }
+        
+        list.add(new PropertyTypeDefinition(type, pid, clazz, sequence, required, defaultValue));
     }
     
     public static void addPropertyTypeDefinition(ObjectType type, PropertyIdentifier pid,
             Class<? extends Encodable> clazz, boolean sequence, boolean required, Encodable defaultValue) {
-        ObjectPropertyIdentifier opid = new ObjectPropertyIdentifier(type, pid);
-        if (propertyTypes.containsKey(opid))
-            throw new RuntimeException("ObjectType already contains the given PropertyIdentifier");
-        propertyTypes.put(opid, new PropertyTypeDefinition(type, pid, clazz, sequence, required, defaultValue));
+        List<PropertyTypeDefinition> list = propertyTypes.get(type);
+        if (list == null)
+            throw new RuntimeException("ObjectType not found: "+ type);
+        
+        // Check for existing entries.
+        for (PropertyTypeDefinition def : list) {
+            if (def.getPropertyIdentifier().equals(pid))
+                throw new RuntimeException("ObjectType already contains the given PropertyIdentifier");
+        }
+        
+        list.add(new PropertyTypeDefinition(type, pid, clazz, sequence, required, defaultValue));
     }
     
     static {
@@ -207,7 +245,7 @@ public class ObjectProperties {
         add(ObjectType.accessDoor, PropertyIdentifier.reliability, Reliability.class, false, false, null);
         add(ObjectType.accessDoor, PropertyIdentifier.outOfService, Boolean.class, false, true, new Boolean(true));
         add(ObjectType.accessDoor, PropertyIdentifier.priorityArray, PriorityArray.class, false, true, new PriorityArray());
-        add(ObjectType.accessDoor, PropertyIdentifier.relinquishDefault, Real.class, false, true, new Real(0));
+        add(ObjectType.accessDoor, PropertyIdentifier.relinquishDefault, DoorValue.class, false, true, DoorValue.lock);
         add(ObjectType.accessDoor, PropertyIdentifier.doorStatus, DoorStatus.class, false, false, null);
         add(ObjectType.accessDoor, PropertyIdentifier.lockStatus, LockStatus.class, false, false, null);
         add(ObjectType.accessDoor, PropertyIdentifier.securedStatus, DoorSecuredStatus.class, false, false, null);
@@ -336,7 +374,7 @@ public class ObjectProperties {
         add(ObjectType.analogValue, PropertyIdentifier.reliability, Reliability.class, false, false, null);
         add(ObjectType.analogValue, PropertyIdentifier.outOfService, Boolean.class, false, true, new Boolean(true));
         add(ObjectType.analogValue, PropertyIdentifier.units, EngineeringUnits.class, false, true, EngineeringUnits.noUnits);
-        add(ObjectType.analogValue, PropertyIdentifier.priorityArray, PriorityArray.class, false, false, null);
+        add(ObjectType.analogValue, PropertyIdentifier.priorityArray, PriorityArray.class, false, false, new PriorityArray());
         add(ObjectType.analogValue, PropertyIdentifier.relinquishDefault, Real.class, false, false, new Real(0));
         add(ObjectType.analogValue, PropertyIdentifier.covIncrement, Real.class, false, false, null);
         add(ObjectType.analogValue, PropertyIdentifier.timeDelay, UnsignedInteger.class, false, false, null);
@@ -451,7 +489,7 @@ public class ObjectProperties {
         add(ObjectType.binaryValue, PropertyIdentifier.timeOfActiveTimeReset, DateTime.class, false, false, null);
         add(ObjectType.binaryValue, PropertyIdentifier.minimumOffTime, UnsignedInteger.class, false, false, null);
         add(ObjectType.binaryValue, PropertyIdentifier.minimumOnTime, UnsignedInteger.class, false, false, null);
-        add(ObjectType.binaryValue, PropertyIdentifier.priorityArray, PriorityArray.class, false, false, null);
+        add(ObjectType.binaryValue, PropertyIdentifier.priorityArray, PriorityArray.class, false, false, new PriorityArray());
         add(ObjectType.binaryValue, PropertyIdentifier.relinquishDefault, BinaryPV.class, false, false, BinaryPV.inactive);
         add(ObjectType.binaryValue, PropertyIdentifier.timeDelay, UnsignedInteger.class, false, false, null);
         add(ObjectType.binaryValue, PropertyIdentifier.notificationClass, UnsignedInteger.class, false, false, null);
@@ -804,7 +842,7 @@ public class ObjectProperties {
         add(ObjectType.multiStateValue, PropertyIdentifier.outOfService, Boolean.class, false, true, new Boolean(true));
         add(ObjectType.multiStateValue, PropertyIdentifier.numberOfStates, UnsignedInteger.class, false, true, null);
         add(ObjectType.multiStateValue, PropertyIdentifier.stateText, CharacterString.class, true, false, null);
-        add(ObjectType.multiStateValue, PropertyIdentifier.priorityArray, PriorityArray.class, false, false, null);
+        add(ObjectType.multiStateValue, PropertyIdentifier.priorityArray, PriorityArray.class, false, false, new PriorityArray());
         add(ObjectType.multiStateValue, PropertyIdentifier.relinquishDefault, UnsignedInteger.class, false, false, new UnsignedInteger(0));
         add(ObjectType.multiStateValue, PropertyIdentifier.timeDelay, UnsignedInteger.class, false, false, null);
         add(ObjectType.multiStateValue, PropertyIdentifier.notificationClass, UnsignedInteger.class, false, false, null);
