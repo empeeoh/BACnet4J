@@ -169,10 +169,11 @@ public class RemoteDevice {
 
     @Override
     public int hashCode() {
-        final int PRIME = 31;
+        final int prime = 31;
         int result = 1;
-        result = PRIME * result + ((address == null) ? 0 : address.hashCode());
-        result = PRIME * result + instanceNumber;
+        result = prime * result + ((address == null) ? 0 : address.hashCode());
+        result = prime * result + instanceNumber;
+        result = prime * result + ((network == null) ? 0 : network.hashCode());
         return result;
     }
 
@@ -192,6 +193,12 @@ public class RemoteDevice {
         else if (!address.equals(other.address))
             return false;
         if (instanceNumber != other.instanceNumber)
+            return false;
+        if (network == null) {
+            if (other.network != null)
+                return false;
+        }
+        else if (!network.equals(other.network))
             return false;
         return true;
     }
