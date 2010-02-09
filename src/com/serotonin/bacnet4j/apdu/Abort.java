@@ -61,6 +61,10 @@ public class Abort extends AckAPDU {
         return server;
     }
 
+    public int getAbortReason() {
+        return abortReason;
+    }
+
     @Override
     public void write(ByteQueue queue) {
         int data = getShiftedTypeId(TYPE_ID) | (server ? 1 : 0);

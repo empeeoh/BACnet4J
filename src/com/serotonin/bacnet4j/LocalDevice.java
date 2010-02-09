@@ -52,6 +52,7 @@ import com.serotonin.bacnet4j.exception.RejectAPDUException;
 import com.serotonin.bacnet4j.npdu.RequestHandler;
 import com.serotonin.bacnet4j.npdu.ip.IpMessageControl;
 import com.serotonin.bacnet4j.obj.BACnetObject;
+import com.serotonin.bacnet4j.obj.ObjectProperties;
 import com.serotonin.bacnet4j.service.acknowledgement.AcknowledgementService;
 import com.serotonin.bacnet4j.service.acknowledgement.ReadPropertyAck;
 import com.serotonin.bacnet4j.service.acknowledgement.ReadPropertyMultipleAck;
@@ -76,6 +77,7 @@ import com.serotonin.bacnet4j.type.constructed.SequenceOf;
 import com.serotonin.bacnet4j.type.constructed.ServicesSupported;
 import com.serotonin.bacnet4j.type.constructed.TimeStamp;
 import com.serotonin.bacnet4j.type.constructed.ReadAccessResult.Result;
+import com.serotonin.bacnet4j.type.enumerated.AbortReason;
 import com.serotonin.bacnet4j.type.enumerated.DeviceStatus;
 import com.serotonin.bacnet4j.type.enumerated.ErrorClass;
 import com.serotonin.bacnet4j.type.enumerated.ErrorCode;
@@ -470,15 +472,15 @@ public class LocalDevice implements RequestHandler {
     /// Remote device management
     ///
     //
-    public RemoteDevice getRemoteDevice(int instanceId, Address address) throws BACnetException {
-        RemoteDevice d = getRemoteDeviceImpl(instanceId, address);
+    public RemoteDevice getRemoteDevice(int instanceId, Address address, Network network) throws BACnetException {
+        RemoteDevice d = getRemoteDeviceImpl(instanceId, address, network);
         if (d == null)
             throw new BACnetException("Unknown device: instance id="+ instanceId +", address="+ address);
         return d;
     }
     
     public RemoteDevice getRemoteDeviceCreate(int instanceId, Address address, Network network) {
-        RemoteDevice d = getRemoteDeviceImpl(instanceId, address);
+        RemoteDevice d = getRemoteDeviceImpl(instanceId, address, network);
         if (d == null) {
             d = new RemoteDevice(instanceId, address, network);
             remoteDevices.add(d);
@@ -490,9 +492,10 @@ public class LocalDevice implements RequestHandler {
         remoteDevices.add(d);
     }
     
-    private RemoteDevice getRemoteDeviceImpl(int instanceId, Address address) {
+    private RemoteDevice getRemoteDeviceImpl(int instanceId, Address address, Network network) {
         for (RemoteDevice d : remoteDevices) {
-            if (d.getInstanceNumber() == instanceId && d.getAddress().equals(address))
+            if (d.getInstanceNumber() == instanceId && d.getAddress().equals(address) &&
+                    ObjectUtils.isEqual(d.getNetwork(), network))
                 return d;
         }
         return null;
@@ -706,15 +709,50 @@ public class LocalDevice implements RequestHandler {
         }
     }
     
+    public Encodable sendReadPropertyAllowNull(RemoteDevice d, ObjectIdentifier oid, PropertyIdentifier pid)
+            throws BACnetException {
+        return sendReadPropertyAllowNull(d, oid, pid, null);
+    }
+    
     /**
      * Sends a ReadProperty-Request and ignores Error responses where the class is Property and the code is 
      * unknownProperty. Returns null in this case.
      */
-    public Encodable sendReadPropertyAllowNull(RemoteDevice d, ObjectIdentifier oid, PropertyIdentifier pid)
-            throws BACnetException{
+    public Encodable sendReadPropertyAllowNull(RemoteDevice d, ObjectIdentifier oid, PropertyIdentifier pid,
+            UnsignedInteger propertyArrayIndex) throws BACnetException {
         try {
-            ReadPropertyAck ack = (ReadPropertyAck)send(d, new ReadPropertyRequest(oid, pid));
+            ReadPropertyAck ack = (ReadPropertyAck)send(d, new ReadPropertyRequest(oid, pid, propertyArrayIndex));
             return ack.getValue();
+        }
+        catch (AbortAPDUException e) {
+            if (e.getApdu().getAbortReason() == AbortReason.bufferOverflow.intValue() || 
+                    e.getApdu().getAbortReason() == AbortReason.segmentationNotSupported.intValue()) {
+                // The response may be too long to send. If the property is a sequence...
+                if (ObjectProperties.getPropertyTypeDefinition(oid.getObjectType(), pid).isSequence()) {
+                    // ... then try getting it by sending requests for indices. Find out how many there are.
+                    int len = ((UnsignedInteger)sendReadPropertyAllowNull(d, oid, pid, new UnsignedInteger(0))).intValue();
+                    
+                    // Create a list of individual property references.
+                    PropertyReferences refs = new PropertyReferences();
+                    for (int i=1; i<=len; i++)
+                        refs.add(oid, new PropertyReference(pid, new UnsignedInteger(i)));
+                    
+                    // Send the request. Use the method that automatically partitions the request.
+                    PropertyValues pvs = readProperties(d, refs);
+                    
+                    // We know that the original request property was a sequence, so create one to store the result.
+                    SequenceOf<Encodable> list = new SequenceOf<Encodable>();
+                    for (int i=1; i<=len; i++)
+                        list.add(pvs.getNoErrorCheck(oid, new PropertyReference(pid, new UnsignedInteger(i))));
+                    
+                    // And there you go.
+                    return list;
+                }
+                else
+                    throw e;
+            }
+            else
+                throw e;
         }
         catch (ErrorAPDUException e) {
             if (e.getBACnetError().equals(ErrorClass.property, ErrorCode.unknownProperty))
