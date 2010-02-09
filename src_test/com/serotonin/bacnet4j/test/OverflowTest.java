@@ -1,24 +1,6 @@
 /*
- * ============================================================================
- * GNU Lesser General Public License
- * ============================================================================
- *
- * Copyright (C) 2006-2009 Serotonin Software Technologies Inc. http://serotoninsoftware.com
- * @author Matthew Lohbihler
- * 
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
- * 
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
- * 
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307, USA.
+    Copyright (C) 2006-2009 Serotonin Software Technologies Inc.
+ 	@author Matthew Lohbihler
  */
 package com.serotonin.bacnet4j.test;
 
@@ -27,35 +9,25 @@ import java.util.List;
 import com.serotonin.bacnet4j.LocalDevice;
 import com.serotonin.bacnet4j.RemoteDevice;
 import com.serotonin.bacnet4j.service.unconfirmed.WhoIsRequest;
-import com.serotonin.bacnet4j.type.constructed.Address;
 import com.serotonin.bacnet4j.type.constructed.SequenceOf;
 import com.serotonin.bacnet4j.type.enumerated.ObjectType;
 import com.serotonin.bacnet4j.type.enumerated.PropertyIdentifier;
 import com.serotonin.bacnet4j.type.primitive.ObjectIdentifier;
-import com.serotonin.bacnet4j.type.primitive.OctetString;
-import com.serotonin.bacnet4j.type.primitive.UnsignedInteger;
 import com.serotonin.bacnet4j.util.PropertyReferences;
 
 /**
+ * Tests what happens when a request for an object list causes an overflow abort.
+ * 
  * @author Matthew Lohbihler
  */
-public class DiscoveryTest {
+public class OverflowTest {
     @SuppressWarnings("unchecked")
     public static void main(String[] args) throws Exception {
-        //LocalDevice localDevice = new LocalDevice(1234, "192.168.0.255");
         LocalDevice localDevice = new LocalDevice(1234, "255.255.255.255");
         localDevice.initialize();
         
         // Who is
-//        localDevice.sendBroadcast(2068, null, new WhoIsRequest());
-        localDevice.sendUnconfirmed(
-                new Address(new UnsignedInteger(47808), new OctetString(new byte[] {(byte)192, (byte)168, 2, (byte)125})),
-                null, new WhoIsRequest());
-//        RemoteDevice rd = new RemoteDevice(105, new Address(new UnsignedInteger(47808), 
-//                new OctetString(new byte[] {(byte)206, (byte)210, 100, (byte)134})), null);
-//        rd.setSegmentationSupported(Segmentation.segmentedBoth);
-//        rd.setMaxAPDULengthAccepted(1476);
-//        localDevice.addRemoteDevice(rd);
+        localDevice.sendBroadcast(47808, null, new WhoIsRequest());
         
         // Wait a bit for responses to come in.
         Thread.sleep(1000);
@@ -63,8 +35,10 @@ public class DiscoveryTest {
         // Get extended information for all remote devices.
         for (RemoteDevice d : localDevice.getRemoteDevices()) {
             localDevice.getExtendedDeviceInformation(d);
+            
             List<ObjectIdentifier> oids = ((SequenceOf<ObjectIdentifier>)localDevice.sendReadPropertyAllowNull(
                     d, d.getObjectIdentifier(), PropertyIdentifier.objectList)).getValues();
+            System.out.println("Object count: "+ oids.size());
             
             PropertyReferences refs = new PropertyReferences();
             for (ObjectIdentifier oid : oids)

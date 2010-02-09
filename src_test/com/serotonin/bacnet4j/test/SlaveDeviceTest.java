@@ -28,6 +28,7 @@ import com.serotonin.bacnet4j.type.enumerated.BinaryPV;
 import com.serotonin.bacnet4j.type.enumerated.EngineeringUnits;
 import com.serotonin.bacnet4j.type.enumerated.ObjectType;
 import com.serotonin.bacnet4j.type.enumerated.PropertyIdentifier;
+import com.serotonin.bacnet4j.type.enumerated.Segmentation;
 import com.serotonin.bacnet4j.type.primitive.CharacterString;
 import com.serotonin.bacnet4j.type.primitive.Real;
 import com.serotonin.bacnet4j.type.primitive.UnsignedInteger;
@@ -36,6 +37,7 @@ public class SlaveDeviceTest {
     public static void main(String[] args) throws Exception {
         LocalDevice localDevice = new LocalDevice(1968, "192.168.0.255");
         localDevice.setPort(2068);
+        localDevice.getConfiguration().setProperty(PropertyIdentifier.segmentationSupported, Segmentation.noSegmentation);
         
         // Set up a few objects.
         BACnetObject ai0 = new BACnetObject(localDevice, 
@@ -77,6 +79,11 @@ public class SlaveDeviceTest {
                 localDevice.getNextInstanceObjectIdentifier(ObjectType.analogOutput));
         ao0.setProperty(PropertyIdentifier.objectName, new CharacterString("Settable analog"));
         localDevice.addObject(ao0);
+        
+        BACnetObject av0 = new BACnetObject(localDevice, 
+                localDevice.getNextInstanceObjectIdentifier(ObjectType.analogValue));
+        av0.setProperty(PropertyIdentifier.objectName, new CharacterString("Command Priority Test"));
+        localDevice.addObject(av0);
         
         
         // Start the local device.
