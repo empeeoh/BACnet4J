@@ -22,12 +22,24 @@
  */
 package com.serotonin.bacnet4j.service.confirmed;
 
+import java.io.IOException;
+
 import com.serotonin.bacnet4j.LocalDevice;
 import com.serotonin.bacnet4j.Network;
+import com.serotonin.bacnet4j.exception.BACnetErrorException;
 import com.serotonin.bacnet4j.exception.BACnetException;
+import com.serotonin.bacnet4j.exception.BACnetServiceException;
 import com.serotonin.bacnet4j.exception.NotImplementedException;
+import com.serotonin.bacnet4j.obj.BACnetObject;
+import com.serotonin.bacnet4j.obj.FileObject;
 import com.serotonin.bacnet4j.service.acknowledgement.AcknowledgementService;
+import com.serotonin.bacnet4j.service.acknowledgement.AtomicReadFileAck;
 import com.serotonin.bacnet4j.type.constructed.Address;
+import com.serotonin.bacnet4j.type.enumerated.ErrorClass;
+import com.serotonin.bacnet4j.type.enumerated.ErrorCode;
+import com.serotonin.bacnet4j.type.enumerated.FileAccessMethod;
+import com.serotonin.bacnet4j.type.enumerated.PropertyIdentifier;
+import com.serotonin.bacnet4j.type.primitive.Boolean;
 import com.serotonin.bacnet4j.type.primitive.ObjectIdentifier;
 import com.serotonin.bacnet4j.type.primitive.SignedInteger;
 import com.serotonin.bacnet4j.type.primitive.UnsignedInteger;
@@ -47,6 +59,10 @@ public class AtomicReadFileRequest extends ConfirmedRequestService {
         this.fileStartPosition = fileStartPosition;
         this.requestedCount = requestedCount;
     }
+    
+    public AtomicReadFileRequest(ObjectIdentifier fileIdentifier, boolean recordAccess, int start, int length) {
+        this(fileIdentifier, recordAccess, new SignedInteger(start), new UnsignedInteger(length));
+    }
 
     @Override
     public byte getChoiceId() {
@@ -56,7 +72,49 @@ public class AtomicReadFileRequest extends ConfirmedRequestService {
     @Override
     public AcknowledgementService handle(LocalDevice localDevice, Address from, Network network)
             throws BACnetException {
-        throw new NotImplementedException();
+        AtomicReadFileAck response;
+        
+        BACnetObject obj;
+        FileObject file;
+        try {
+            // Find the file.
+            obj = localDevice.getObjectRequired(fileIdentifier);
+            if (!(obj instanceof FileObject)) {
+                System.out.println("File access request on an object that is not a file");
+                throw new BACnetServiceException(ErrorClass.object, ErrorCode.rejectInconsistentParameters);
+            }
+            file = (FileObject)obj;
+            
+            // Validation.
+            FileAccessMethod fileAccessMethod = (FileAccessMethod)file.getProperty(PropertyIdentifier.fileAccessMethod);
+            if (recordAccess && fileAccessMethod.equals(FileAccessMethod.streamAccess) ||
+                    !recordAccess && fileAccessMethod.equals(FileAccessMethod.recordAccess))
+                throw new BACnetErrorException(getChoiceId(), ErrorClass.object, ErrorCode.invalidFileAccessMethod);
+        }
+        catch (BACnetServiceException e) {
+            throw new BACnetErrorException(getChoiceId(), e);
+        }
+            
+        if (recordAccess) {
+            throw new NotImplementedException();
+        }
+        else {
+            int start = fileStartPosition.intValue();
+            int length = requestedCount.intValue();
+            
+            if (start >= file.length())
+                throw new BACnetErrorException(getChoiceId(), ErrorClass.object, ErrorCode.invalidFileStartPosition);
+                
+            try {
+                response = new AtomicReadFileAck(new Boolean(file.length() <= start + length), fileStartPosition,
+                        file.readData(start, length));
+            }
+            catch (IOException e) {
+                throw new BACnetErrorException(getChoiceId(), ErrorClass.object, ErrorCode.fileAccessDenied);
+            }
+        }
+        
+        return response;
     }
 
     @Override

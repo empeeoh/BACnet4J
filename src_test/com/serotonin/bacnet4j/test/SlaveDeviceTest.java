@@ -22,13 +22,18 @@
  */
 package com.serotonin.bacnet4j.test;
 
+import java.io.File;
+
 import com.serotonin.bacnet4j.LocalDevice;
 import com.serotonin.bacnet4j.obj.BACnetObject;
+import com.serotonin.bacnet4j.obj.FileObject;
 import com.serotonin.bacnet4j.type.enumerated.BinaryPV;
 import com.serotonin.bacnet4j.type.enumerated.EngineeringUnits;
+import com.serotonin.bacnet4j.type.enumerated.FileAccessMethod;
 import com.serotonin.bacnet4j.type.enumerated.ObjectType;
 import com.serotonin.bacnet4j.type.enumerated.PropertyIdentifier;
 import com.serotonin.bacnet4j.type.enumerated.Segmentation;
+import com.serotonin.bacnet4j.type.primitive.Boolean;
 import com.serotonin.bacnet4j.type.primitive.CharacterString;
 import com.serotonin.bacnet4j.type.primitive.Real;
 import com.serotonin.bacnet4j.type.primitive.UnsignedInteger;
@@ -85,6 +90,11 @@ public class SlaveDeviceTest {
         av0.setProperty(PropertyIdentifier.objectName, new CharacterString("Command Priority Test"));
         localDevice.addObject(av0);
         
+        FileObject file0 = new FileObject(localDevice, localDevice.getNextInstanceObjectIdentifier(ObjectType.file),
+                new File("testFile.txt"), FileAccessMethod.streamAccess);
+        file0.setProperty(PropertyIdentifier.fileType, new CharacterString("aTestFile"));
+        file0.setProperty(PropertyIdentifier.archive, new Boolean(false));
+        localDevice.addObject(file0);
         
         // Start the local device.
         localDevice.initialize();

@@ -34,9 +34,25 @@ public class DateTime extends BaseType {
     private final Date date;
     private final Time time;
     
+    public DateTime() {
+        this(new GregorianCalendar());
+    }
+    
     public DateTime(Date date, Time time) {
         this.date = date;
         this.time = time;
+    }
+    
+    public DateTime(long millis) {
+        GregorianCalendar gc = new GregorianCalendar();
+        gc.setTimeInMillis(millis);
+        date = new Date(gc);
+        time = new Time(gc);
+    }
+    
+    public DateTime(GregorianCalendar gc) {
+        date = new Date(gc);
+        time = new Time(gc);
     }
     
     @Override
@@ -48,12 +64,6 @@ public class DateTime extends BaseType {
     public DateTime(ByteQueue queue) throws BACnetException {
         date = read(queue, Date.class);
         time = read(queue, Time.class);
-    }
-    
-    public DateTime() {
-        GregorianCalendar now = new GregorianCalendar();
-        this.date = new Date(now);
-        this.time = new Time(now);
     }
     
     public Date getDate() {
