@@ -8,6 +8,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.RandomAccessFile;
 import java.math.BigInteger;
 
 import com.serotonin.bacnet4j.LocalDevice;
@@ -66,7 +67,7 @@ public class FileObject extends BACnetObject {
         return file.length();
     }
     
-    public OctetString readData(int start, int length) throws IOException {
+    public OctetString readData(long start, long length) throws IOException {
         FileInputStream in = new FileInputStream(file);
         try {
             in.skip(start);
@@ -78,6 +79,23 @@ public class FileObject extends BACnetObject {
             in.close();
         }
     }
+    
+    public void writeData(long start, OctetString fileData) throws IOException {
+        RandomAccessFile raf = new RandomAccessFile(file, "rw");
+        try {
+            byte data[] = fileData.getBytes();
+            long newLength = start + data.length;
+            raf.seek(start);
+            raf.write(data);
+            raf.setLength(newLength);
+        }
+        finally {
+            raf.close();
+        }
+        
+        updateProperties();
+    }    
+    
 //    
 //    public SequenceOf<OctetString> readRecords(int start, int length) throws IOException {
 //        

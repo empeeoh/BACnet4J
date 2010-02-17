@@ -22,13 +22,24 @@
  */
 package com.serotonin.bacnet4j.service.confirmed;
 
+import java.io.IOException;
+
 import com.serotonin.bacnet4j.LocalDevice;
 import com.serotonin.bacnet4j.Network;
+import com.serotonin.bacnet4j.exception.BACnetErrorException;
 import com.serotonin.bacnet4j.exception.BACnetException;
+import com.serotonin.bacnet4j.exception.BACnetServiceException;
 import com.serotonin.bacnet4j.exception.NotImplementedException;
+import com.serotonin.bacnet4j.obj.BACnetObject;
+import com.serotonin.bacnet4j.obj.FileObject;
 import com.serotonin.bacnet4j.service.acknowledgement.AcknowledgementService;
+import com.serotonin.bacnet4j.service.acknowledgement.AtomicWriteFileAck;
 import com.serotonin.bacnet4j.type.constructed.Address;
 import com.serotonin.bacnet4j.type.constructed.SequenceOf;
+import com.serotonin.bacnet4j.type.enumerated.ErrorClass;
+import com.serotonin.bacnet4j.type.enumerated.ErrorCode;
+import com.serotonin.bacnet4j.type.enumerated.FileAccessMethod;
+import com.serotonin.bacnet4j.type.enumerated.PropertyIdentifier;
 import com.serotonin.bacnet4j.type.primitive.ObjectIdentifier;
 import com.serotonin.bacnet4j.type.primitive.OctetString;
 import com.serotonin.bacnet4j.type.primitive.SignedInteger;
@@ -69,8 +80,47 @@ public class AtomicWriteFileRequest extends ConfirmedRequestService {
     @Override
     public AcknowledgementService handle(LocalDevice localDevice, Address from, Network network)
             throws BACnetException {
-        throw new NotImplementedException();
-    }
+        AtomicWriteFileAck response;
+
+        BACnetObject obj;
+        FileObject file;
+        try {
+            // Find the file.
+            obj = localDevice.getObjectRequired(fileIdentifier);
+            if (!(obj instanceof FileObject))
+                throw new BACnetServiceException(ErrorClass.object, ErrorCode.rejectInconsistentParameters);
+            file = (FileObject) obj;
+
+            // Validation.
+            FileAccessMethod fileAccessMethod = (FileAccessMethod)file.getProperty(PropertyIdentifier.fileAccessMethod);
+            if (fileData == null && fileAccessMethod.equals(FileAccessMethod.streamAccess) || 
+                    fileData != null && fileAccessMethod.equals(FileAccessMethod.recordAccess))
+                throw new BACnetErrorException(getChoiceId(), ErrorClass.object, ErrorCode.invalidFileAccessMethod);
+        }
+        catch (BACnetServiceException e) {
+            throw new BACnetErrorException(getChoiceId(), e);
+        }
+
+        if (fileData == null) {
+            throw new NotImplementedException();
+        }
+        else {
+            long start = fileStart.longValue();
+
+            if (start > file.length())
+                throw new BACnetErrorException(getChoiceId(), ErrorClass.object, ErrorCode.invalidFileStartPosition);
+
+            try {
+                file.writeData(start, fileData);
+                response = new AtomicWriteFileAck(fileData == null, fileStart);
+            }
+            catch (IOException e) {
+                throw new BACnetErrorException(getChoiceId(), ErrorClass.object, ErrorCode.fileAccessDenied);
+            }
+        }
+
+        return response;
+    }    
 
     @Override
     public void write(ByteQueue queue) {

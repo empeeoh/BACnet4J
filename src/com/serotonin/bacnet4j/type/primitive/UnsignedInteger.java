@@ -38,6 +38,10 @@ public class UnsignedInteger extends Primitive {
         smallValue = value;
     }
     
+    public UnsignedInteger(long value) {
+        bigValue = BigInteger.valueOf(value);
+    }
+    
     public UnsignedInteger(BigInteger value) {
         if (value.signum() == -1)
             throw new IllegalArgumentException("Value cannot be less than zero");
@@ -48,6 +52,12 @@ public class UnsignedInteger extends Primitive {
         if (bigValue == null)
             return smallValue;
         return bigValue.intValue();
+    }
+    
+    public long longValue() {
+        if (bigValue == null)
+            return smallValue;
+        return bigValue.longValue();
     }
     
     public BigInteger bigIntegerValue() {
@@ -135,7 +145,7 @@ public class UnsignedInteger extends Primitive {
         if (getClass() != obj.getClass())
             return false;
         final UnsignedInteger other = (UnsignedInteger) obj;
-        return this.bigIntegerValue().equals(other.bigIntegerValue());
+        return bigIntegerValue().equals(other.bigIntegerValue());
     }
     
     @Override

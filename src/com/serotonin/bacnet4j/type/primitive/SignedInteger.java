@@ -36,6 +36,10 @@ public class SignedInteger extends Primitive {
         smallValue = value;
     }
     
+    public SignedInteger(long value) {
+        bigValue = BigInteger.valueOf(value);
+    }
+    
     public SignedInteger(BigInteger value) {
         bigValue = value;
     }
@@ -44,6 +48,12 @@ public class SignedInteger extends Primitive {
         if (bigValue == null)
             return smallValue;
         return bigValue.intValue();
+    }
+    
+    public long longValue() {
+        if (bigValue == null)
+            return smallValue;
+        return bigValue.longValue();
     }
     
     public BigInteger bigIntegerValue() {
@@ -120,7 +130,7 @@ public class SignedInteger extends Primitive {
         if (getClass() != obj.getClass())
             return false;
         final SignedInteger other = (SignedInteger) obj;
-        return this.bigIntegerValue().equals(other.bigIntegerValue());
+        return bigIntegerValue().equals(other.bigIntegerValue());
     }
     
     @Override

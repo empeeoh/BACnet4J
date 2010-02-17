@@ -99,8 +99,8 @@ public class AtomicReadFileRequest extends ConfirmedRequestService {
             throw new NotImplementedException();
         }
         else {
-            int start = fileStartPosition.intValue();
-            int length = requestedCount.intValue();
+            long start = fileStartPosition.longValue();
+            long length = requestedCount.longValue();
             
             if (start >= file.length())
                 throw new BACnetErrorException(getChoiceId(), ErrorClass.object, ErrorCode.invalidFileStartPosition);
