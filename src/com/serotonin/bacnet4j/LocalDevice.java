@@ -810,7 +810,30 @@ public class LocalDevice implements RequestHandler {
         Map<ObjectIdentifier, List<PropertyReference>> properties;
         PropertyValues propertyValues = new PropertyValues();
         
-        if (refs.size() > 1 && d.getServicesSupported() != null && d.getServicesSupported().isReadPropertyMultiple()) {
+        boolean multipleSupported = d.getServicesSupported() != null &&
+                d.getServicesSupported().isReadPropertyMultiple();
+        
+        boolean forceMultiple = false;
+        // Check if a "special" property identifier is contained in the references.
+        for (List<PropertyReference> prs : refs.getProperties().values()) {
+            for (PropertyReference pr : prs) {
+                PropertyIdentifier pi = pr.getPropertyIdentifier();
+                if (pi.equals(PropertyIdentifier.all) || 
+                        pi.equals(PropertyIdentifier.required) || 
+                        pi.equals(PropertyIdentifier.optional)) {
+                    forceMultiple = true;
+                    break;
+                }
+            }
+            
+            if (forceMultiple)
+                break;
+        }
+        
+        if (forceMultiple && !multipleSupported)
+            throw new BACnetException("Cannot send request. ReadPropertyMultiple is required but not supported.");
+        
+        if (forceMultiple || (refs.size() > 1 && multipleSupported)) {
             // Read property multiple can be used. Determine the max references
             int maxRef = maxReadMultipleReferencesNonsegmented;
             if (d.getSegmentationSupported().hasTransmitSegmentation())
