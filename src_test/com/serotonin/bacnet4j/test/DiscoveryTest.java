@@ -35,6 +35,7 @@ import com.serotonin.bacnet4j.type.primitive.ObjectIdentifier;
 import com.serotonin.bacnet4j.type.primitive.OctetString;
 import com.serotonin.bacnet4j.type.primitive.UnsignedInteger;
 import com.serotonin.bacnet4j.util.PropertyReferences;
+import com.serotonin.bacnet4j.util.PropertyValues;
 
 /**
  * @author Matthew Lohbihler
@@ -70,7 +71,8 @@ public class DiscoveryTest {
             for (ObjectIdentifier oid : oids)
                 addPropertyReferences(refs, oid);
           
-            localDevice.readProperties(d, refs);
+            PropertyValues pvs = localDevice.readProperties(d, refs);
+            //pvs.
             System.out.println(d);
         }
         

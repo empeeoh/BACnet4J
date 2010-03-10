@@ -46,6 +46,7 @@ import com.serotonin.bacnet4j.service.unconfirmed.WhoIsRequest;
 import com.serotonin.bacnet4j.type.constructed.Address;
 import com.serotonin.bacnet4j.type.constructed.Destination;
 import com.serotonin.bacnet4j.type.constructed.EventTransitionBits;
+import com.serotonin.bacnet4j.type.constructed.ObjectPropertyReference;
 import com.serotonin.bacnet4j.type.constructed.PropertyReference;
 import com.serotonin.bacnet4j.type.constructed.PropertyValue;
 import com.serotonin.bacnet4j.type.constructed.ReadAccessSpecification;
@@ -62,23 +63,49 @@ import com.serotonin.bacnet4j.type.primitive.ObjectIdentifier;
 import com.serotonin.bacnet4j.type.primitive.OctetString;
 import com.serotonin.bacnet4j.type.primitive.Real;
 import com.serotonin.bacnet4j.type.primitive.UnsignedInteger;
+import com.serotonin.bacnet4j.util.PropertyReferences;
+import com.serotonin.bacnet4j.util.PropertyValues;
 
 public class Test {
     public static void main(String[] args) throws Exception {
-        LocalDevice d = new LocalDevice(1234, "192.168.0.255");
-        //d.setPort(0xbac0);
-        d.initialize();
-        long start = System.currentTimeMillis();
+        LocalDevice localDevice = new LocalDevice(1, "255.255.255.255","localhost");
         try {
-            test3(d);
+            localDevice.initialize();
+            localDevice.sendBroadcast(47808, new WhoIsRequest(null,null));
+            
+            Thread.sleep(5000);
+            
+            RemoteDevice d = localDevice.getRemoteDevices().get(0);
+            
+            ObjectIdentifier oid = new ObjectIdentifier(ObjectType.multiStateOutput, 0);
+            PropertyReferences refs = new PropertyReferences();
+            refs.add(oid, PropertyIdentifier.all);
+                
+            PropertyValues pvs = localDevice.readProperties(d, refs);
+            for (ObjectPropertyReference opr : pvs)
+                System.out.println(""+ opr.getPropertyIdentifier() +": "+ pvs.getNoErrorCheck(opr));
+            Thread.sleep(2000);
         }
-        catch (Exception e) {
-            e.printStackTrace();
+        finally {
+            localDevice.terminate();
         }
-        System.out.println("Total test time: "+ (System.currentTimeMillis() - start) +"ms");
-        Thread.sleep(2000);
-        d.terminate();
     }
+    
+//    public static void main(String[] args) throws Exception {
+//        LocalDevice d = new LocalDevice(1234, "192.168.0.255");
+//        //d.setPort(0xbac0);
+//        d.initialize();
+//        long start = System.currentTimeMillis();
+//        try {
+//            test3(d);
+//        }
+//        catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//        System.out.println("Total test time: "+ (System.currentTimeMillis() - start) +"ms");
+//        Thread.sleep(2000);
+//        d.terminate();
+//    }
     
     public static void test3(LocalDevice d) throws Exception {
         RemoteDevice rd = new RemoteDevice(105, new Address(new UnsignedInteger(47808), 

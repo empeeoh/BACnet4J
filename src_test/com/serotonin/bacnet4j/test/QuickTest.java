@@ -27,17 +27,21 @@ public class QuickTest {
             Thread.sleep(1000);
             
             RemoteDevice d = localDevice.getRemoteDevices().get(0);
+            localDevice.getExtendedDeviceInformation(d);
             
-            ObjectIdentifier oid = new ObjectIdentifier(ObjectType.multiStateOutput, 0);
-            for (int i=8; i<9; i++) {
-                PropertyReferences refs = new PropertyReferences();
-                refs.add(oid, new PropertyIdentifier(i));
+            ObjectIdentifier oid = new ObjectIdentifier(ObjectType.binaryValue, 0);
+            PropertyReferences refs = new PropertyReferences();
+            refs.add(oid, PropertyIdentifier.all);
             
-                PropertyValues pvs = localDevice.readProperties(d, refs);
-                for (ObjectPropertyReference opr : pvs)
-                    System.out.println(""+ i +": "+ pvs.getNoErrorCheck(opr));
-            }
-            Thread.sleep(2000);
+            PropertyValues pvs = localDevice.readProperties(d, refs);
+            for (ObjectPropertyReference opr : pvs)
+                System.out.println(pvs.getNoErrorCheck(opr));
+            
+//            Encodable value = new com.serotonin.bacnet4j.type.primitive.Boolean(true);
+//            //Encodable value = BinaryPV.active;
+//            WritePropertyRequest wpr = new WritePropertyRequest(oid, PropertyIdentifier.presentValue, null, value, null);
+//            System.out.println(localDevice.send(d, wpr));
+//            Thread.sleep(2000);
         }
         finally {
             localDevice.terminate();

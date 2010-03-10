@@ -25,6 +25,7 @@ package com.serotonin.bacnet4j.event;
 import com.serotonin.bacnet4j.RemoteDevice;
 import com.serotonin.bacnet4j.RemoteObject;
 import com.serotonin.bacnet4j.obj.BACnetObject;
+import com.serotonin.bacnet4j.service.confirmed.ReinitializeDeviceRequest.ReinitializedStateOfDevice;
 import com.serotonin.bacnet4j.type.Encodable;
 import com.serotonin.bacnet4j.type.constructed.Choice;
 import com.serotonin.bacnet4j.type.constructed.PropertyValue;
@@ -128,4 +129,11 @@ public interface DeviceEventListener {
      * @param serviceParameters
      */
     void privateTransferReceived(UnsignedInteger vendorId, UnsignedInteger serviceNumber, Encodable serviceParameters);
+    
+    /**
+     * Notification that the device should be reinitialized. The local device's password has already been validated at
+     * this point, the the indicated action should be carried out.
+     * @param reinitializedStateOfDevice
+     */
+    void reinitializeDevice(ReinitializedStateOfDevice reinitializedStateOfDevice);
 }

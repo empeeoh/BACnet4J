@@ -24,12 +24,15 @@ package com.serotonin.bacnet4j.service.confirmed;
 
 import com.serotonin.bacnet4j.LocalDevice;
 import com.serotonin.bacnet4j.Network;
+import com.serotonin.bacnet4j.exception.BACnetErrorException;
 import com.serotonin.bacnet4j.exception.BACnetException;
-import com.serotonin.bacnet4j.exception.NotImplementedException;
 import com.serotonin.bacnet4j.service.acknowledgement.AcknowledgementService;
 import com.serotonin.bacnet4j.type.constructed.Address;
+import com.serotonin.bacnet4j.type.enumerated.ErrorClass;
+import com.serotonin.bacnet4j.type.enumerated.ErrorCode;
 import com.serotonin.bacnet4j.type.primitive.CharacterString;
 import com.serotonin.bacnet4j.type.primitive.Enumerated;
+import com.serotonin.util.StringUtils;
 import com.serotonin.util.queue.ByteQueue;
 
 public class ReinitializeDeviceRequest extends ConfirmedRequestService {
@@ -80,7 +83,19 @@ public class ReinitializeDeviceRequest extends ConfirmedRequestService {
     @Override
     public AcknowledgementService handle(LocalDevice localDevice, Address from, Network network)
             throws BACnetException {
-        throw new NotImplementedException();
+        String password = null;
+        if (this.password != null)
+            password = this.password.getValue();
+        if (password == null)
+            password = "";
+        
+        // Check the password
+        if (StringUtils.isEqual(localDevice.getPassword(), password)) {
+            localDevice.getEventHandler().reinitializeDevice(reinitializedStateOfDevice);
+            return null;
+        }
+        else
+            throw new BACnetErrorException(getChoiceId(), ErrorClass.security, ErrorCode.passwordFailure);
     }
 
     @Override

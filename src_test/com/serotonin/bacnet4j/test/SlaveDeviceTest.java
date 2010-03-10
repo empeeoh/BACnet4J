@@ -96,6 +96,14 @@ public class SlaveDeviceTest {
         file0.setProperty(PropertyIdentifier.archive, new Boolean(false));
         localDevice.addObject(file0);
         
+        BACnetObject bv1 = new BACnetObject(localDevice,
+                localDevice.getNextInstanceObjectIdentifier(ObjectType.binaryValue));
+        bv1.setProperty(PropertyIdentifier.objectName, new CharacterString("A binary value"));
+        bi1.setProperty(PropertyIdentifier.inactiveText, new CharacterString("Down"));
+        bi1.setProperty(PropertyIdentifier.activeText, new CharacterString("Up"));
+        localDevice.addObject(bv1);
+        
+        
         // Start the local device.
         localDevice.initialize();
         

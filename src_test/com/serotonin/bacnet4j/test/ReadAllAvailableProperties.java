@@ -32,6 +32,7 @@ import com.serotonin.bacnet4j.RemoteObject;
 import com.serotonin.bacnet4j.event.DeviceEventListener;
 import com.serotonin.bacnet4j.exception.BACnetException;
 import com.serotonin.bacnet4j.obj.BACnetObject;
+import com.serotonin.bacnet4j.service.confirmed.ReinitializeDeviceRequest.ReinitializedStateOfDevice;
 import com.serotonin.bacnet4j.service.unconfirmed.WhoIsRequest;
 import com.serotonin.bacnet4j.type.Encodable;
 import com.serotonin.bacnet4j.type.constructed.Choice;
@@ -111,6 +112,10 @@ public class ReadAllAvailableProperties {
 
             public void privateTransferReceived(UnsignedInteger vendorId, UnsignedInteger serviceNumber, Encodable serviceParameters) {
                 System.out.println("DiscoveryTest privateTransferReceived");
+            }
+
+            public void reinitializeDevice(ReinitializedStateOfDevice reinitializedStateOfDevice) {
+                System.out.println("DiscoveryTest reinitializeDevice");
             }
         });
         localDevice.initialize();

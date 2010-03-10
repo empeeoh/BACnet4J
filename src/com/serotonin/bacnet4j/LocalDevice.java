@@ -142,6 +142,11 @@ public class LocalDevice implements RequestHandler {
     private final List<BACnetObject> localObjects = new CopyOnWriteArrayList<BACnetObject>();
     private final List<RemoteDevice> remoteDevices = new CopyOnWriteArrayList<RemoteDevice>();
     
+    /**
+     * The local password of the device. Used in the ReinitializeDeviceRequest service. 
+     */
+    private String password = "";
+
     // Misc configuration.
     private int maxReadMultipleReferencesSegmented = 200;
     private int maxReadMultipleReferencesNonsegmented = 20;
@@ -273,6 +278,14 @@ public class LocalDevice implements RequestHandler {
     }
     public int getRetries() {
         return messageControl.getRetries();
+    }
+    public String getPassword() {
+        return password;
+    }
+    public void setPassword(String password) {
+        if (password == null)
+            password = "";
+        this.password = password;
     }
     public int getMaxReadMultipleReferencesSegmented() {
         return maxReadMultipleReferencesSegmented;

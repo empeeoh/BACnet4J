@@ -29,6 +29,7 @@ import java.util.concurrent.Executors;
 import com.serotonin.bacnet4j.RemoteDevice;
 import com.serotonin.bacnet4j.RemoteObject;
 import com.serotonin.bacnet4j.obj.BACnetObject;
+import com.serotonin.bacnet4j.service.confirmed.ReinitializeDeviceRequest.ReinitializedStateOfDevice;
 import com.serotonin.bacnet4j.type.Encodable;
 import com.serotonin.bacnet4j.type.constructed.Choice;
 import com.serotonin.bacnet4j.type.constructed.PropertyValue;
@@ -170,6 +171,14 @@ public class DeviceEventHandler {
         multicast(new EventDispatcher() {
             public void dispatch(DeviceEventListener l) {
                 l.privateTransferReceived(vendorId, serviceNumber, serviceParameters);
+            }
+        });
+    }
+    
+    public void reinitializeDevice(final ReinitializedStateOfDevice reinitializedStateOfDevice) {
+        multicast(new EventDispatcher() {
+            public void dispatch(DeviceEventListener l) {
+                l.reinitializeDevice(reinitializedStateOfDevice);
             }
         });
     }
