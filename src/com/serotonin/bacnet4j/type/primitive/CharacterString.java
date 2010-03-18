@@ -105,7 +105,7 @@ public class CharacterString extends Primitive {
         try {
             switch (encoding) {
             case Encodings.ANSI_X3_4 :
-                return value.getBytes();
+                return value.getBytes("UTF-8");
             case Encodings.ISO_8859_1 :
                 return value.getBytes("ISO-8859-1");
             }
@@ -121,7 +121,7 @@ public class CharacterString extends Primitive {
         try {
             switch (encoding) {
             case Encodings.ANSI_X3_4 :
-                return new String(bytes);
+                return new String(bytes, "UTF-8");
             case Encodings.ISO_8859_1 :
                 return new String(bytes, "ISO-8859-1");
             }
