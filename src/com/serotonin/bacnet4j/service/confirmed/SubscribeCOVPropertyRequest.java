@@ -37,16 +37,16 @@ import com.serotonin.util.queue.ByteQueue;
 
 public class SubscribeCOVPropertyRequest extends ConfirmedRequestService {
     public static final byte TYPE_ID = 28;
-    
+
     private final UnsignedInteger subscriberProcessIdentifier;
     private final ObjectIdentifier monitoredObjectIdentifier;
     private final com.serotonin.bacnet4j.type.primitive.Boolean issueConfirmedNotifications; // optional
     private final UnsignedInteger lifetime; // optional
     private final PropertyReference monitoredPropertyIdentifier;
     private final Real covIncrement; // optional
-    
-    public SubscribeCOVPropertyRequest(UnsignedInteger subscriberProcessIdentifier, 
-            ObjectIdentifier monitoredObjectIdentifier, Boolean issueConfirmedNotifications, UnsignedInteger lifetime, 
+
+    public SubscribeCOVPropertyRequest(UnsignedInteger subscriberProcessIdentifier,
+            ObjectIdentifier monitoredObjectIdentifier, Boolean issueConfirmedNotifications, UnsignedInteger lifetime,
             PropertyReference monitoredPropertyIdentifier, Real covIncrement) {
         this.subscriberProcessIdentifier = subscriberProcessIdentifier;
         this.monitoredObjectIdentifier = monitoredObjectIdentifier;
@@ -55,12 +55,12 @@ public class SubscribeCOVPropertyRequest extends ConfirmedRequestService {
         this.monitoredPropertyIdentifier = monitoredPropertyIdentifier;
         this.covIncrement = covIncrement;
     }
-    
+
     @Override
     public byte getChoiceId() {
         return TYPE_ID;
     }
-    
+
     @Override
     public void write(ByteQueue queue) {
         write(queue, subscriberProcessIdentifier, 0);
@@ -70,19 +70,18 @@ public class SubscribeCOVPropertyRequest extends ConfirmedRequestService {
         write(queue, monitoredPropertyIdentifier, 4);
         writeOptional(queue, covIncrement, 5);
     }
-    
+
     SubscribeCOVPropertyRequest(ByteQueue queue) throws BACnetException {
         subscriberProcessIdentifier = read(queue, UnsignedInteger.class, 0);
         monitoredObjectIdentifier = read(queue, ObjectIdentifier.class, 1);
         issueConfirmedNotifications = readOptional(queue, Boolean.class, 2);
         lifetime = readOptional(queue, UnsignedInteger.class, 3);
         monitoredPropertyIdentifier = read(queue, PropertyReference.class, 4);
-        covIncrement = read(queue, Real.class, 5);
+        covIncrement = readOptional(queue, Real.class, 5);
     }
 
     @Override
-    public AcknowledgementService handle(LocalDevice localDevice, Address from, Network network)
-            throws BACnetException {
+    public AcknowledgementService handle(LocalDevice localDevice, Address from, Network network) throws BACnetException {
         throw new NotImplementedException();
     }
 

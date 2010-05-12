@@ -37,16 +37,15 @@ import com.serotonin.bacnet4j.type.primitive.UnsignedInteger;
 import com.serotonin.util.queue.ByteQueue;
 
 public class ConfirmedPrivateTransferRequest extends ConfirmedRequestService {
-    public static final Map<VendorServiceKey, SequenceDefinition> vendorServiceResolutions = 
-            new HashMap<VendorServiceKey, SequenceDefinition>();
-    
+    public static final Map<VendorServiceKey, SequenceDefinition> vendorServiceResolutions = new HashMap<VendorServiceKey, SequenceDefinition>();
+
     public static final byte TYPE_ID = 18;
-    
+
     private final UnsignedInteger vendorId;
     private final UnsignedInteger serviceNumber;
     private final Encodable serviceParameters;
-    
-    public ConfirmedPrivateTransferRequest(UnsignedInteger vendorId, UnsignedInteger serviceNumber, 
+
+    public ConfirmedPrivateTransferRequest(UnsignedInteger vendorId, UnsignedInteger serviceNumber,
             Encodable serviceParameters) {
         this.vendorId = vendorId;
         this.serviceNumber = serviceNumber;
@@ -57,10 +56,9 @@ public class ConfirmedPrivateTransferRequest extends ConfirmedRequestService {
     public byte getChoiceId() {
         return TYPE_ID;
     }
-    
+
     @Override
-    public AcknowledgementService handle(LocalDevice localDevice, Address from, Network network)
-            throws BACnetException {
+    public AcknowledgementService handle(LocalDevice localDevice, Address from, Network network) {
         localDevice.getEventHandler().firePrivateTransfer(vendorId, serviceNumber, serviceParameters);
         return null;
     }
@@ -71,7 +69,7 @@ public class ConfirmedPrivateTransferRequest extends ConfirmedRequestService {
         write(queue, serviceNumber, 1);
         writeOptional(queue, serviceParameters, 2);
     }
-    
+
     ConfirmedPrivateTransferRequest(ByteQueue queue) throws BACnetException {
         vendorId = read(queue, UnsignedInteger.class, 0);
         serviceNumber = read(queue, UnsignedInteger.class, 1);

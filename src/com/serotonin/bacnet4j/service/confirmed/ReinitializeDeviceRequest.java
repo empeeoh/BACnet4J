@@ -37,10 +37,10 @@ import com.serotonin.util.queue.ByteQueue;
 
 public class ReinitializeDeviceRequest extends ConfirmedRequestService {
     public static final byte TYPE_ID = 20;
-    
+
     private final ReinitializedStateOfDevice reinitializedStateOfDevice;
     private final CharacterString password;
-    
+
     public ReinitializeDeviceRequest(ReinitializedStateOfDevice reinitializedStateOfDevice, CharacterString password) {
         this.reinitializedStateOfDevice = reinitializedStateOfDevice;
         this.password = password;
@@ -56,12 +56,12 @@ public class ReinitializeDeviceRequest extends ConfirmedRequestService {
         write(queue, reinitializedStateOfDevice, 0);
         writeOptional(queue, password, 1);
     }
-    
+
     ReinitializeDeviceRequest(ByteQueue queue) throws BACnetException {
         reinitializedStateOfDevice = read(queue, ReinitializedStateOfDevice.class, 0);
         password = readOptional(queue, CharacterString.class, 1);
     }
-    
+
     public static class ReinitializedStateOfDevice extends Enumerated {
         public static final ReinitializedStateOfDevice coldstart = new ReinitializedStateOfDevice(0);
         public static final ReinitializedStateOfDevice warmstart = new ReinitializedStateOfDevice(1);
@@ -74,28 +74,27 @@ public class ReinitializeDeviceRequest extends ConfirmedRequestService {
         public ReinitializedStateOfDevice(int value) {
             super(value);
         }
-        
+
         public ReinitializedStateOfDevice(ByteQueue queue) {
             super(queue);
         }
     }
 
     @Override
-    public AcknowledgementService handle(LocalDevice localDevice, Address from, Network network)
-            throws BACnetException {
+    public AcknowledgementService handle(LocalDevice localDevice, Address from, Network network) throws BACnetException {
         String password = null;
         if (this.password != null)
             password = this.password.getValue();
         if (password == null)
             password = "";
-        
+
         // Check the password
         if (StringUtils.isEqual(localDevice.getPassword(), password)) {
             localDevice.getEventHandler().reinitializeDevice(reinitializedStateOfDevice);
             return null;
         }
-        else
-            throw new BACnetErrorException(getChoiceId(), ErrorClass.security, ErrorCode.passwordFailure);
+
+        throw new BACnetErrorException(getChoiceId(), ErrorClass.security, ErrorCode.passwordFailure);
     }
 
     @Override

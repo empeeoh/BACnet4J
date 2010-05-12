@@ -35,15 +35,15 @@ import com.serotonin.util.queue.ByteQueue;
 
 public class UnconfirmedCovNotificationRequest extends UnconfirmedRequestService {
     public static final byte TYPE_ID = 2;
-    
+
     private final UnsignedInteger subscriberProcessIdentifier;
     private final ObjectIdentifier initiatingDeviceIdentifier;
     private final ObjectIdentifier monitoredObjectIdentifier;
     private final UnsignedInteger timeRemaining;
     private final SequenceOf<PropertyValue> listOfValues;
-    
-    public UnconfirmedCovNotificationRequest(UnsignedInteger subscriberProcessIdentifier, 
-            ObjectIdentifier initiatingDeviceIdentifier, ObjectIdentifier monitoredObjectIdentifier, 
+
+    public UnconfirmedCovNotificationRequest(UnsignedInteger subscriberProcessIdentifier,
+            ObjectIdentifier initiatingDeviceIdentifier, ObjectIdentifier monitoredObjectIdentifier,
             UnsignedInteger timeRemaining, SequenceOf<PropertyValue> listOfValues) {
         this.subscriberProcessIdentifier = subscriberProcessIdentifier;
         this.initiatingDeviceIdentifier = initiatingDeviceIdentifier;
@@ -51,16 +51,16 @@ public class UnconfirmedCovNotificationRequest extends UnconfirmedRequestService
         this.timeRemaining = timeRemaining;
         this.listOfValues = listOfValues;
     }
-    
+
     @Override
     public byte getChoiceId() {
         return TYPE_ID;
     }
 
     @Override
-    public void handle(LocalDevice localDevice, Address from, Network network) throws BACnetException {
+    public void handle(LocalDevice localDevice, Address from, Network network) {
         localDevice.getEventHandler().fireCovNotification(subscriberProcessIdentifier,
-                localDevice.getRemoteDeviceCreate(initiatingDeviceIdentifier.getInstanceNumber(), from, network), 
+                localDevice.getRemoteDeviceCreate(initiatingDeviceIdentifier.getInstanceNumber(), from, network),
                 monitoredObjectIdentifier, timeRemaining, listOfValues);
     }
 
@@ -72,7 +72,7 @@ public class UnconfirmedCovNotificationRequest extends UnconfirmedRequestService
         write(queue, timeRemaining, 3);
         write(queue, listOfValues, 4);
     }
-    
+
     UnconfirmedCovNotificationRequest(ByteQueue queue) throws BACnetException {
         subscriberProcessIdentifier = read(queue, UnsignedInteger.class, 0);
         initiatingDeviceIdentifier = read(queue, ObjectIdentifier.class, 1);

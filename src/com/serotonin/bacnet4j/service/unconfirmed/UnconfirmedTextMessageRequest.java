@@ -39,7 +39,7 @@ import com.serotonin.util.queue.ByteQueue;
 
 public class UnconfirmedTextMessageRequest extends UnconfirmedRequestService {
     public static final byte TYPE_ID = 5;
-    
+
     private static List<Class<? extends Encodable>> classes;
     static {
         classes = new ArrayList<Class<? extends Encodable>>();
@@ -50,8 +50,8 @@ public class UnconfirmedTextMessageRequest extends UnconfirmedRequestService {
     private Choice messageClass;
     private final MessagePriority messagePriority;
     private final CharacterString message;
-    
-    public UnconfirmedTextMessageRequest(ObjectIdentifier textMessageSourceDevice, UnsignedInteger messageClass, 
+
+    public UnconfirmedTextMessageRequest(ObjectIdentifier textMessageSourceDevice, UnsignedInteger messageClass,
             MessagePriority messagePriority, CharacterString message) {
         this.textMessageSourceDevice = textMessageSourceDevice;
         this.messageClass = new Choice(0, messageClass);
@@ -59,7 +59,7 @@ public class UnconfirmedTextMessageRequest extends UnconfirmedRequestService {
         this.message = message;
     }
 
-    public UnconfirmedTextMessageRequest(ObjectIdentifier textMessageSourceDevice, CharacterString messageClass, 
+    public UnconfirmedTextMessageRequest(ObjectIdentifier textMessageSourceDevice, CharacterString messageClass,
             MessagePriority messagePriority, CharacterString message) {
         this.textMessageSourceDevice = textMessageSourceDevice;
         this.messageClass = new Choice(0, messageClass);
@@ -67,7 +67,7 @@ public class UnconfirmedTextMessageRequest extends UnconfirmedRequestService {
         this.message = message;
     }
 
-    public UnconfirmedTextMessageRequest(ObjectIdentifier textMessageSourceDevice, MessagePriority messagePriority, 
+    public UnconfirmedTextMessageRequest(ObjectIdentifier textMessageSourceDevice, MessagePriority messagePriority,
             CharacterString message) {
         this.textMessageSourceDevice = textMessageSourceDevice;
         this.messagePriority = messagePriority;
@@ -78,9 +78,9 @@ public class UnconfirmedTextMessageRequest extends UnconfirmedRequestService {
     public byte getChoiceId() {
         return TYPE_ID;
     }
-    
+
     @Override
-    public void handle(LocalDevice localDevice, Address from, Network network) throws BACnetException {
+    public void handle(LocalDevice localDevice, Address from, Network network) {
         localDevice.getEventHandler().fireTextMessage(
                 localDevice.getRemoteDeviceCreate(textMessageSourceDevice.getInstanceNumber(), from, network),
                 messageClass, messagePriority, message);
@@ -93,7 +93,7 @@ public class UnconfirmedTextMessageRequest extends UnconfirmedRequestService {
         write(queue, messagePriority, 2);
         write(queue, message, 3);
     }
-    
+
     UnconfirmedTextMessageRequest(ByteQueue queue) throws BACnetException {
         textMessageSourceDevice = read(queue, ObjectIdentifier.class, 0);
         if (readStart(queue) == 1)
@@ -101,7 +101,7 @@ public class UnconfirmedTextMessageRequest extends UnconfirmedRequestService {
         messagePriority = read(queue, MessagePriority.class, 2);
         message = read(queue, CharacterString.class, 3);
     }
-    
+
     @Override
     public int hashCode() {
         final int PRIME = 31;

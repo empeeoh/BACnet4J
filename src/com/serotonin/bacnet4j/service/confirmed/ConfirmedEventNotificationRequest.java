@@ -40,7 +40,7 @@ import com.serotonin.util.queue.ByteQueue;
 
 public class ConfirmedEventNotificationRequest extends ConfirmedRequestService {
     public static final byte TYPE_ID = 2;
-    
+
     private final UnsignedInteger processIdentifier; // 0
     private final ObjectIdentifier initiatingDeviceIdentifier; // 1
     private final ObjectIdentifier eventObjectIdentifier; // 2
@@ -54,11 +54,11 @@ public class ConfirmedEventNotificationRequest extends ConfirmedRequestService {
     private final EventState fromState; // 10 optional
     private final EventState toState; // 11
     private final NotificationParameters eventValues; // 12 optional
-    
-    public ConfirmedEventNotificationRequest(UnsignedInteger processIdentifier, 
-            ObjectIdentifier initiatingDeviceIdentifier, ObjectIdentifier eventObjectIdentifier, TimeStamp timeStamp, 
-            UnsignedInteger notificationClass, UnsignedInteger priority, EventType eventType, 
-            CharacterString messageText, NotifyType notifyType, Boolean ackRequired, EventState fromState, 
+
+    public ConfirmedEventNotificationRequest(UnsignedInteger processIdentifier,
+            ObjectIdentifier initiatingDeviceIdentifier, ObjectIdentifier eventObjectIdentifier, TimeStamp timeStamp,
+            UnsignedInteger notificationClass, UnsignedInteger priority, EventType eventType,
+            CharacterString messageText, NotifyType notifyType, Boolean ackRequired, EventState fromState,
             EventState toState, NotificationParameters eventValues) {
         this.processIdentifier = processIdentifier;
         this.initiatingDeviceIdentifier = initiatingDeviceIdentifier;
@@ -74,15 +74,14 @@ public class ConfirmedEventNotificationRequest extends ConfirmedRequestService {
         this.toState = toState;
         this.eventValues = eventValues;
     }
-    
+
     @Override
     public byte getChoiceId() {
         return TYPE_ID;
     }
 
     @Override
-    public AcknowledgementService handle(LocalDevice localDevice, Address from, Network network)
-            throws BACnetException {
+    public AcknowledgementService handle(LocalDevice localDevice, Address from, Network network) {
         localDevice.getEventHandler().fireEventNotification(processIdentifier,
                 localDevice.getRemoteDeviceCreate(initiatingDeviceIdentifier.getInstanceNumber(), from, network),
                 eventObjectIdentifier, timeStamp, notificationClass, priority, eventType, messageText, notifyType,
@@ -106,7 +105,7 @@ public class ConfirmedEventNotificationRequest extends ConfirmedRequestService {
         write(queue, toState, 11);
         writeOptional(queue, eventValues, 12);
     }
-    
+
     ConfirmedEventNotificationRequest(ByteQueue queue) throws BACnetException {
         processIdentifier = read(queue, UnsignedInteger.class, 0);
         initiatingDeviceIdentifier = read(queue, ObjectIdentifier.class, 1);

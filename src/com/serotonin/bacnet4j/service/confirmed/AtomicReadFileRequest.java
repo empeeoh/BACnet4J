@@ -47,19 +47,20 @@ import com.serotonin.util.queue.ByteQueue;
 
 public class AtomicReadFileRequest extends ConfirmedRequestService {
     public static final byte TYPE_ID = 6;
-    
+
     private final ObjectIdentifier fileIdentifier;
     private final boolean recordAccess;
     private final SignedInteger fileStartPosition;
     private final UnsignedInteger requestedCount;
-    
-    public AtomicReadFileRequest(ObjectIdentifier fileIdentifier, boolean recordAccess, SignedInteger fileStartPosition, UnsignedInteger requestedCount) {
+
+    public AtomicReadFileRequest(ObjectIdentifier fileIdentifier, boolean recordAccess,
+            SignedInteger fileStartPosition, UnsignedInteger requestedCount) {
         this.fileIdentifier = fileIdentifier;
         this.recordAccess = recordAccess;
         this.fileStartPosition = fileStartPosition;
         this.requestedCount = requestedCount;
     }
-    
+
     public AtomicReadFileRequest(ObjectIdentifier fileIdentifier, boolean recordAccess, int start, int length) {
         this(fileIdentifier, recordAccess, new SignedInteger(start), new UnsignedInteger(length));
     }
@@ -68,12 +69,11 @@ public class AtomicReadFileRequest extends ConfirmedRequestService {
     public byte getChoiceId() {
         return TYPE_ID;
     }
-    
+
     @Override
-    public AcknowledgementService handle(LocalDevice localDevice, Address from, Network network)
-            throws BACnetException {
+    public AcknowledgementService handle(LocalDevice localDevice, Address from, Network network) throws BACnetException {
         AtomicReadFileAck response;
-        
+
         BACnetObject obj;
         FileObject file;
         try {
@@ -83,37 +83,36 @@ public class AtomicReadFileRequest extends ConfirmedRequestService {
                 System.out.println("File access request on an object that is not a file");
                 throw new BACnetServiceException(ErrorClass.object, ErrorCode.rejectInconsistentParameters);
             }
-            file = (FileObject)obj;
-            
+            file = (FileObject) obj;
+
             // Validation.
-            FileAccessMethod fileAccessMethod = (FileAccessMethod)file.getProperty(PropertyIdentifier.fileAccessMethod);
-            if (recordAccess && fileAccessMethod.equals(FileAccessMethod.streamAccess) ||
-                    !recordAccess && fileAccessMethod.equals(FileAccessMethod.recordAccess))
+            FileAccessMethod fileAccessMethod = (FileAccessMethod) file
+                    .getProperty(PropertyIdentifier.fileAccessMethod);
+            if (recordAccess && fileAccessMethod.equals(FileAccessMethod.streamAccess) || !recordAccess
+                    && fileAccessMethod.equals(FileAccessMethod.recordAccess))
                 throw new BACnetErrorException(getChoiceId(), ErrorClass.object, ErrorCode.invalidFileAccessMethod);
         }
         catch (BACnetServiceException e) {
             throw new BACnetErrorException(getChoiceId(), e);
         }
-            
-        if (recordAccess) {
+
+        if (recordAccess)
             throw new NotImplementedException();
+
+        long start = fileStartPosition.longValue();
+        long length = requestedCount.longValue();
+
+        if (start >= file.length())
+            throw new BACnetErrorException(getChoiceId(), ErrorClass.object, ErrorCode.invalidFileStartPosition);
+
+        try {
+            response = new AtomicReadFileAck(new Boolean(file.length() <= start + length), fileStartPosition, file
+                    .readData(start, length));
         }
-        else {
-            long start = fileStartPosition.longValue();
-            long length = requestedCount.longValue();
-            
-            if (start >= file.length())
-                throw new BACnetErrorException(getChoiceId(), ErrorClass.object, ErrorCode.invalidFileStartPosition);
-                
-            try {
-                response = new AtomicReadFileAck(new Boolean(file.length() <= start + length), fileStartPosition,
-                        file.readData(start, length));
-            }
-            catch (IOException e) {
-                throw new BACnetErrorException(getChoiceId(), ErrorClass.object, ErrorCode.fileAccessDenied);
-            }
+        catch (IOException e) {
+            throw new BACnetErrorException(getChoiceId(), ErrorClass.object, ErrorCode.fileAccessDenied);
         }
-        
+
         return response;
     }
 
@@ -125,7 +124,7 @@ public class AtomicReadFileRequest extends ConfirmedRequestService {
         write(queue, requestedCount);
         writeContextTag(queue, recordAccess ? 1 : 0, false);
     }
-    
+
     AtomicReadFileRequest(ByteQueue queue) throws BACnetException {
         fileIdentifier = read(queue, ObjectIdentifier.class);
         recordAccess = popStart(queue) == 1;

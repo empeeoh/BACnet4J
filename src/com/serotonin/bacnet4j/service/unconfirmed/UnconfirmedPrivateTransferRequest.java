@@ -36,16 +36,15 @@ import com.serotonin.bacnet4j.type.primitive.UnsignedInteger;
 import com.serotonin.util.queue.ByteQueue;
 
 public class UnconfirmedPrivateTransferRequest extends UnconfirmedRequestService {
-    public static final Map<VendorServiceKey, SequenceDefinition> vendorServiceResolutions = 
-        new HashMap<VendorServiceKey, SequenceDefinition>();
-    
+    public static final Map<VendorServiceKey, SequenceDefinition> vendorServiceResolutions = new HashMap<VendorServiceKey, SequenceDefinition>();
+
     public static final byte TYPE_ID = 4;
-    
+
     private final UnsignedInteger vendorId;
     private final UnsignedInteger serviceNumber;
     private final Encodable serviceParameters;
-    
-    public UnconfirmedPrivateTransferRequest(UnsignedInteger vendorId, UnsignedInteger serviceNumber, 
+
+    public UnconfirmedPrivateTransferRequest(UnsignedInteger vendorId, UnsignedInteger serviceNumber,
             Encodable serviceParameters) {
         this.vendorId = vendorId;
         this.serviceNumber = serviceNumber;
@@ -53,7 +52,7 @@ public class UnconfirmedPrivateTransferRequest extends UnconfirmedRequestService
     }
 
     @Override
-    public void handle(LocalDevice localDevice, Address from, Network network) throws BACnetException {
+    public void handle(LocalDevice localDevice, Address from, Network network) {
         localDevice.getEventHandler().firePrivateTransfer(vendorId, serviceNumber, serviceParameters);
     }
 
@@ -61,14 +60,14 @@ public class UnconfirmedPrivateTransferRequest extends UnconfirmedRequestService
     public byte getChoiceId() {
         return TYPE_ID;
     }
-    
+
     @Override
     public void write(ByteQueue queue) {
         write(queue, vendorId, 0);
         write(queue, serviceNumber, 1);
         writeOptional(queue, serviceParameters, 2);
     }
-    
+
     UnconfirmedPrivateTransferRequest(ByteQueue queue) throws BACnetException {
         vendorId = read(queue, UnsignedInteger.class, 0);
         serviceNumber = read(queue, UnsignedInteger.class, 1);

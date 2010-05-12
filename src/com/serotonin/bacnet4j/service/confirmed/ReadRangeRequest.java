@@ -43,7 +43,7 @@ import com.serotonin.util.queue.ByteQueue;
 
 public class ReadRangeRequest extends ConfirmedRequestService {
     public static final byte TYPE_ID = 26;
-    
+
     private static List<Class<? extends Encodable>> classes;
     static {
         classes = new ArrayList<Class<? extends Encodable>>();
@@ -60,27 +60,27 @@ public class ReadRangeRequest extends ConfirmedRequestService {
     private final PropertyIdentifier propertyIdentifier;
     private final UnsignedInteger propertyArrayIndex;
     private Choice range;
-    
-    private ReadRangeRequest(ObjectIdentifier objectIdentifier, PropertyIdentifier propertyIdentifier, 
+
+    private ReadRangeRequest(ObjectIdentifier objectIdentifier, PropertyIdentifier propertyIdentifier,
             UnsignedInteger propertyArrayIndex) {
         this.objectIdentifier = objectIdentifier;
         this.propertyIdentifier = propertyIdentifier;
         this.propertyArrayIndex = propertyArrayIndex;
     }
 
-    public ReadRangeRequest(ObjectIdentifier objectIdentifier, PropertyIdentifier propertyIdentifier, 
+    public ReadRangeRequest(ObjectIdentifier objectIdentifier, PropertyIdentifier propertyIdentifier,
             UnsignedInteger propertyArrayIndex, ByPosition range) {
         this(objectIdentifier, propertyIdentifier, propertyArrayIndex);
         this.range = new Choice(3, range);
     }
 
-    public ReadRangeRequest(ObjectIdentifier objectIdentifier, PropertyIdentifier propertyIdentifier, 
+    public ReadRangeRequest(ObjectIdentifier objectIdentifier, PropertyIdentifier propertyIdentifier,
             UnsignedInteger propertyArrayIndex, BySequenceNumber range) {
         this(objectIdentifier, propertyIdentifier, propertyArrayIndex);
         this.range = new Choice(6, range);
     }
 
-    public ReadRangeRequest(ObjectIdentifier objectIdentifier, PropertyIdentifier propertyIdentifier, 
+    public ReadRangeRequest(ObjectIdentifier objectIdentifier, PropertyIdentifier propertyIdentifier,
             UnsignedInteger propertyArrayIndex, ByTime range) {
         this(objectIdentifier, propertyIdentifier, propertyArrayIndex);
         this.range = new Choice(7, range);
@@ -90,10 +90,9 @@ public class ReadRangeRequest extends ConfirmedRequestService {
     public byte getChoiceId() {
         return TYPE_ID;
     }
-    
+
     @Override
-    public AcknowledgementService handle(LocalDevice localDevice, Address from, Network network)
-            throws BACnetException {
+    public AcknowledgementService handle(LocalDevice localDevice, Address from, Network network) throws BACnetException {
         throw new NotImplementedException();
     }
 
@@ -104,7 +103,7 @@ public class ReadRangeRequest extends ConfirmedRequestService {
         writeOptional(queue, propertyArrayIndex, 2);
         writeOptional(queue, range);
     }
-    
+
     ReadRangeRequest(ByteQueue queue) throws BACnetException {
         objectIdentifier = read(queue, ObjectIdentifier.class, 0);
         propertyIdentifier = read(queue, PropertyIdentifier.class, 1);
@@ -112,7 +111,7 @@ public class ReadRangeRequest extends ConfirmedRequestService {
         if (peekTagNumber(queue) != -1)
             range = new Choice(queue, classes);
     }
-    
+
     abstract public static class Range extends BaseType {
         protected SignedInteger count;
 
@@ -121,9 +120,10 @@ public class ReadRangeRequest extends ConfirmedRequestService {
         }
 
         Range() {
+            // no op
         }
     }
-    
+
     public static class ByPosition extends Range {
         private final UnsignedInteger referenceIndex;
 
@@ -137,13 +137,13 @@ public class ReadRangeRequest extends ConfirmedRequestService {
             write(queue, referenceIndex);
             write(queue, count);
         }
-        
+
         ByPosition(ByteQueue queue) throws BACnetException {
             referenceIndex = read(queue, UnsignedInteger.class);
             count = read(queue, SignedInteger.class);
         }
     }
-    
+
     public static class BySequenceNumber extends Range {
         private final UnsignedInteger referenceIndex;
 
@@ -157,13 +157,13 @@ public class ReadRangeRequest extends ConfirmedRequestService {
             write(queue, referenceIndex);
             write(queue, count);
         }
-        
+
         BySequenceNumber(ByteQueue queue) throws BACnetException {
             referenceIndex = read(queue, UnsignedInteger.class);
             count = read(queue, SignedInteger.class);
         }
     }
-    
+
     public static class ByTime extends Range {
         private final DateTime referenceTime;
 
@@ -177,7 +177,7 @@ public class ReadRangeRequest extends ConfirmedRequestService {
             write(queue, referenceTime);
             write(queue, count);
         }
-        
+
         ByTime(ByteQueue queue) throws BACnetException {
             referenceTime = read(queue, DateTime.class);
             count = read(queue, SignedInteger.class);

@@ -28,6 +28,7 @@ import com.serotonin.util.queue.ByteQueue;
 
 /**
  * Network layer protocol control information. This class currently only implements the reading of information.
+ * 
  * @author mlohbihler
  */
 public class NPCI {
@@ -42,11 +43,11 @@ public class NPCI {
     private int hopCount;
     private int messageType;
     private int vendorId;
-    
+
     public NPCI(ByteQueue queue) {
         version = queue.popU1B();
         control = BigInteger.valueOf(queue.popU1B());
-        
+
         if (control.testBit(5)) {
             destinationNetwork = queue.popU2B();
             destinationLength = queue.popU1B();
@@ -55,17 +56,17 @@ public class NPCI {
                 queue.pop(destinationAddress);
             }
         }
-        
+
         if (control.testBit(3)) {
             sourceNetwork = queue.popU2B();
             sourceLength = queue.popU1B();
             sourceAddress = new byte[sourceLength];
             queue.pop(sourceAddress);
         }
-        
+
         if (control.testBit(5))
             hopCount = queue.popU1B();
-        
+
         if (control.testBit(7)) {
             messageType = queue.popU1B();
             if (messageType >= 80)
@@ -76,32 +77,31 @@ public class NPCI {
     public boolean hasDestinationInfo() {
         return control.testBit(5);
     }
-    
+
     public boolean isDestinationBroadcast() {
         return destinationLength == 0;
     }
-    
+
     public boolean hasSourceInfo() {
         return control.testBit(3);
     }
-    
+
     public boolean isExpectingReply() {
         return control.testBit(2);
     }
-    
+
     public boolean isNetworkMessage() {
         return control.testBit(7);
     }
-    
+
     public boolean isVendorSpecificNetworkMessage() {
         return isNetworkMessage() && messageType >= 80;
     }
-    
+
     public int getNetworkPriority() {
         return (control.testBit(1) ? 2 : 0) | (control.testBit(0) ? 1 : 0);
     }
-    
-    
+
     public byte[] getDestinationAddress() {
         return destinationAddress;
     }
@@ -141,14 +141,14 @@ public class NPCI {
     public int getVersion() {
         return version;
     }
-    
-    public static void main(String[] args) {
-        byte[] b1 = {(byte)0x81,(byte)0xb,(byte)0x0,(byte)0x18};
-        byte[] b2 = {(byte)0x1,(byte)0x8,(byte)0x0,(byte)0x64,(byte)0x1,
-                (byte)0x2,(byte)0x10,(byte)0x0,(byte)0xc4,(byte)0x2,(byte)0x0,(byte)0x7,(byte)0xd0,(byte)0x22,
-                (byte)0x1,(byte)0xe0,(byte)0x91,(byte)0x0,(byte)0x21,(byte)0x23};
-        ByteQueue q = new ByteQueue(b2);
-        new NPCI(q);
-
-    }
+    //    
+    // public static void main(String[] args) {
+    // byte[] b1 = {(byte)0x81,(byte)0xb,(byte)0x0,(byte)0x18};
+    // byte[] b2 = {(byte)0x1,(byte)0x8,(byte)0x0,(byte)0x64,(byte)0x1,
+    // (byte)0x2,(byte)0x10,(byte)0x0,(byte)0xc4,(byte)0x2,(byte)0x0,(byte)0x7,(byte)0xd0,(byte)0x22,
+    // (byte)0x1,(byte)0xe0,(byte)0x91,(byte)0x0,(byte)0x21,(byte)0x23};
+    // ByteQueue q = new ByteQueue(b2);
+    // new NPCI(q);
+    //
+    // }
 }

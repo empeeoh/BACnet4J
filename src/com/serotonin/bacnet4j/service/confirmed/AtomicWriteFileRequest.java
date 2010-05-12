@@ -48,22 +48,21 @@ import com.serotonin.util.queue.ByteQueue;
 
 public class AtomicWriteFileRequest extends ConfirmedRequestService {
     public static final byte TYPE_ID = 7;
-    
+
     private final ObjectIdentifier fileIdentifier;
     private SignedInteger fileStart;
     private OctetString fileData;
     private UnsignedInteger recordCount;
     private SequenceOf<OctetString> fileRecordData;
-    
-    public AtomicWriteFileRequest(ObjectIdentifier fileIdentifier, SignedInteger fileStart, 
-            OctetString fileData) {
+
+    public AtomicWriteFileRequest(ObjectIdentifier fileIdentifier, SignedInteger fileStart, OctetString fileData) {
         super();
         this.fileIdentifier = fileIdentifier;
         this.fileStart = fileStart;
         this.fileData = fileData;
     }
 
-    public AtomicWriteFileRequest(ObjectIdentifier fileIdentifier, SignedInteger fileStart, 
+    public AtomicWriteFileRequest(ObjectIdentifier fileIdentifier, SignedInteger fileStart,
             UnsignedInteger recordCount, SequenceOf<OctetString> fileRecordData) {
         super();
         this.fileIdentifier = fileIdentifier;
@@ -71,15 +70,14 @@ public class AtomicWriteFileRequest extends ConfirmedRequestService {
         this.recordCount = recordCount;
         this.fileRecordData = fileRecordData;
     }
-    
+
     @Override
     public byte getChoiceId() {
         return TYPE_ID;
     }
-    
+
     @Override
-    public AcknowledgementService handle(LocalDevice localDevice, Address from, Network network)
-            throws BACnetException {
+    public AcknowledgementService handle(LocalDevice localDevice, Address from, Network network) throws BACnetException {
         AtomicWriteFileAck response;
 
         BACnetObject obj;
@@ -92,9 +90,10 @@ public class AtomicWriteFileRequest extends ConfirmedRequestService {
             file = (FileObject) obj;
 
             // Validation.
-            FileAccessMethod fileAccessMethod = (FileAccessMethod)file.getProperty(PropertyIdentifier.fileAccessMethod);
-            if (fileData == null && fileAccessMethod.equals(FileAccessMethod.streamAccess) || 
-                    fileData != null && fileAccessMethod.equals(FileAccessMethod.recordAccess))
+            FileAccessMethod fileAccessMethod = (FileAccessMethod) file
+                    .getProperty(PropertyIdentifier.fileAccessMethod);
+            if (fileData == null && fileAccessMethod.equals(FileAccessMethod.streamAccess) || fileData != null
+                    && fileAccessMethod.equals(FileAccessMethod.recordAccess))
                 throw new BACnetErrorException(getChoiceId(), ErrorClass.object, ErrorCode.invalidFileAccessMethod);
         }
         catch (BACnetServiceException e) {
@@ -104,23 +103,22 @@ public class AtomicWriteFileRequest extends ConfirmedRequestService {
         if (fileData == null) {
             throw new NotImplementedException();
         }
-        else {
-            long start = fileStart.longValue();
 
-            if (start > file.length())
-                throw new BACnetErrorException(getChoiceId(), ErrorClass.object, ErrorCode.invalidFileStartPosition);
+        long start = fileStart.longValue();
 
-            try {
-                file.writeData(start, fileData);
-                response = new AtomicWriteFileAck(fileData == null, fileStart);
-            }
-            catch (IOException e) {
-                throw new BACnetErrorException(getChoiceId(), ErrorClass.object, ErrorCode.fileAccessDenied);
-            }
+        if (start > file.length())
+            throw new BACnetErrorException(getChoiceId(), ErrorClass.object, ErrorCode.invalidFileStartPosition);
+
+        try {
+            file.writeData(start, fileData);
+            response = new AtomicWriteFileAck(fileData == null, fileStart);
+        }
+        catch (IOException e) {
+            throw new BACnetErrorException(getChoiceId(), ErrorClass.object, ErrorCode.fileAccessDenied);
         }
 
         return response;
-    }    
+    }
 
     @Override
     public void write(ByteQueue queue) {
@@ -139,7 +137,7 @@ public class AtomicWriteFileRequest extends ConfirmedRequestService {
             writeContextTag(queue, 1, false);
         }
     }
-    
+
     AtomicWriteFileRequest(ByteQueue queue) throws BACnetException {
         fileIdentifier = read(queue, ObjectIdentifier.class);
         if (popStart(queue) == 0) {

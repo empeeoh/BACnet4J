@@ -29,6 +29,7 @@ import com.serotonin.bacnet4j.type.Encodable;
 import com.serotonin.bacnet4j.type.enumerated.BinaryPV;
 import com.serotonin.bacnet4j.type.enumerated.ErrorClass;
 import com.serotonin.bacnet4j.type.enumerated.ErrorCode;
+import com.serotonin.bacnet4j.type.primitive.Enumerated;
 import com.serotonin.bacnet4j.type.primitive.Null;
 import com.serotonin.bacnet4j.type.primitive.Real;
 import com.serotonin.bacnet4j.type.primitive.UnsignedInteger;
@@ -40,27 +41,27 @@ public class PriorityValue extends BaseType {
     private BinaryPV binaryValue;
     private UnsignedInteger integerValue;
     private Encodable constructedValue;
-    
+
     public PriorityValue(Null nullValue) {
         this.nullValue = nullValue;
     }
-    
+
     public PriorityValue(Real realValue) {
         this.realValue = realValue;
     }
-    
+
     public PriorityValue(BinaryPV binaryValue) {
         this.binaryValue = binaryValue;
     }
-    
+
     public PriorityValue(UnsignedInteger integerValue) {
         this.integerValue = integerValue;
     }
-    
+
     public PriorityValue(BaseType constructedValue) {
         this.constructedValue = constructedValue;
     }
-    
+
     public Null getNullValue() {
         return nullValue;
     }
@@ -80,11 +81,11 @@ public class PriorityValue extends BaseType {
     public Encodable getConstructedValue() {
         return constructedValue;
     }
-    
+
     public boolean isNull() {
         return nullValue != null;
     }
-    
+
     public Encodable getValue() {
         if (nullValue != null)
             return nullValue;
@@ -96,7 +97,7 @@ public class PriorityValue extends BaseType {
             return integerValue;
         return constructedValue;
     }
-    
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
@@ -128,7 +129,7 @@ public class PriorityValue extends BaseType {
         else
             constructedValue.write(queue, 0);
     }
-    
+
     public PriorityValue(ByteQueue queue) throws BACnetException {
         // Sweet Jesus...
         int tag = (queue.peek(0) & 0xff);
@@ -143,13 +144,13 @@ public class PriorityValue extends BaseType {
                 nullValue = new Null(queue);
             else if (tag == Real.TYPE_ID)
                 realValue = new Real(queue);
-            else if (tag == BinaryPV.TYPE_ID)
+            else if (tag == Enumerated.TYPE_ID)
                 binaryValue = new BinaryPV(queue);
             else if (tag == UnsignedInteger.TYPE_ID)
                 integerValue = new UnsignedInteger(queue);
             else
                 throw new BACnetErrorException(ErrorClass.property, ErrorCode.invalidDataType,
-                        "Unsupported primitive id: "+ tag);
+                        "Unsupported primitive id: " + tag);
         }
     }
 }

@@ -29,147 +29,130 @@ import com.serotonin.util.queue.ByteQueue;
 
 public class ConfirmedRequest extends APDU implements Segmentable {
     public static final byte TYPE_ID = 0;
-    
+
     public static int getHeaderSize(boolean segmented) {
         if (segmented)
             return 6;
         return 4;
     }
-    
+
     /**
-     * This parameter indicates whether or not the confirmed service request is entirely, or only partially, contained 
-     * in the present PDU. If the request is present in its entirety, the value of the 'segmented-message' parameter 
+     * This parameter indicates whether or not the confirmed service request is entirely, or only partially, contained
+     * in the present PDU. If the request is present in its entirety, the value of the 'segmented-message' parameter
      * shall be FALSE. If the present PDU contains only a segment of the request, this parameter shall be TRUE.
      */
     private boolean segmentedMessage;
-    
+
     /**
-     * This parameter is only meaningful if the 'segmented-message' parameter is TRUE. If 'segmented-message' is TRUE, 
-     * then the 'more-follows' parameter shall be TRUE for all segments comprising the confirmed service request except 
-     * for the last and shall be FALSE for the final segment. If 'segmented-message' is FALSE, then 'more-follows' 
-     * shall be set FALSE by the encoder and shall be ignored by the decoder.
+     * This parameter is only meaningful if the 'segmented-message' parameter is TRUE. If 'segmented-message' is TRUE,
+     * then the 'more-follows' parameter shall be TRUE for all segments comprising the confirmed service request except
+     * for the last and shall be FALSE for the final segment. If 'segmented-message' is FALSE, then 'more-follows' shall
+     * be set FALSE by the encoder and shall be ignored by the decoder.
      */
     private boolean moreFollows;
-    
+
     /**
-     * This parameter shall be TRUE if the device issuing the confirmed request will accept a segmented complex 
-     * acknowledgment as a response. It shall be FALSE otherwise. This parameter is included in the confirmed request 
-     * so that the responding device may determine how to convey its response.
+     * This parameter shall be TRUE if the device issuing the confirmed request will accept a segmented complex
+     * acknowledgment as a response. It shall be FALSE otherwise. This parameter is included in the confirmed request so
+     * that the responding device may determine how to convey its response.
      */
     private boolean segmentedResponseAccepted;
-    
+
     /**
-     * This optional parameter specifies the maximum number of segments that the device will accept. This parameter is 
-     * included in the confirmed request so that the responding device may determine how to convey its response. The 
-     * parameter shall be encoded as follows:
-     * B'000' Unspecified number of segments accepted.
-     * B'001' 2 segments accepted.
-     * B'010' 4 segments accepted.
-     * B'011' 8 segments accepted.
-     * B'100' 16 segments accepted.
-     * B'101' 32 segments accepted.
-     * B'110' 64 segments accepted.
-     * B'111' Greater than 64 segments accepted.
+     * This optional parameter specifies the maximum number of segments that the device will accept. This parameter is
+     * included in the confirmed request so that the responding device may determine how to convey its response. The
+     * parameter shall be encoded as follows: B'000' Unspecified number of segments accepted. B'001' 2 segments
+     * accepted. B'010' 4 segments accepted. B'011' 8 segments accepted. B'100' 16 segments accepted. B'101' 32 segments
+     * accepted. B'110' 64 segments accepted. B'111' Greater than 64 segments accepted.
      */
     private int maxSegmentsAccepted;
-    
+
     /**
-     * This parameter specifies the maximum size of a single APDU that the issuing device will accept. This parameter 
-     * is included in the confirmed request so that the responding device may determine how to convey its response. The 
-     * parameter shall be encoded as follows:
-     * B'0000' Up to MinimumMessageSize (50 octets)
-     * B'0001' Up to 128 octets
-     * B'0010' Up to 206 octets (fits in a LonTalk frame)
-     * B'0011' Up to 480 octets (fits in an ARCNET frame)
-     * B'0100' Up to 1024 octets
-     * B'0101' Up to 1476 octets (fits in an ISO 8802-3 frame)
-     * B'0110' reserved by ASHRAE
-     * B'0111' reserved by ASHRAE
-     * B'1000' reserved by ASHRAE
-     * B'1001' reserved by ASHRAE
-     * B'1010' reserved by ASHRAE
-     * B'1011' reserved by ASHRAE
-     * B'1100' reserved by ASHRAE
-     * B'1101' reserved by ASHRAE
-     * B'1110' reserved by ASHRAE
-     * B'1111' reserved by ASHRAE
+     * This parameter specifies the maximum size of a single APDU that the issuing device will accept. This parameter is
+     * included in the confirmed request so that the responding device may determine how to convey its response. The
+     * parameter shall be encoded as follows: B'0000' Up to MinimumMessageSize (50 octets) B'0001' Up to 128 octets
+     * B'0010' Up to 206 octets (fits in a LonTalk frame) B'0011' Up to 480 octets (fits in an ARCNET frame) B'0100' Up
+     * to 1024 octets B'0101' Up to 1476 octets (fits in an ISO 8802-3 frame) B'0110' reserved by ASHRAE B'0111'
+     * reserved by ASHRAE B'1000' reserved by ASHRAE B'1001' reserved by ASHRAE B'1010' reserved by ASHRAE B'1011'
+     * reserved by ASHRAE B'1100' reserved by ASHRAE B'1101' reserved by ASHRAE B'1110' reserved by ASHRAE B'1111'
+     * reserved by ASHRAE
      */
     private MaxApduLength maxApduLengthAccepted;
-    
+
     /**
-     * This parameter shall be an integer in the range 0 - 255 assigned by the service requester. It shall be used to 
-     * associate the response to a confirmed service request with the original request. In the absence of any error, 
-     * the 'invokeID' shall be returned by the service provider in a BACnet-SimpleACK-PDU or a BACnet-ComplexACK-PDU. 
-     * In the event of an error condition, the 'invokeID' shall be returned by the service provider in a 
-     * BACnet-Error-PDU, BACnet-Reject-PDU, or BACnet-Abort-PDU as appropriate.
+     * This parameter shall be an integer in the range 0 - 255 assigned by the service requester. It shall be used to
+     * associate the response to a confirmed service request with the original request. In the absence of any error, the
+     * 'invokeID' shall be returned by the service provider in a BACnet-SimpleACK-PDU or a BACnet-ComplexACK-PDU. In the
+     * event of an error condition, the 'invokeID' shall be returned by the service provider in a BACnet-Error-PDU,
+     * BACnet-Reject-PDU, or BACnet-Abort-PDU as appropriate.
      * 
-     * The 'invokeID' shall be generated by the device issuing the service request. It shall be unique for all 
-     * outstanding confirmed request APDUs generated by the device. The same 'invokeID' shall be used for all segments 
-     * of a segmented service request. Once an 'invokeID' has been assigned to an APDU, it shall be maintained within 
-     * the device until either a response APDU is received with the same 'invokeID' or a no response timer expires (see 
-     * 5.3). In either case, the 'invokeID' value shall then be released for reassignment. The algorithm used to pick 
-     * a value out of the set of unused values is a local matter. The storage mechanism for maintaining the used 
-     * 'invokeID' values within the requesting and responding devices is also a local matter. The requesting device may 
-     * use a single 'invokeID' space for all its confirmed APDUs or multiple 'invokeID' spaces (one per destination 
-     * device address) as desired. Since the 'invokeID' values are only source-device-unique, the responding device 
-     * shall maintain the 'invokeID' as well as the requesting device address until a response has been sent. The 
+     * The 'invokeID' shall be generated by the device issuing the service request. It shall be unique for all
+     * outstanding confirmed request APDUs generated by the device. The same 'invokeID' shall be used for all segments
+     * of a segmented service request. Once an 'invokeID' has been assigned to an APDU, it shall be maintained within
+     * the device until either a response APDU is received with the same 'invokeID' or a no response timer expires (see
+     * 5.3). In either case, the 'invokeID' value shall then be released for reassignment. The algorithm used to pick a
+     * value out of the set of unused values is a local matter. The storage mechanism for maintaining the used
+     * 'invokeID' values within the requesting and responding devices is also a local matter. The requesting device may
+     * use a single 'invokeID' space for all its confirmed APDUs or multiple 'invokeID' spaces (one per destination
+     * device address) as desired. Since the 'invokeID' values are only source-device-unique, the responding device
+     * shall maintain the 'invokeID' as well as the requesting device address until a response has been sent. The
      * responding device may discard the 'invokeID' information after a response has been sent.
      */
     private byte invokeId;
-    
+
     /**
-     * This optional parameter is only present if the 'segmented-message' parameter is TRUE. In this case, the 
-     * 'sequence-number' shall be a sequentially incremented unsigned integer, modulo 256, which identifies each 
-     * segment of a segmented request. The value of the received 'sequence-number' is used by the responder to 
-     * acknowledge the receipt of one or more segments of a segmented request. The 'sequence-number' of the first 
-     * segment of a segmented request shall be zero.
+     * This optional parameter is only present if the 'segmented-message' parameter is TRUE. In this case, the
+     * 'sequence-number' shall be a sequentially incremented unsigned integer, modulo 256, which identifies each segment
+     * of a segmented request. The value of the received 'sequence-number' is used by the responder to acknowledge the
+     * receipt of one or more segments of a segmented request. The 'sequence-number' of the first segment of a segmented
+     * request shall be zero.
      */
     private int sequenceNumber;
-    
+
     /**
-     * This optional parameter is only present if the 'segmented-message' parameter is TRUE. In this case, the 
-     * 'proposed-windowsize' parameter shall specify as an unsigned binary integer the maximum number of message 
-     * segments containing 'invokeID' the sender is able or willing to send before waiting for a segment acknowledgment 
+     * This optional parameter is only present if the 'segmented-message' parameter is TRUE. In this case, the
+     * 'proposed-windowsize' parameter shall specify as an unsigned binary integer the maximum number of message
+     * segments containing 'invokeID' the sender is able or willing to send before waiting for a segment acknowledgment
      * PDU (see 5.2 and 5.3). The value of the 'proposed-window-size' shall be in the range 1 - 127.
      */
     private int proposedWindowSize;
-    
+
     /**
-     * This parameter shall contain the parameters of the specific service that is being requested, encoded according 
-     * to the rules of 20.2. These parameters are defined in the individual service descriptions in this standard and 
-     * are represented in Clause 21 in accordance with the rules of ASN.1.
+     * This parameter shall contain the parameters of the specific service that is being requested, encoded according to
+     * the rules of 20.2. These parameters are defined in the individual service descriptions in this standard and are
+     * represented in Clause 21 in accordance with the rules of ASN.1.
      */
     private byte serviceChoice;
     private ConfirmedRequestService serviceRequest;
-    
+
     /**
-     * This field is used to allow parsing of only the APDU so that those fields are available in case there
-     * is a problem parsing the service request.
+     * This field is used to allow parsing of only the APDU so that those fields are available in case there is a
+     * problem parsing the service request.
      */
     private ByteQueue serviceData;
-    
-    public ConfirmedRequest(boolean segmentedMessage, boolean moreFollows, boolean segmentedResponseAccepted, 
-            int maxSegmentsAccepted, MaxApduLength maxApduLengthAccepted, byte invokeId, int sequenceNumber, 
+
+    public ConfirmedRequest(boolean segmentedMessage, boolean moreFollows, boolean segmentedResponseAccepted,
+            int maxSegmentsAccepted, MaxApduLength maxApduLengthAccepted, byte invokeId, int sequenceNumber,
             int proposedWindowSize, ConfirmedRequestService serviceRequest) {
-        
+
         setFields(segmentedMessage, moreFollows, segmentedResponseAccepted, maxSegmentsAccepted, maxApduLengthAccepted,
                 invokeId, sequenceNumber, proposedWindowSize, serviceRequest.getChoiceId());
-        
+
         this.serviceRequest = serviceRequest;
     }
-    
-    public ConfirmedRequest(boolean segmentedMessage, boolean moreFollows, boolean segmentedResponseAccepted, 
-            int maxSegmentsAccepted, MaxApduLength maxApduLengthAccepted, byte invokeId, int sequenceNumber, 
+
+    public ConfirmedRequest(boolean segmentedMessage, boolean moreFollows, boolean segmentedResponseAccepted,
+            int maxSegmentsAccepted, MaxApduLength maxApduLengthAccepted, byte invokeId, int sequenceNumber,
             int proposedWindowSize, byte serviceChoice, ByteQueue serviceData) {
-        
+
         setFields(segmentedMessage, moreFollows, segmentedResponseAccepted, maxSegmentsAccepted, maxApduLengthAccepted,
                 invokeId, sequenceNumber, proposedWindowSize, serviceChoice);
-        
+
         this.serviceData = serviceData;
     }
-    
-    private void setFields(boolean segmentedMessage, boolean moreFollows, boolean segmentedResponseAccepted, 
-            int maxSegmentsAccepted, MaxApduLength maxApduLengthAccepted, byte invokeId, int sequenceNumber, 
+
+    private void setFields(boolean segmentedMessage, boolean moreFollows, boolean segmentedResponseAccepted,
+            int maxSegmentsAccepted, MaxApduLength maxApduLengthAccepted, byte invokeId, int sequenceNumber,
             int proposedWindowSize, byte serviceChoice) {
         this.segmentedMessage = segmentedMessage;
         this.moreFollows = moreFollows;
@@ -181,12 +164,12 @@ public class ConfirmedRequest extends APDU implements Segmentable {
         this.proposedWindowSize = proposedWindowSize;
         this.serviceChoice = serviceChoice;
     }
-    
+
     @Override
     public byte getPduType() {
         return TYPE_ID;
     }
-    
+
     public byte getInvokeId() {
         return invokeId;
     }
@@ -194,7 +177,7 @@ public class ConfirmedRequest extends APDU implements Segmentable {
     public int getSequenceNumber() {
         return sequenceNumber;
     }
-    
+
     public MaxApduLength getMaxApduLengthAccepted() {
         return maxApduLengthAccepted;
     }
@@ -222,7 +205,7 @@ public class ConfirmedRequest extends APDU implements Segmentable {
     public ConfirmedRequestService getServiceRequest() {
         return serviceRequest;
     }
-    
+
     public void appendServiceData(ByteQueue data) {
         this.serviceData.push(data);
     }
@@ -233,8 +216,8 @@ public class ConfirmedRequest extends APDU implements Segmentable {
 
     @Override
     public void write(ByteQueue queue) {
-        queue.push(getShiftedTypeId(TYPE_ID) | (segmentedMessage ? 8 : 0) | 
-                (moreFollows ? 4 : 0) | (segmentedResponseAccepted ? 2 : 0 ));
+        queue.push(getShiftedTypeId(TYPE_ID) | (segmentedMessage ? 8 : 0) | (moreFollows ? 4 : 0)
+                | (segmentedResponseAccepted ? 2 : 0));
         queue.push(((maxSegmentsAccepted & 7) << 4) | (maxApduLengthAccepted.getId() & 0xf));
         queue.push(invokeId);
         if (segmentedMessage) {
@@ -247,16 +230,16 @@ public class ConfirmedRequest extends APDU implements Segmentable {
         else
             queue.push(serviceData);
     }
-    
-    ConfirmedRequest(ByteQueue queue) throws BACnetException {
+
+    ConfirmedRequest(ByteQueue queue) {
         byte b = queue.pop();
         segmentedMessage = (b & 8) != 0;
         moreFollows = (b & 4) != 0;
         segmentedResponseAccepted = (b & 2) != 0;
-        
+
         b = queue.pop();
         maxSegmentsAccepted = (b & 0x70) >> 4;
-        maxApduLengthAccepted = MaxApduLength.valueOf((byte)(b & 0xf));
+        maxApduLengthAccepted = MaxApduLength.valueOf((byte) (b & 0xf));
         invokeId = queue.pop();
         if (segmentedMessage) {
             sequenceNumber = queue.popU1B();
@@ -265,33 +248,27 @@ public class ConfirmedRequest extends APDU implements Segmentable {
         serviceChoice = queue.pop();
         serviceData = new ByteQueue(queue.popAll());
     }
-    
+
     public void parseServiceData() throws BACnetException {
         if (serviceData != null) {
             serviceRequest = ConfirmedRequestService.createConfirmedRequestService(serviceChoice, serviceData);
             serviceData = null;
         }
     }
-    
+
     public APDU clone(boolean moreFollows, int sequenceNumber, int actualSegWindow, ByteQueue serviceData) {
         return new ConfirmedRequest(this.segmentedMessage, moreFollows, this.segmentedResponseAccepted,
-                this.maxSegmentsAccepted, this.maxApduLengthAccepted, this.invokeId, sequenceNumber,
-                actualSegWindow, this.serviceChoice, serviceData);
+                this.maxSegmentsAccepted, this.maxApduLengthAccepted, this.invokeId, sequenceNumber, actualSegWindow,
+                this.serviceChoice, serviceData);
     }
 
     @Override
     public String toString() {
-        return "ConfirmedRequest(segmentedMessage="+ segmentedMessage
-                +", moreFollows="+ moreFollows
-                +", segmentedResponseAccepted="+ segmentedResponseAccepted
-                +", maxSegmentsAccepted="+ maxSegmentsAccepted
-                +", maxApduLengthAccepted="+ maxApduLengthAccepted
-                +", invokeId="+ invokeId
-                +", sequenceNumber="+ sequenceNumber
-                +", proposedWindowSize="+ proposedWindowSize
-                +", serviceChoice="+ serviceChoice
-                +", serviceRequest="+ serviceRequest
-                +")";
+        return "ConfirmedRequest(segmentedMessage=" + segmentedMessage + ", moreFollows=" + moreFollows
+                + ", segmentedResponseAccepted=" + segmentedResponseAccepted + ", maxSegmentsAccepted="
+                + maxSegmentsAccepted + ", maxApduLengthAccepted=" + maxApduLengthAccepted + ", invokeId=" + invokeId
+                + ", sequenceNumber=" + sequenceNumber + ", proposedWindowSize=" + proposedWindowSize
+                + ", serviceChoice=" + serviceChoice + ", serviceRequest=" + serviceRequest + ")";
     }
 
     @Override
