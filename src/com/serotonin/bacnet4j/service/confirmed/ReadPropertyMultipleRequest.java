@@ -35,7 +35,6 @@ import com.serotonin.bacnet4j.obj.ObjectProperties;
 import com.serotonin.bacnet4j.obj.PropertyTypeDefinition;
 import com.serotonin.bacnet4j.service.acknowledgement.AcknowledgementService;
 import com.serotonin.bacnet4j.service.acknowledgement.ReadPropertyMultipleAck;
-import com.serotonin.bacnet4j.type.Encodable;
 import com.serotonin.bacnet4j.type.constructed.Address;
 import com.serotonin.bacnet4j.type.constructed.BACnetError;
 import com.serotonin.bacnet4j.type.constructed.PropertyReference;
@@ -50,9 +49,9 @@ import com.serotonin.util.queue.ByteQueue;
 
 public class ReadPropertyMultipleRequest extends ConfirmedRequestService {
     public static final byte TYPE_ID = 14;
-    
+
     private final SequenceOf<ReadAccessSpecification> listOfReadAccessSpecs;
-    
+
     public ReadPropertyMultipleRequest(SequenceOf<ReadAccessSpecification> listOfReadAccessSpecs) {
         this.listOfReadAccessSpecs = listOfReadAccessSpecs;
     }
@@ -61,40 +60,39 @@ public class ReadPropertyMultipleRequest extends ConfirmedRequestService {
     public byte getChoiceId() {
         return TYPE_ID;
     }
-    
+
     @Override
     public void write(ByteQueue queue) {
         write(queue, listOfReadAccessSpecs);
     }
-    
+
     ReadPropertyMultipleRequest(ByteQueue queue) throws BACnetException {
         listOfReadAccessSpecs = readSequenceOf(queue, ReadAccessSpecification.class);
     }
 
     @Override
-    public AcknowledgementService handle(LocalDevice localDevice, Address from, Network network)
-            throws BACnetException {
+    public AcknowledgementService handle(LocalDevice localDevice, Address from, Network network) throws BACnetException {
         BACnetObject obj;
         ObjectIdentifier oid;
         List<ReadAccessResult> readAccessResults = new ArrayList<ReadAccessResult>();
         List<Result> results;
-        
+
         try {
             for (ReadAccessSpecification req : listOfReadAccessSpecs) {
                 results = new ArrayList<Result>();
                 oid = req.getObjectIdentifier();
                 obj = localDevice.getObjectRequired(oid);
-                
+
                 for (PropertyReference propRef : req.getListOfPropertyReferences())
-                    addProperty(obj, results, propRef.getPropertyIdentifier(), propRef.getPropertyArrayIndex(), true);
-                
+                    addProperty(obj, results, propRef.getPropertyIdentifier(), propRef.getPropertyArrayIndex());
+
                 readAccessResults.add(new ReadAccessResult(oid, new SequenceOf<Result>(results)));
             }
         }
         catch (BACnetServiceException e) {
             throw new BACnetErrorException(getChoiceId(), e);
         }
-        
+
         return new ReadPropertyMultipleAck(new SequenceOf<ReadAccessResult>(readAccessResults));
     }
 
@@ -123,33 +121,26 @@ public class ReadPropertyMultipleRequest extends ConfirmedRequestService {
             return false;
         return true;
     }
-    
-    private void addProperty(BACnetObject obj, List<Result> results, PropertyIdentifier pid, UnsignedInteger pin,
-            boolean valueRequired) {
+
+    private void addProperty(BACnetObject obj, List<Result> results, PropertyIdentifier pid, UnsignedInteger pin) {
         if (pid.intValue() == PropertyIdentifier.all.intValue()) {
             for (PropertyTypeDefinition def : ObjectProperties.getPropertyTypeDefinitions(obj.getId().getObjectType()))
-                addProperty(obj, results, def.getPropertyIdentifier(), pin, def.isRequired());
+                addProperty(obj, results, def.getPropertyIdentifier(), pin);
         }
         else if (pid.intValue() == PropertyIdentifier.required.intValue()) {
-            for (PropertyTypeDefinition def : ObjectProperties.getRequiredPropertyTypeDefinitions(
-                    obj.getId().getObjectType()))
-                addProperty(obj, results, def.getPropertyIdentifier(), pin, true);
+            for (PropertyTypeDefinition def : ObjectProperties.getRequiredPropertyTypeDefinitions(obj.getId()
+                    .getObjectType()))
+                addProperty(obj, results, def.getPropertyIdentifier(), pin);
         }
         else if (pid.intValue() == PropertyIdentifier.optional.intValue()) {
-            for (PropertyTypeDefinition def : ObjectProperties.getOptionalPropertyTypeDefinitions(
-                    obj.getId().getObjectType()))
-                addProperty(obj, results, def.getPropertyIdentifier(), pin, false);
+            for (PropertyTypeDefinition def : ObjectProperties.getOptionalPropertyTypeDefinitions(obj.getId()
+                    .getObjectType()))
+                addProperty(obj, results, def.getPropertyIdentifier(), pin);
         }
         else {
             // Get the specified property.
             try {
-                if (valueRequired)
-                    results.add(new Result(pid, pin, obj.getPropertyRequired(pid, pin)));
-                else {
-                    Encodable prop = obj.getProperty(pid, pin);
-                    if (prop != null)
-                        results.add(new Result(pid, pin, prop));
-                }
+                results.add(new Result(pid, pin, obj.getPropertyRequired(pid, pin)));
             }
             catch (BACnetServiceException e) {
                 results.add(new Result(pid, pin, new BACnetError(e.getErrorClass(), e.getErrorCode())));

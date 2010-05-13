@@ -39,17 +39,17 @@ import com.serotonin.util.queue.ByteQueue;
 
 public class ReadPropertyRequest extends ConfirmedRequestService {
     public static final byte TYPE_ID = 12;
-    
+
     private final ObjectIdentifier objectIdentifier;
     private final PropertyIdentifier propertyIdentifier;
     private UnsignedInteger propertyArrayIndex;
-    
+
     public ReadPropertyRequest(ObjectIdentifier objectIdentifier, PropertyIdentifier propertyIdentifier) {
         this.objectIdentifier = objectIdentifier;
         this.propertyIdentifier = propertyIdentifier;
     }
 
-    public ReadPropertyRequest(ObjectIdentifier objectIdentifier, PropertyIdentifier propertyIdentifier, 
+    public ReadPropertyRequest(ObjectIdentifier objectIdentifier, PropertyIdentifier propertyIdentifier,
             UnsignedInteger propertyArrayIndex) {
         this.objectIdentifier = objectIdentifier;
         this.propertyIdentifier = propertyIdentifier;
@@ -67,7 +67,7 @@ public class ReadPropertyRequest extends ConfirmedRequestService {
         write(queue, propertyIdentifier, 1);
         writeOptional(queue, propertyArrayIndex, 2);
     }
-    
+
     ReadPropertyRequest(ByteQueue queue) throws BACnetException {
         objectIdentifier = read(queue, ObjectIdentifier.class, 0);
         propertyIdentifier = read(queue, PropertyIdentifier.class, 1);
@@ -75,12 +75,11 @@ public class ReadPropertyRequest extends ConfirmedRequestService {
     }
 
     @Override
-    public AcknowledgementService handle(LocalDevice localDevice, Address from, Network network)
-            throws BACnetException {
+    public AcknowledgementService handle(LocalDevice localDevice, Address from, Network network) throws BACnetException {
         Encodable prop;
         try {
             BACnetObject obj = localDevice.getObjectRequired(objectIdentifier);
-            prop = obj.getProperty(propertyIdentifier, propertyArrayIndex);
+            prop = obj.getPropertyRequired(propertyIdentifier, propertyArrayIndex);
         }
         catch (BACnetServiceException e) {
             throw new BACnetErrorException(getChoiceId(), e);
