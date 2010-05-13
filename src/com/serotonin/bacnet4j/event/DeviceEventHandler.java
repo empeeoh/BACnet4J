@@ -32,6 +32,7 @@ import com.serotonin.bacnet4j.obj.BACnetObject;
 import com.serotonin.bacnet4j.service.confirmed.ReinitializeDeviceRequest.ReinitializedStateOfDevice;
 import com.serotonin.bacnet4j.type.Encodable;
 import com.serotonin.bacnet4j.type.constructed.Choice;
+import com.serotonin.bacnet4j.type.constructed.DateTime;
 import com.serotonin.bacnet4j.type.constructed.PropertyValue;
 import com.serotonin.bacnet4j.type.constructed.SequenceOf;
 import com.serotonin.bacnet4j.type.constructed.TimeStamp;
@@ -178,6 +179,14 @@ public class DeviceEventHandler {
         multicast(new EventDispatcher() {
             public void dispatch(DeviceEventListener l) {
                 l.reinitializeDevice(reinitializedStateOfDevice);
+            }
+        });
+    }
+
+    public void synchronizeTime(final DateTime dateTime, final boolean utc) {
+        multicast(new EventDispatcher() {
+            public void dispatch(DeviceEventListener l) {
+                l.synchronizeTime(dateTime, utc);
             }
         });
     }

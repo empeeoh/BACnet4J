@@ -28,6 +28,7 @@ import com.serotonin.bacnet4j.obj.BACnetObject;
 import com.serotonin.bacnet4j.service.confirmed.ReinitializeDeviceRequest.ReinitializedStateOfDevice;
 import com.serotonin.bacnet4j.type.Encodable;
 import com.serotonin.bacnet4j.type.constructed.Choice;
+import com.serotonin.bacnet4j.type.constructed.DateTime;
 import com.serotonin.bacnet4j.type.constructed.PropertyValue;
 import com.serotonin.bacnet4j.type.constructed.SequenceOf;
 import com.serotonin.bacnet4j.type.constructed.TimeStamp;
@@ -42,8 +43,8 @@ import com.serotonin.bacnet4j.type.primitive.ObjectIdentifier;
 import com.serotonin.bacnet4j.type.primitive.UnsignedInteger;
 
 /**
- * A default class for easy implementation of the DeviceEventListener interface. Instead of having to implement
- * all of the defined methods, listener classes can override this and only implement the desired methods.
+ * A default class for easy implementation of the DeviceEventListener interface. Instead of having to implement all of
+ * the defined methods, listener classes can override this and only implement the desired methods.
  * 
  * @author mlohbihler
  */
@@ -51,7 +52,7 @@ public class DefaultDeviceEventListener implements DeviceEventListener {
     public void listenerException(Throwable e) {
         // no op
     }
-    
+
     public boolean allowPropertyWrite(BACnetObject obj, PropertyValue pv) {
         return true;
     }
@@ -68,17 +69,16 @@ public class DefaultDeviceEventListener implements DeviceEventListener {
         // no op
     }
 
-    public void covNotificationReceived(UnsignedInteger subscriberProcessIdentifier, 
-            RemoteDevice initiatingDevice, ObjectIdentifier monitoredObjectIdentifier, 
-            UnsignedInteger timeRemaining, SequenceOf<PropertyValue> listOfValues) {
+    public void covNotificationReceived(UnsignedInteger subscriberProcessIdentifier, RemoteDevice initiatingDevice,
+            ObjectIdentifier monitoredObjectIdentifier, UnsignedInteger timeRemaining,
+            SequenceOf<PropertyValue> listOfValues) {
         // no op
     }
 
-    public void eventNotificationReceived(UnsignedInteger processIdentifier, 
-            RemoteDevice initiatingDevice, ObjectIdentifier eventObjectIdentifier, TimeStamp timeStamp, 
-            UnsignedInteger notificationClass, UnsignedInteger priority, EventType eventType, 
-            CharacterString messageText, NotifyType notifyType, Boolean ackRequired, EventState fromState, 
-            EventState toState, NotificationParameters eventValues) {
+    public void eventNotificationReceived(UnsignedInteger processIdentifier, RemoteDevice initiatingDevice,
+            ObjectIdentifier eventObjectIdentifier, TimeStamp timeStamp, UnsignedInteger notificationClass,
+            UnsignedInteger priority, EventType eventType, CharacterString messageText, NotifyType notifyType,
+            Boolean ackRequired, EventState fromState, EventState toState, NotificationParameters eventValues) {
         // no op
     }
 
@@ -93,6 +93,10 @@ public class DefaultDeviceEventListener implements DeviceEventListener {
     }
 
     public void reinitializeDevice(ReinitializedStateOfDevice reinitializedStateOfDevice) {
+        // no op
+    }
+
+    public void synchronizeTime(DateTime dateTime, boolean utc) {
         // no op
     }
 }

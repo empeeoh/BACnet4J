@@ -49,9 +49,11 @@ import com.serotonin.bacnet4j.type.enumerated.ObjectType;
 import com.serotonin.bacnet4j.type.enumerated.PropertyIdentifier;
 import com.serotonin.bacnet4j.type.primitive.Boolean;
 import com.serotonin.bacnet4j.type.primitive.CharacterString;
+import com.serotonin.bacnet4j.type.primitive.Date;
 import com.serotonin.bacnet4j.type.primitive.Null;
 import com.serotonin.bacnet4j.type.primitive.ObjectIdentifier;
 import com.serotonin.bacnet4j.type.primitive.Real;
+import com.serotonin.bacnet4j.type.primitive.Time;
 import com.serotonin.bacnet4j.type.primitive.UnsignedInteger;
 import com.serotonin.util.ObjectUtils;
 
@@ -130,6 +132,12 @@ public class BACnetObject {
         // Check that the requested property is valid for the object. This will throw an exception if the
         // property doesn't belong.
         ObjectProperties.getPropertyTypeDefinitionRequired(id.getObjectType(), pid);
+
+        // Do some property-specific checking here.
+        if (pid.intValue() == PropertyIdentifier.localTime.intValue())
+            return new Time();
+        if (pid.intValue() == PropertyIdentifier.localDate.intValue())
+            return new Date();
 
         return properties.get(pid);
     }

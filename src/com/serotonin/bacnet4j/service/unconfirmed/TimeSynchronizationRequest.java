@@ -25,16 +25,18 @@ package com.serotonin.bacnet4j.service.unconfirmed;
 import com.serotonin.bacnet4j.LocalDevice;
 import com.serotonin.bacnet4j.Network;
 import com.serotonin.bacnet4j.exception.BACnetException;
-import com.serotonin.bacnet4j.exception.NotImplementedException;
+import com.serotonin.bacnet4j.exception.BACnetServiceException;
 import com.serotonin.bacnet4j.type.constructed.Address;
 import com.serotonin.bacnet4j.type.constructed.DateTime;
+import com.serotonin.bacnet4j.type.constructed.ServicesSupported;
+import com.serotonin.bacnet4j.type.enumerated.PropertyIdentifier;
 import com.serotonin.util.queue.ByteQueue;
 
 public class TimeSynchronizationRequest extends UnconfirmedRequestService {
     public static final byte TYPE_ID = 6;
-    
+
     private final DateTime time;
-    
+
     public TimeSynchronizationRequest(DateTime time) {
         this.time = time;
     }
@@ -48,14 +50,22 @@ public class TimeSynchronizationRequest extends UnconfirmedRequestService {
     public void write(ByteQueue queue) {
         write(queue, time);
     }
-    
+
     TimeSynchronizationRequest(ByteQueue queue) throws BACnetException {
         time = read(queue, DateTime.class);
     }
 
     @Override
-    public void handle(LocalDevice localDevice, Address from, Network network) throws BACnetException {
-        throw new NotImplementedException();
+    public void handle(LocalDevice localDevice, Address from, Network network) {
+        try {
+            ServicesSupported servicesSupported = (ServicesSupported) localDevice.getConfiguration().getProperty(
+                    PropertyIdentifier.protocolServicesSupported);
+            if (servicesSupported.isTimeSynchronization())
+                localDevice.getEventHandler().synchronizeTime(time, false);
+        }
+        catch (BACnetServiceException e) {
+            // no op
+        }
     }
 
     @Override
