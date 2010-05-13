@@ -260,9 +260,6 @@ abstract public class Encodable {
 
     // Read and write encodable
     protected static void writeEncodable(ByteQueue queue, Encodable type, int contextId) {
-        if (type == null)
-            type = new Null();
-
         if (Primitive.class.isAssignableFrom(type.getClass()))
             ((Primitive) type).writeEncodable(queue, contextId);
         else
