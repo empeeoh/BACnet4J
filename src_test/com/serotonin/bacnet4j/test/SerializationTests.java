@@ -10,6 +10,7 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 
 import com.serotonin.bacnet4j.type.Encodable;
+import com.serotonin.bacnet4j.type.constructed.ServicesSupported;
 import com.serotonin.bacnet4j.type.constructed.TimeValue;
 import com.serotonin.bacnet4j.type.enumerated.ObjectType;
 import com.serotonin.bacnet4j.type.primitive.BitString;
@@ -38,38 +39,39 @@ public class SerializationTests {
         for (Encodable encodable : encodables)
             testEncodable(encodable);
     }
-    
+
     private static void testEncodable(Encodable encodable) throws Exception {
         ByteQueue queue = new ByteQueue();
         encodable.write(queue);
-        
+
         Constructor<? extends Encodable> c = encodable.getClass().getConstructor(ByteQueue.class);
         Encodable deserialized = c.newInstance(queue);
-        
+
         if (!encodable.equals(deserialized))
-            throw new Exception("Unequal deserialization in class "+ encodable.getClass());
+            throw new Exception("Unequal deserialization in class " + encodable.getClass());
     }
-    
+
     private static final Encodable[] encodables = {
-        // Primitives
-        new BitString(new boolean[] {true, false, true, false, true}),
-        new Boolean(true),
-        new CharacterString("My test character string"),
-        new Date(new GregorianCalendar(2008, Calendar.MARCH, 22)),
-        new Double(123.456),
-        new Enumerated(4),
-        new Null(),
-        new ObjectIdentifier(ObjectType.averaging, 2),
-        new OctetString(new byte[] {1, 2, 3, 4}),
-        new Real(234.567F),
-        new SignedInteger(-345),
-        new Time(13, 23, 12, 45),
-        new Unsigned16(65500),
-        new Unsigned32(Integer.MAX_VALUE),
-        new Unsigned8(254),
-        new UnsignedInteger(new BigInteger(Long.toString(Long.MAX_VALUE))),
-        
-        // Constructed
-        new TimeValue(new Time(13, 23, 12, 45), new Real(65.56F)),
+    // Primitives
+            new BitString(new boolean[] { true, false, true, false, true }), //
+            new Boolean(true), //
+            new CharacterString("My test character string"), //
+            new Date(new GregorianCalendar(2008, Calendar.MARCH, 22)), //
+            new Double(123.456), //
+            new Enumerated(4), //
+            new Null(), //
+            new ObjectIdentifier(ObjectType.averaging, 2), //
+            new OctetString(new byte[] { 1, 2, 3, 4 }), //
+            new Real(234.567F), //
+            new SignedInteger(-345), //
+            new Time(13, 23, 12, 45), //
+            new Unsigned16(65500), //
+            new Unsigned32(Integer.MAX_VALUE), //
+            new Unsigned8(254), //
+            new UnsignedInteger(new BigInteger(Long.toString(Long.MAX_VALUE))), //
+            new ServicesSupported(), //
+
+            // Constructed
+            new TimeValue(new Time(13, 23, 12, 45), new Real(65.56F)), //
     };
 }

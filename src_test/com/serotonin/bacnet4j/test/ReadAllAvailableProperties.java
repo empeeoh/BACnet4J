@@ -36,6 +36,7 @@ import com.serotonin.bacnet4j.service.confirmed.ReinitializeDeviceRequest.Reinit
 import com.serotonin.bacnet4j.service.unconfirmed.WhoIsRequest;
 import com.serotonin.bacnet4j.type.Encodable;
 import com.serotonin.bacnet4j.type.constructed.Choice;
+import com.serotonin.bacnet4j.type.constructed.DateTime;
 import com.serotonin.bacnet4j.type.constructed.ObjectPropertyReference;
 import com.serotonin.bacnet4j.type.constructed.PropertyValue;
 import com.serotonin.bacnet4j.type.constructed.SequenceOf;
@@ -54,10 +55,9 @@ import com.serotonin.bacnet4j.util.PropertyReferences;
 import com.serotonin.bacnet4j.util.PropertyValues;
 
 /**
- * Discovers and devices and print all properties of all objects found.
- * this is done by using PropertyIdentifier.all so the Device will send all propertys that are set.
- * if you want poll all PropertyId {@link ReadPropertyRangeTest}.
- *
+ * Discovers and devices and print all properties of all objects found. this is done by using PropertyIdentifier.all so
+ * the Device will send all propertys that are set. if you want poll all PropertyId {@link ReadPropertyRangeTest}.
+ * 
  * @author Matthew Lohbihler
  * @author Arne Plöse
  */
@@ -66,7 +66,7 @@ public class ReadAllAvailableProperties {
     private LoopDevice loopDevice;
     private final LocalDevice localDevice;
     // remote devices found
-    private final List<RemoteDevice> remoteDevices = new ArrayList<RemoteDevice>();
+    final List<RemoteDevice> remoteDevices = new ArrayList<RemoteDevice>();
 
     public ReadAllAvailableProperties(String broadcastAddress, int port) throws IOException {
         localDevice = new LocalDevice(1234, broadcastAddress);
@@ -98,24 +98,36 @@ public class ReadAllAvailableProperties {
                 System.out.println("DiscoveryTest iHaveReceived");
             }
 
-            public void covNotificationReceived(UnsignedInteger subscriberProcessIdentifier, RemoteDevice initiatingDevice, ObjectIdentifier monitoredObjectIdentifier, UnsignedInteger timeRemaining, SequenceOf<PropertyValue> listOfValues) {
+            public void covNotificationReceived(UnsignedInteger subscriberProcessIdentifier,
+                    RemoteDevice initiatingDevice, ObjectIdentifier monitoredObjectIdentifier,
+                    UnsignedInteger timeRemaining, SequenceOf<PropertyValue> listOfValues) {
                 System.out.println("DiscoveryTest covNotificationReceived");
             }
 
-            public void eventNotificationReceived(UnsignedInteger processIdentifier, RemoteDevice initiatingDevice, ObjectIdentifier eventObjectIdentifier, TimeStamp timeStamp, UnsignedInteger notificationClass, UnsignedInteger priority, EventType eventType, CharacterString messageText, NotifyType notifyType, Boolean ackRequired, EventState fromState, EventState toState, NotificationParameters eventValues) {
+            public void eventNotificationReceived(UnsignedInteger processIdentifier, RemoteDevice initiatingDevice,
+                    ObjectIdentifier eventObjectIdentifier, TimeStamp timeStamp, UnsignedInteger notificationClass,
+                    UnsignedInteger priority, EventType eventType, CharacterString messageText, NotifyType notifyType,
+                    Boolean ackRequired, EventState fromState, EventState toState, NotificationParameters eventValues) {
                 System.out.println("DiscoveryTest eventNotificationReceived");
             }
 
-            public void textMessageReceived(RemoteDevice textMessageSourceDevice, Choice messageClass, MessagePriority messagePriority, CharacterString message) {
+            public void textMessageReceived(RemoteDevice textMessageSourceDevice, Choice messageClass,
+                    MessagePriority messagePriority, CharacterString message) {
                 System.out.println("DiscoveryTest textMessageReceived");
             }
 
-            public void privateTransferReceived(UnsignedInteger vendorId, UnsignedInteger serviceNumber, Encodable serviceParameters) {
+            public void privateTransferReceived(UnsignedInteger vendorId, UnsignedInteger serviceNumber,
+                    Encodable serviceParameters) {
                 System.out.println("DiscoveryTest privateTransferReceived");
             }
 
             public void reinitializeDevice(ReinitializedStateOfDevice reinitializedStateOfDevice) {
                 System.out.println("DiscoveryTest reinitializeDevice");
+            }
+
+            @Override
+            public void synchronizeTime(DateTime dateTime, boolean utc) {
+                System.out.println("DiscoveryTest synchronizeTime");
             }
         });
         localDevice.initialize();
@@ -124,6 +136,7 @@ public class ReadAllAvailableProperties {
 
     /**
      * Send a WhoIs request and wait for the first to answer
+     * 
      * @throws java.lang.Exception
      */
     public void doDiscover() throws Exception {
@@ -149,8 +162,8 @@ public class ReadAllAvailableProperties {
 
             localDevice.getExtendedDeviceInformation(d);
 
-            List<ObjectIdentifier> oids = ((SequenceOf<ObjectIdentifier>) localDevice.sendReadPropertyAllowNull(
-                    d, d.getObjectIdentifier(), PropertyIdentifier.objectList)).getValues();
+            List<ObjectIdentifier> oids = ((SequenceOf<ObjectIdentifier>) localDevice.sendReadPropertyAllowNull(d, d
+                    .getObjectIdentifier(), PropertyIdentifier.objectList)).getValues();
 
             PropertyReferences refs = new PropertyReferences();
             // add the property references of the "device object" to the list
@@ -162,7 +175,7 @@ public class ReadAllAvailableProperties {
             }
 
             System.out.println("Start read properties");
-              final long start = System.currentTimeMillis();
+            final long start = System.currentTimeMillis();
 
             PropertyValues pvs = localDevice.readProperties(d, refs);
             System.out.println(String.format("Properties read done in %d ms", System.currentTimeMillis() - start));
@@ -170,7 +183,6 @@ public class ReadAllAvailableProperties {
             for (ObjectIdentifier oid : oids) {
                 printObject(oid, pvs);
             }
-
 
         }
 
@@ -181,30 +193,33 @@ public class ReadAllAvailableProperties {
         System.out.println(String.format("\t%s", oid));
         for (ObjectPropertyReference opr : pvs) {
             if (oid.equals(opr.getObjectIdentifier())) {
-                System.out.println(String.format("\t\t%s = %s", opr.getPropertyIdentifier().toString(), pvs.getNoErrorCheck(opr)));
+                System.out.println(String.format("\t\t%s = %s", opr.getPropertyIdentifier().toString(), pvs
+                        .getNoErrorCheck(opr)));
             }
 
         }
     }
 
     /**
-     * Note same Bropadcast address, but different ports!!!
+     * Note same Broadcast address, but different ports!!!
+     * 
      * @param args
      * @throws java.lang.Exception
      */
-    @SuppressWarnings("unchecked")
     public static void main(String[] args) throws Exception {
         ReadAllAvailableProperties dt = new ReadAllAvailableProperties(BROADCAST_ADDRESS, LocalDevice.DEFAULT_PORT);
         try {
             dt.setLoopDevice(new LoopDevice(BROADCAST_ADDRESS, LocalDevice.DEFAULT_PORT + 1));
-        } catch (RuntimeException e) {
+        }
+        catch (RuntimeException e) {
             dt.localDevice.terminate();
             throw e;
         }
         try {
             dt.doDiscover();
             dt.printDevices();
-        } finally {
+        }
+        finally {
             dt.localDevice.terminate();
             System.out.println("Cleanup loopDevice");
             dt.getLoopDevice().doTerminate();
@@ -219,7 +234,8 @@ public class ReadAllAvailableProperties {
     }
 
     /**
-     * @param loopDevice the loopDevice to set
+     * @param loopDevice
+     *            the loopDevice to set
      */
     public void setLoopDevice(LoopDevice loopDevice) {
         this.loopDevice = loopDevice;

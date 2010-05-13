@@ -33,6 +33,7 @@ import com.serotonin.bacnet4j.obj.BACnetObject;
 import com.serotonin.bacnet4j.service.confirmed.ReinitializeDeviceRequest.ReinitializedStateOfDevice;
 import com.serotonin.bacnet4j.type.Encodable;
 import com.serotonin.bacnet4j.type.constructed.Choice;
+import com.serotonin.bacnet4j.type.constructed.DateTime;
 import com.serotonin.bacnet4j.type.constructed.PropertyValue;
 import com.serotonin.bacnet4j.type.constructed.SequenceOf;
 import com.serotonin.bacnet4j.type.constructed.TimeStamp;
@@ -53,9 +54,9 @@ import com.serotonin.bacnet4j.type.primitive.Real;
 import com.serotonin.bacnet4j.type.primitive.UnsignedInteger;
 
 /**
- *
+ * 
  * software only device default local loop ;-)
- *
+ * 
  * @author mlohbihler
  * @author aploese
  */
@@ -66,7 +67,7 @@ public class LoopDevice implements Runnable {
         Thread.sleep(12000); // wait 2 min
         ld.doTerminate();
     }
-    
+
     private boolean terminate;
     private LocalDevice localDevice;
     private BACnetObject ai0;
@@ -103,41 +104,61 @@ public class LoopDevice implements Runnable {
                     System.out.println("loopDevice iHaveReceived");
                 }
 
-                public void covNotificationReceived(UnsignedInteger subscriberProcessIdentifier, RemoteDevice initiatingDevice, ObjectIdentifier monitoredObjectIdentifier, UnsignedInteger timeRemaining, SequenceOf<PropertyValue> listOfValues) {
+                public void covNotificationReceived(UnsignedInteger subscriberProcessIdentifier,
+                        RemoteDevice initiatingDevice, ObjectIdentifier monitoredObjectIdentifier,
+                        UnsignedInteger timeRemaining, SequenceOf<PropertyValue> listOfValues) {
                     System.out.println("loopDevice covNotificationReceived");
                 }
 
-                public void eventNotificationReceived(UnsignedInteger processIdentifier, RemoteDevice initiatingDevice, ObjectIdentifier eventObjectIdentifier, TimeStamp timeStamp, UnsignedInteger notificationClass, UnsignedInteger priority, EventType eventType, CharacterString messageText, NotifyType notifyType, Boolean ackRequired, EventState fromState, EventState toState, NotificationParameters eventValues) {
+                public void eventNotificationReceived(UnsignedInteger processIdentifier, RemoteDevice initiatingDevice,
+                        ObjectIdentifier eventObjectIdentifier, TimeStamp timeStamp, UnsignedInteger notificationClass,
+                        UnsignedInteger priority, EventType eventType, CharacterString messageText,
+                        NotifyType notifyType, Boolean ackRequired, EventState fromState, EventState toState,
+                        NotificationParameters eventValues) {
                     System.out.println("loopDevice eventNotificationReceived");
                 }
 
-                public void textMessageReceived(RemoteDevice textMessageSourceDevice, Choice messageClass, MessagePriority messagePriority, CharacterString message) {
+                public void textMessageReceived(RemoteDevice textMessageSourceDevice, Choice messageClass,
+                        MessagePriority messagePriority, CharacterString message) {
                     System.out.println("loopDevice textMessageReceived");
                 }
 
-                public void privateTransferReceived(UnsignedInteger vendorId, UnsignedInteger serviceNumber, Encodable serviceParameters) {
+                public void privateTransferReceived(UnsignedInteger vendorId, UnsignedInteger serviceNumber,
+                        Encodable serviceParameters) {
                     System.out.println("loopDevice privateTransferReceived");
                 }
 
                 public void reinitializeDevice(ReinitializedStateOfDevice reinitializedStateOfDevice) {
                     System.out.println("loopDevice reinitializeDevice");
                 }
+
+                @Override
+                public void synchronizeTime(DateTime dateTime, boolean utc) {
+                    System.out.println("loopDevice synchronizeTime");
+                }
             });
 
-            // for valid property values with valid datatypes see com.serotonin.bacnet4j.obj.ObjectProperties and ther look for the big static block at the end;
+            // for valid property values with valid datatypes see com.serotonin.bacnet4j.obj.ObjectProperties and ther
+            // look for the big static block at the end;
             // properties of device object
-            localDevice.getConfiguration().setProperty(PropertyIdentifier.modelName, new CharacterString("BACnet4J LoopDevice"));
+            localDevice.getConfiguration().setProperty(PropertyIdentifier.modelName,
+                    new CharacterString("BACnet4J LoopDevice"));
 
             // Set up a few objects.
             ai0 = new BACnetObject(localDevice, localDevice.getNextInstanceObjectIdentifier(ObjectType.analogInput));
 
-            //mandatory properties
-            ai0.setProperty(PropertyIdentifier.objectName, new CharacterString("G1-RLT03-TM-01")); // this is a cryptic encoded name of a temp sensor from a drawing... (ahm. actually taken from a book ;-))
+            // mandatory properties
+            ai0.setProperty(PropertyIdentifier.objectName, new CharacterString("G1-RLT03-TM-01")); // this is a cryptic
+            // encoded name of a
+            // temp sensor from a
+            // drawing... (ahm.
+            // actually taken
+            // from a book ;-))
             ai0.setProperty(PropertyIdentifier.presentValue, new Real(11));
             ai0.setProperty(PropertyIdentifier.outOfService, new Boolean(false));
             ai0.setProperty(PropertyIdentifier.units, EngineeringUnits.degreesCelsius);
 
-            //some optional properties
+            // some optional properties
             ai0.setProperty(PropertyIdentifier.description, new CharacterString("temperature"));
             ai0.setProperty(PropertyIdentifier.deviceType, new CharacterString("random values"));
             ai0.setProperty(PropertyIdentifier.reliability, Reliability.noFaultDetected);
@@ -145,32 +166,29 @@ public class LoopDevice implements Runnable {
 
             ai0.setProperty(PropertyIdentifier.minPresValue, new Real(-70));
             ai0.setProperty(PropertyIdentifier.maxPresValue, new Real(120));
-            ai0.setProperty(PropertyIdentifier.resolution, new Real((float)0.1));
+            ai0.setProperty(PropertyIdentifier.resolution, new Real((float) 0.1));
             ai0.setProperty(PropertyIdentifier.profileName, new CharacterString("funny reader"));
 
             localDevice.addObject(ai0);
 
-            ai1 = new BACnetObject(
-                    localDevice, localDevice.getNextInstanceObjectIdentifier(ObjectType.analogInput));
+            ai1 = new BACnetObject(localDevice, localDevice.getNextInstanceObjectIdentifier(ObjectType.analogInput));
             ai1.setProperty(PropertyIdentifier.units, EngineeringUnits.percentObscurationPerFoot);
             localDevice.addObject(ai1);
 
-            bi0 = new BACnetObject(
-                    localDevice, localDevice.getNextInstanceObjectIdentifier(ObjectType.binaryInput));
+            bi0 = new BACnetObject(localDevice, localDevice.getNextInstanceObjectIdentifier(ObjectType.binaryInput));
             localDevice.addObject(bi0);
             bi0.setProperty(PropertyIdentifier.objectName, new CharacterString("Off and on"));
             bi0.setProperty(PropertyIdentifier.inactiveText, new CharacterString("Off"));
             bi0.setProperty(PropertyIdentifier.activeText, new CharacterString("On"));
 
-            bi1 = new BACnetObject(
-                    localDevice, localDevice.getNextInstanceObjectIdentifier(ObjectType.binaryInput));
+            bi1 = new BACnetObject(localDevice, localDevice.getNextInstanceObjectIdentifier(ObjectType.binaryInput));
             localDevice.addObject(bi1);
             bi1.setProperty(PropertyIdentifier.objectName, new CharacterString("Good and bad"));
             bi1.setProperty(PropertyIdentifier.inactiveText, new CharacterString("Bad"));
             bi1.setProperty(PropertyIdentifier.activeText, new CharacterString("Good"));
 
-            mso0 = new BACnetObject(
-                    localDevice, localDevice.getNextInstanceObjectIdentifier(ObjectType.multiStateOutput));
+            mso0 = new BACnetObject(localDevice, localDevice
+                    .getNextInstanceObjectIdentifier(ObjectType.multiStateOutput));
             mso0.setProperty(PropertyIdentifier.objectName, new CharacterString("Vegetable"));
             mso0.setProperty(PropertyIdentifier.numberOfStates, new UnsignedInteger(4));
             mso0.setProperty(PropertyIdentifier.stateText, 1, new CharacterString("Tomato"));
@@ -180,16 +198,15 @@ public class LoopDevice implements Runnable {
             mso0.setProperty(PropertyIdentifier.presentValue, new UnsignedInteger(1));
             localDevice.addObject(mso0);
 
-            ao0 = new BACnetObject(
-                    localDevice, localDevice.getNextInstanceObjectIdentifier(ObjectType.analogOutput));
+            ao0 = new BACnetObject(localDevice, localDevice.getNextInstanceObjectIdentifier(ObjectType.analogOutput));
             ao0.setProperty(PropertyIdentifier.objectName, new CharacterString("Settable analog"));
             localDevice.addObject(ao0);
-
 
             // Start the local device.
             localDevice.initialize();
             new Thread(this).start();
-        } catch (RuntimeException e) {
+        }
+        catch (RuntimeException e) {
             System.out.println("Ex in LoopDevice() ");
             e.printStackTrace();
             localDevice.terminate();
@@ -212,7 +229,6 @@ public class LoopDevice implements Runnable {
             while (!isTerminate()) {
                 System.out.print("Change values of LoopDevice " + this);
 
-
                 // Update the values in the objects.
                 ai0.setProperty(PropertyIdentifier.presentValue, new Real(ai0value));
                 ai1.setProperty(PropertyIdentifier.presentValue, new Real(ai1value));
@@ -224,14 +240,16 @@ public class LoopDevice implements Runnable {
                 }
             }
             System.out.println("Close LoopDevive " + this);
-        } catch (Exception ex) {
+        }
+        catch (Exception ex) {
+            // no op
         }
         localDevice.terminate();
         localDevice = null;
     }
 
     @Override
-    protected void finalize() throws Throwable {
+    protected void finalize() {
         if (localDevice != null) {
             localDevice.terminate();
             localDevice = null;
@@ -246,7 +264,8 @@ public class LoopDevice implements Runnable {
     }
 
     /**
-     * @param terminate the terminate to set
+     * @param terminate
+     *            the terminate to set
      */
     public void doTerminate() {
         terminate = true;
