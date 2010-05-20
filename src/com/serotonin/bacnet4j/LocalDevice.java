@@ -91,7 +91,6 @@ import com.serotonin.bacnet4j.type.notificationParameters.NotificationParameters
 import com.serotonin.bacnet4j.type.primitive.Boolean;
 import com.serotonin.bacnet4j.type.primitive.CharacterString;
 import com.serotonin.bacnet4j.type.primitive.ObjectIdentifier;
-import com.serotonin.bacnet4j.type.primitive.OctetString;
 import com.serotonin.bacnet4j.type.primitive.Unsigned16;
 import com.serotonin.bacnet4j.type.primitive.UnsignedInteger;
 import com.serotonin.bacnet4j.util.PropertyReferences;
@@ -411,9 +410,8 @@ public class LocalDevice implements RequestHandler {
     public AcknowledgementService send(Address address, Network network, int maxAPDULengthAccepted,
             Segmentation segmentationSupported, ConfirmedRequestService serviceRequest) throws BACnetException {
         try {
-            return send(new InetSocketAddress(InetAddress.getByAddress(address.getMacAddress().getBytes()), address
-                    .getNetworkNumber().intValue()), network, maxAPDULengthAccepted, segmentationSupported,
-                    serviceRequest);
+            return send(new InetSocketAddress(address.getInetAddress(), address.getPort()), network,
+                    maxAPDULengthAccepted, segmentationSupported, serviceRequest);
         }
         catch (UnknownHostException e) {
             throw new BACnetException(e);
@@ -445,8 +443,7 @@ public class LocalDevice implements RequestHandler {
     public void sendUnconfirmed(Address address, Network network, UnconfirmedRequestService serviceRequest)
             throws BACnetException {
         try {
-            sendUnconfirmed(new InetSocketAddress(InetAddress.getByAddress(address.getMacAddress().getBytes()), address
-                    .getNetworkNumber().intValue()), network, serviceRequest);
+            sendUnconfirmed(new InetSocketAddress(address.getInetAddress(), address.getPort()), network, serviceRequest);
         }
         catch (UnknownHostException e) {
             throw new BACnetException(e);
@@ -689,8 +686,7 @@ public class LocalDevice implements RequestHandler {
     //
     public Address getAddress() {
         try {
-            return new Address(new UnsignedInteger(messageControl.getPort()), new OctetString(InetAddress
-                    .getLocalHost().getAddress()));
+            return new Address(InetAddress.getLocalHost().getAddress(), messageControl.getPort());
         }
         catch (UnknownHostException e) {
             // Should never happen, so just wrap in a RuntimeException

@@ -22,6 +22,9 @@
  */
 package com.serotonin.bacnet4j.type.constructed;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+
 import com.serotonin.bacnet4j.Network;
 import com.serotonin.bacnet4j.exception.BACnetException;
 import com.serotonin.bacnet4j.type.primitive.OctetString;
@@ -33,23 +36,27 @@ import com.serotonin.util.queue.ByteQueue;
 public class Address extends BaseType {
     private final UnsignedInteger networkNumber;
     private final OctetString macAddress;
-    
+
     public Address(UnsignedInteger networkNumber, OctetString macAddress) {
         this.networkNumber = networkNumber;
         this.macAddress = macAddress;
     }
-    
+
+    public Address(byte[] ipAddress, int port) {
+        this(null, ipAddress, port);
+    }
+
     public Address(Network network, byte[] ipAddress, int port) {
         if (network == null)
             networkNumber = new Unsigned16(0);
         else
             networkNumber = new Unsigned16(network.getNetworkNumber());
-        
+
         byte[] ipMacAddress = new byte[ipAddress.length + 2];
         System.arraycopy(ipAddress, 0, ipMacAddress, 0, ipAddress.length);
-        ipMacAddress[ipAddress.length] = (byte)(port >> 8);
-        ipMacAddress[ipAddress.length + 1] = (byte)port;
-        macAddress = new OctetString (ipMacAddress);
+        ipMacAddress[ipAddress.length] = (byte) (port >> 8);
+        ipMacAddress[ipAddress.length + 1] = (byte) port;
+        macAddress = new OctetString(ipMacAddress);
     }
 
     @Override
@@ -57,12 +64,12 @@ public class Address extends BaseType {
         write(queue, networkNumber);
         write(queue, macAddress);
     }
-    
+
     public Address(ByteQueue queue) throws BACnetException {
         networkNumber = read(queue, UnsignedInteger.class);
         macAddress = read(queue, OctetString.class);
     }
-    
+
     public OctetString getMacAddress() {
         return macAddress;
     }
@@ -73,11 +80,31 @@ public class Address extends BaseType {
 
     @Override
     public String toString() {
-        return "Address(networkNumber="+ networkNumber +", macAddress="+ macAddress +")";
+        return "Address(networkNumber=" + networkNumber + ", macAddress=" + macAddress + ")";
     }
-    
+
+    public InetAddress getInetAddress() throws UnknownHostException {
+        return InetAddress.getByAddress(getIpBytes());
+    }
+
+    public int getPort() {
+        byte[] b = macAddress.getBytes();
+        if (b.length == 6)
+            return ((b[4] & 0xff) << 8) | (b[5] & 0xff);
+        return -1;
+    }
+
     public String toIpString() {
-        return IpAddressUtils.toIpString(macAddress.getBytes()) +":"+ networkNumber.intValue();
+        return IpAddressUtils.toIpString(getIpBytes()) + ":" + getPort();
+    }
+
+    private byte[] getIpBytes() {
+        if (macAddress.getLength() == 4)
+            return macAddress.getBytes();
+
+        byte[] b = new byte[4];
+        System.arraycopy(macAddress.getBytes(), 0, b, 0, 4);
+        return b;
     }
 
     @Override

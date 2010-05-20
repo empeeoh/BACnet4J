@@ -29,33 +29,33 @@ import com.serotonin.util.queue.ByteQueue;
 
 public class OctetString extends Primitive {
     public static final byte TYPE_ID = 6;
-    
+
     private final byte[] value;
-    
+
     public OctetString(byte[] value) {
         this.value = value;
     }
-    
+
     public byte[] getBytes() {
         return value;
     }
-    
+
     //
     // Reading and writing
     //
     public OctetString(ByteQueue queue) {
-        int length = (int)readTag(queue);
+        int length = (int) readTag(queue);
         value = new byte[length];
         queue.pop(value);
     }
-    
+
     @Override
     public void writeImpl(ByteQueue queue) {
         queue.push(value);
     }
 
     @Override
-    protected long getLength() {
+    public long getLength() {
         return value.length;
     }
 
@@ -85,7 +85,7 @@ public class OctetString extends Primitive {
             return false;
         return true;
     }
-    
+
     @Override
     public String toString() {
         return ArrayUtils.toHexString(value);

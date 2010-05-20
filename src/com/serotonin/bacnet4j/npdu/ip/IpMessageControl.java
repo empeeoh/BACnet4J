@@ -64,8 +64,6 @@ import com.serotonin.bacnet4j.type.enumerated.ErrorClass;
 import com.serotonin.bacnet4j.type.enumerated.ErrorCode;
 import com.serotonin.bacnet4j.type.enumerated.Segmentation;
 import com.serotonin.bacnet4j.type.error.BaseError;
-import com.serotonin.bacnet4j.type.primitive.OctetString;
-import com.serotonin.bacnet4j.type.primitive.UnsignedInteger;
 import com.serotonin.util.queue.ByteQueue;
 
 /**
@@ -541,12 +539,12 @@ public class IpMessageControl extends Thread {
                     // Handle the request.
                     try {
                         confAPDU.parseServiceData();
-                        AcknowledgementService ackService = requestHandler.handleConfirmedRequest(new Address(
-                                new UnsignedInteger(fromPort), new OctetString(fromAddr.getAddress())), fromNetwork,
-                                invokeId, confAPDU.getServiceRequest());
                         // AcknowledgementService ackService = requestHandler.handleConfirmedRequest(new Address(
-                        // fromNetwork, fromAddr.getAddress(), fromPort), fromNetwork, invokeId, confAPDU
-                        // .getServiceRequest());
+                        // new UnsignedInteger(fromPort), new OctetString(fromAddr.getAddress())), fromNetwork,
+                        // invokeId, confAPDU.getServiceRequest());
+                        AcknowledgementService ackService = requestHandler.handleConfirmedRequest(new Address(
+                                fromNetwork, fromAddr.getAddress(), fromPort), fromNetwork, invokeId, confAPDU
+                                .getServiceRequest());
                         sendResponse(from, fromNetwork, confAPDU, ackService);
                     }
                     catch (BACnetErrorException e) {
@@ -563,8 +561,8 @@ public class IpMessageControl extends Thread {
                 }
             }
             else if (apdu instanceof UnconfirmedRequest) {
-                requestHandler.handleUnconfirmedRequest(new Address(new UnsignedInteger(fromPort), new OctetString(
-                        fromAddr.getAddress())), fromNetwork, ((UnconfirmedRequest) apdu).getService());
+                requestHandler.handleUnconfirmedRequest(new Address(fromNetwork, fromAddr.getAddress(), fromPort),
+                        fromNetwork, ((UnconfirmedRequest) apdu).getService());
             }
             else {
                 // An acknowledgement.
