@@ -34,10 +34,10 @@ import com.serotonin.util.IpAddressUtils;
 import com.serotonin.util.queue.ByteQueue;
 
 public class Address extends BaseType {
-    private final UnsignedInteger networkNumber;
+    private final Unsigned16 networkNumber;
     private final OctetString macAddress;
 
-    public Address(UnsignedInteger networkNumber, OctetString macAddress) {
+    public Address(Unsigned16 networkNumber, OctetString macAddress) {
         this.networkNumber = networkNumber;
         this.macAddress = macAddress;
     }
@@ -66,7 +66,7 @@ public class Address extends BaseType {
     }
 
     public Address(ByteQueue queue) throws BACnetException {
-        networkNumber = read(queue, UnsignedInteger.class);
+        networkNumber = read(queue, Unsigned16.class);
         macAddress = read(queue, OctetString.class);
     }
 

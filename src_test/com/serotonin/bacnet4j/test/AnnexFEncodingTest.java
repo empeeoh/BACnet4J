@@ -148,6 +148,7 @@ import com.serotonin.bacnet4j.type.primitive.OctetString;
 import com.serotonin.bacnet4j.type.primitive.Real;
 import com.serotonin.bacnet4j.type.primitive.SignedInteger;
 import com.serotonin.bacnet4j.type.primitive.Time;
+import com.serotonin.bacnet4j.type.primitive.Unsigned16;
 import com.serotonin.bacnet4j.type.primitive.UnsignedInteger;
 import com.serotonin.util.queue.ByteQueue;
 
@@ -1484,8 +1485,8 @@ public class AnnexFEncodingTest {
 
     public void e6_aTest() {
         ConfirmedRequestService service = new RequestKeyRequest(new ObjectIdentifier(ObjectType.device, 1),
-                new Address(new UnsignedInteger(2), new OctetString(new byte[] { 17 })), new ObjectIdentifier(
-                        ObjectType.device, 2), new Address(new UnsignedInteger(2), new OctetString(new byte[] { 34 })));
+                new Address(new Unsigned16(2), new OctetString(new byte[] { 17 })), new ObjectIdentifier(
+                        ObjectType.device, 2), new Address(new Unsigned16(2), new OctetString(new byte[] { 34 })));
         APDU pdu = new ConfirmedRequest(false, false, false, 0, MaxApduLength.UP_TO_1476, (byte) 15, (byte) 0, 0,
                 service);
         byte[] expectedResult = { (byte) 0x00, (byte) 0x05, (byte) 0x0f, (byte) 0x19, (byte) 0xc4, (byte) 0x02,
