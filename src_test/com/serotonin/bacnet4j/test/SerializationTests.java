@@ -10,9 +10,14 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 
 import com.serotonin.bacnet4j.type.Encodable;
+import com.serotonin.bacnet4j.type.constructed.BACnetError;
 import com.serotonin.bacnet4j.type.constructed.ServicesSupported;
 import com.serotonin.bacnet4j.type.constructed.TimeValue;
+import com.serotonin.bacnet4j.type.enumerated.ErrorClass;
+import com.serotonin.bacnet4j.type.enumerated.ErrorCode;
 import com.serotonin.bacnet4j.type.enumerated.ObjectType;
+import com.serotonin.bacnet4j.type.error.BaseError;
+import com.serotonin.bacnet4j.type.error.ChangeListError;
 import com.serotonin.bacnet4j.type.primitive.BitString;
 import com.serotonin.bacnet4j.type.primitive.Boolean;
 import com.serotonin.bacnet4j.type.primitive.CharacterString;
@@ -44,15 +49,20 @@ public class SerializationTests {
         ByteQueue queue = new ByteQueue();
         encodable.write(queue);
 
-        Constructor<? extends Encodable> c = encodable.getClass().getConstructor(ByteQueue.class);
-        Encodable deserialized = c.newInstance(queue);
+        Encodable deserialized;
+        if (BaseError.class.isAssignableFrom(encodable.getClass()))
+            deserialized = BaseError.createBaseError(queue);
+        else {
+            Constructor<? extends Encodable> c = encodable.getClass().getConstructor(ByteQueue.class);
+            deserialized = c.newInstance(queue);
+        }
 
         if (!encodable.equals(deserialized))
             throw new Exception("Unequal deserialization in class " + encodable.getClass());
     }
 
     private static final Encodable[] encodables = {
-    // Primitives
+            // Primitives
             new BitString(new boolean[] { true, false, true, false, true }), //
             new Boolean(true), //
             new CharacterString("My test character string"), //
@@ -70,6 +80,8 @@ public class SerializationTests {
             new Unsigned8(254), //
             new UnsignedInteger(new BigInteger(Long.toString(Long.MAX_VALUE))), //
             new ServicesSupported(), //
+            new ChangeListError((byte) 9, new BACnetError(ErrorClass.object, ErrorCode.abortBufferOverflow),
+                    new UnsignedInteger(13)), //            
 
             // Constructed
             new TimeValue(new Time(13, 23, 12, 45), new Real(65.56F)), //

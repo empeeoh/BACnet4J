@@ -22,8 +22,12 @@
  */
 package com.serotonin.bacnet4j.test;
 
+import java.net.InetAddress;
 import java.net.InetSocketAddress;
+import java.net.NetworkInterface;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Enumeration;
 import java.util.List;
 
 import com.serotonin.bacnet4j.LocalDevice;
@@ -46,7 +50,6 @@ import com.serotonin.bacnet4j.service.unconfirmed.WhoIsRequest;
 import com.serotonin.bacnet4j.type.constructed.Address;
 import com.serotonin.bacnet4j.type.constructed.Destination;
 import com.serotonin.bacnet4j.type.constructed.EventTransitionBits;
-import com.serotonin.bacnet4j.type.constructed.ObjectPropertyReference;
 import com.serotonin.bacnet4j.type.constructed.PropertyReference;
 import com.serotonin.bacnet4j.type.constructed.PropertyValue;
 import com.serotonin.bacnet4j.type.constructed.ReadAccessSpecification;
@@ -62,33 +65,60 @@ import com.serotonin.bacnet4j.type.primitive.CharacterString;
 import com.serotonin.bacnet4j.type.primitive.ObjectIdentifier;
 import com.serotonin.bacnet4j.type.primitive.Real;
 import com.serotonin.bacnet4j.type.primitive.UnsignedInteger;
-import com.serotonin.bacnet4j.util.PropertyReferences;
-import com.serotonin.bacnet4j.util.PropertyValues;
 
 public class Test {
     public static void main(String[] args) throws Exception {
-        LocalDevice localDevice = new LocalDevice(1, "255.255.255.255", "localhost");
-        try {
-            localDevice.initialize();
-            localDevice.sendBroadcast(47808, new WhoIsRequest(null, null));
+        Enumeration<NetworkInterface> netInter = NetworkInterface.getNetworkInterfaces();
+        int n = 0;
 
-            Thread.sleep(5000);
+        while (netInter.hasMoreElements()) {
+            NetworkInterface ni = netInter.nextElement();
 
-            RemoteDevice d = localDevice.getRemoteDevices().get(0);
+            System.out.println("NetworkInterface " + n++ + ": " + ni.getDisplayName());
 
-            ObjectIdentifier oid = new ObjectIdentifier(ObjectType.multiStateOutput, 0);
-            PropertyReferences refs = new PropertyReferences();
-            refs.add(oid, PropertyIdentifier.all);
+            for (InetAddress iaddress : Collections.list(ni.getInetAddresses())) {
+                System.out.println("CanonicalHostName: " + iaddress.getCanonicalHostName());
 
-            PropertyValues pvs = localDevice.readProperties(d, refs);
-            for (ObjectPropertyReference opr : pvs)
-                System.out.println("" + opr.getPropertyIdentifier() + ": " + pvs.getNoErrorCheck(opr));
-            Thread.sleep(2000);
+                System.out.println("IP: " + iaddress.getHostAddress());
+
+                System.out.println("Loopback? " + iaddress.isLoopbackAddress());
+                System.out.println("SiteLocal? " + iaddress.isSiteLocalAddress());
+                System.out.println();
+
+                // if (!iaddress.isLoopbackAddress() && iaddress.isSiteLocalAddress()) {
+                // System.out.println(iaddress.getAddress());
+                // return;
+                // // return iaddress.getAddress();
+                // }
+            }
         }
-        finally {
-            localDevice.terminate();
-        }
+
+        System.out.println(InetAddress.getLocalHost().getAddress());
     }
+
+    // public static void main(String[] args) throws Exception {
+    // LocalDevice localDevice = new LocalDevice(1, "255.255.255.255", "localhost");
+    // try {
+    // localDevice.initialize();
+    // localDevice.sendBroadcast(47808, new WhoIsRequest(null, null));
+    //
+    // Thread.sleep(5000);
+    //
+    // RemoteDevice d = localDevice.getRemoteDevices().get(0);
+    //
+    // ObjectIdentifier oid = new ObjectIdentifier(ObjectType.multiStateOutput, 0);
+    // PropertyReferences refs = new PropertyReferences();
+    // refs.add(oid, PropertyIdentifier.all);
+    //
+    // PropertyValues pvs = localDevice.readProperties(d, refs);
+    // for (ObjectPropertyReference opr : pvs)
+    // System.out.println("" + opr.getPropertyIdentifier() + ": " + pvs.getNoErrorCheck(opr));
+    // Thread.sleep(2000);
+    // }
+    // finally {
+    // localDevice.terminate();
+    // }
+    // }
 
     // public static void main(String[] args) throws Exception {
     // LocalDevice d = new LocalDevice(1234, "192.168.0.255");

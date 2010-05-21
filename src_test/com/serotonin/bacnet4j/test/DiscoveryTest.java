@@ -22,8 +22,6 @@
  */
 package com.serotonin.bacnet4j.test;
 
-import java.net.InetAddress;
-import java.net.InetSocketAddress;
 import java.util.List;
 
 import com.serotonin.bacnet4j.LocalDevice;
@@ -49,9 +47,9 @@ public class DiscoveryTest {
         localDevice.initialize();
 
         // Who is
-        InetSocketAddress addr = new InetSocketAddress(InetAddress.getByName("96.51.27.33"), 47808);
-        localDevice.sendUnconfirmed(addr, null, new WhoIsRequest());
-        // localDevice.sendBroadcast(2068, null, new WhoIsRequest());
+        // InetSocketAddress addr = new InetSocketAddress(InetAddress.getByName("96.51.27.33"), 47808);
+        // localDevice.sendUnconfirmed(addr, null, new WhoIsRequest());
+        localDevice.sendBroadcast(2068, null, new WhoIsRequest());
         // localDevice.sendUnconfirmed(new Address(new UnsignedInteger(47808), new OctetString(new byte[] { (byte) 96,
         // (byte) 51, (byte) 24, (byte) 1 })), null, new WhoIsRequest());
         // RemoteDevice rd = new RemoteDevice(105, new Address(new UnsignedInteger(47808),

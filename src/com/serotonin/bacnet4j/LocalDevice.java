@@ -25,6 +25,8 @@ package com.serotonin.bacnet4j;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
+import java.net.NetworkInterface;
+import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -686,12 +688,23 @@ public class LocalDevice implements RequestHandler {
     //
     public Address getAddress() {
         try {
-            return new Address(InetAddress.getLocalHost().getAddress(), messageControl.getPort());
+            return new Address(getLocalIPAddress(), messageControl.getPort());
         }
-        catch (UnknownHostException e) {
+        catch (Exception e) {
             // Should never happen, so just wrap in a RuntimeException
             throw new RuntimeException(e);
         }
+    }
+
+    private byte[] getLocalIPAddress() throws UnknownHostException, SocketException {
+        for (NetworkInterface iface : Collections.list(NetworkInterface.getNetworkInterfaces())) {
+            for (InetAddress addr : Collections.list(iface.getInetAddresses())) {
+                if (!addr.isLoopbackAddress() && addr.isSiteLocalAddress())
+                    return addr.getAddress();
+            }
+        }
+
+        return InetAddress.getLocalHost().getAddress();
     }
 
     public IAmRequest getIAm() {
