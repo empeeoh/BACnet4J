@@ -443,6 +443,12 @@ public class IpMessageControl extends Thread {
         }
     }
 
+    public void testDecoding(byte[] message) throws Exception {
+        IncomingMessageExecutor ime = new IncomingMessageExecutor();
+        ime.queue = new ByteQueue(message);
+        ime.runImpl();
+    }
+
     class IncomingMessageExecutor implements Runnable {
         ByteQueue originalQueue;
         ByteQueue queue;
@@ -567,6 +573,10 @@ public class IpMessageControl extends Thread {
             else {
                 // An acknowledgement.
                 AckAPDU ack = (AckAPDU) apdu;
+
+                // Used for testing only. This is required to test the parsing of service data in an ack.
+                //((ComplexACK) ack).parseServiceData();
+
                 waitingRoom.notifyMember(new InetSocketAddress(fromAddr, fromPort), fromNetwork, ack
                         .getOriginalInvokeId(), ack.isServer(), ack);
             }
