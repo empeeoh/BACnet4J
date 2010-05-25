@@ -11,6 +11,7 @@ import java.util.GregorianCalendar;
 
 import com.serotonin.bacnet4j.type.Encodable;
 import com.serotonin.bacnet4j.type.constructed.BACnetError;
+import com.serotonin.bacnet4j.type.constructed.SequenceOf;
 import com.serotonin.bacnet4j.type.constructed.ServicesSupported;
 import com.serotonin.bacnet4j.type.constructed.StatusFlags;
 import com.serotonin.bacnet4j.type.constructed.TimeValue;
@@ -19,7 +20,12 @@ import com.serotonin.bacnet4j.type.enumerated.ErrorCode;
 import com.serotonin.bacnet4j.type.enumerated.ObjectType;
 import com.serotonin.bacnet4j.type.error.BaseError;
 import com.serotonin.bacnet4j.type.error.ChangeListError;
+import com.serotonin.bacnet4j.type.eventParameter.BufferReady;
+import com.serotonin.bacnet4j.type.eventParameter.EventParameter;
+import com.serotonin.bacnet4j.type.eventParameter.Extended;
+import com.serotonin.bacnet4j.type.notificationParameters.ChangeOfValue;
 import com.serotonin.bacnet4j.type.notificationParameters.CommandFailure;
+import com.serotonin.bacnet4j.type.notificationParameters.FloatingLimit;
 import com.serotonin.bacnet4j.type.notificationParameters.NotificationParameters;
 import com.serotonin.bacnet4j.type.primitive.BitString;
 import com.serotonin.bacnet4j.type.primitive.Boolean;
@@ -57,12 +63,14 @@ public class SerializationTests {
             deserialized = BaseError.createBaseError(queue);
         else if (NotificationParameters.class.isAssignableFrom(encodable.getClass()))
             deserialized = NotificationParameters.createNotificationParameters(queue);
+        else if (EventParameter.class.isAssignableFrom(encodable.getClass()))
+            deserialized = EventParameter.createEventParameter(queue);
         else {
             Constructor<? extends Encodable> c = encodable.getClass().getConstructor(ByteQueue.class);
             deserialized = c.newInstance(queue);
         }
 
-        if (!encodable.equals(deserialized))
+        if (!deserialized.equals(encodable))
             throw new Exception("Unequal deserialization in class " + encodable.getClass());
     }
 
@@ -90,6 +98,14 @@ public class SerializationTests {
             new TimeValue(new Time(13, 23, 12, 45), new Real(65.56F)), //
             new ChangeListError((byte) 9, new BACnetError(ErrorClass.object, ErrorCode.abortBufferOverflow),
                     new UnsignedInteger(13)), //
+            new FloatingLimit(new Real(123.45F), new StatusFlags(false, true, false, true), new Real(234.56F),
+                    new Real(345.67F)), //
+            new ChangeOfValue(new BitString(7, true), new StatusFlags(false, true, false, true)), //
+            new ChangeOfValue(new Real(987.65F), new StatusFlags(false, true, false, true)), //
+            new CommandFailure(new Time(), new StatusFlags(false, true, false, true), new Real(123.45F)), //
             new CommandFailure(new Real(123.45F), new StatusFlags(false, true, false, true), new Time()), //
+
+            new BufferReady(new UnsignedInteger(17), new UnsignedInteger(19)), //
+            new Extended(new UnsignedInteger(17), new UnsignedInteger(19), new SequenceOf<Extended.Parameter>()), //
     };
 }
