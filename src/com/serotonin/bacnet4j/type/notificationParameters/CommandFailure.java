@@ -23,34 +23,59 @@
 package com.serotonin.bacnet4j.type.notificationParameters;
 
 import com.serotonin.bacnet4j.exception.BACnetException;
+import com.serotonin.bacnet4j.type.AmbiguousValue;
 import com.serotonin.bacnet4j.type.Encodable;
 import com.serotonin.bacnet4j.type.constructed.StatusFlags;
 import com.serotonin.util.queue.ByteQueue;
 
 public class CommandFailure extends NotificationParameters {
     public static final byte TYPE_ID = 3;
-  
-    private Encodable commandValue;
+
+    private final Encodable commandValue;
     private final StatusFlags statusFlags;
-    private Encodable feedbackValue;
-  
+    private final Encodable feedbackValue;
+
     public CommandFailure(Encodable commandValue, StatusFlags statusFlags, Encodable feedbackValue) {
         this.commandValue = commandValue;
         this.statusFlags = statusFlags;
         this.feedbackValue = feedbackValue;
     }
-    
+
     @Override
     protected void writeImpl(ByteQueue queue) {
         write(queue, commandValue, 0);
         write(queue, statusFlags, 1);
         write(queue, feedbackValue, 2);
     }
-    
+
     public CommandFailure(ByteQueue queue) throws BACnetException {
-        // Not sure how to do this: commandValue.
+        // // Sweet Jesus...
+        // int tag = (queue.peek(0) & 0xff);
+        // if ((tag & 8) == 8) {
+        // // A class tag, so this is a constructed value.
+        // // constructedValue = new AmbiguousValue(queue, 0);
+        // System.out.println("class tag");
+        // }
+        // else {
+        // System.out.println("primitive");
+        // // // A primitive value
+        // // tag = tag >> 4;
+        // // if (tag == Null.TYPE_ID)
+        // // nullValue = new Null(queue);
+        // // else if (tag == Real.TYPE_ID)
+        // // realValue = new Real(queue);
+        // // else if (tag == Enumerated.TYPE_ID)
+        // // binaryValue = new BinaryPV(queue);
+        // // else if (tag == UnsignedInteger.TYPE_ID)
+        // // integerValue = new UnsignedInteger(queue);
+        // // else
+        // // throw new BACnetErrorException(ErrorClass.property, ErrorCode.invalidDataType,
+        // // "Unsupported primitive id: " + tag);
+        // }
+
+        commandValue = new AmbiguousValue(queue, 0);
         statusFlags = read(queue, StatusFlags.class, 1);
-        // Not sure how to do this: feedbackValue.
+        feedbackValue = new AmbiguousValue(queue, 2);
     }
 
     @Override
