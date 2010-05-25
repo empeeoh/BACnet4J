@@ -57,7 +57,7 @@ public class Extended extends EventParameter {
 
     public Extended(ByteQueue queue) throws BACnetException {
         vendorId = read(queue, UnsignedInteger.class, 0);
-        extendedEventType = read(queue, UnsignedInteger.class, 0);
+        extendedEventType = read(queue, UnsignedInteger.class, 1);
         parameters = readSequenceOf(queue, Parameter.class, 2);
     }
 
