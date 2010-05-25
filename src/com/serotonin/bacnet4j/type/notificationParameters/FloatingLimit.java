@@ -29,34 +29,34 @@ import com.serotonin.util.queue.ByteQueue;
 
 public class FloatingLimit extends NotificationParameters {
     public static final byte TYPE_ID = 4;
-  
+
     private final Real referenceValue;
     private final StatusFlags statusFlags;
     private final Real setpointValue;
     private final Real errorLimit;
-    
+
     public FloatingLimit(Real referenceValue, StatusFlags statusFlags, Real setpointValue, Real errorLimit) {
         this.referenceValue = referenceValue;
         this.statusFlags = statusFlags;
         this.setpointValue = setpointValue;
         this.errorLimit = errorLimit;
     }
-    
+
     @Override
     protected void writeImpl(ByteQueue queue) {
         write(queue, referenceValue, 0);
-        write(queue, statusFlags, 0);
-        write(queue, setpointValue, 0);
-        write(queue, errorLimit, 0);
+        write(queue, statusFlags, 1);
+        write(queue, setpointValue, 2);
+        write(queue, errorLimit, 3);
     }
-    
+
     public FloatingLimit(ByteQueue queue) throws BACnetException {
         referenceValue = read(queue, Real.class, 0);
         statusFlags = read(queue, StatusFlags.class, 1);
         setpointValue = read(queue, Real.class, 2);
         errorLimit = read(queue, Real.class, 3);
     }
-    
+
     @Override
     protected int getTypeId() {
         return TYPE_ID;

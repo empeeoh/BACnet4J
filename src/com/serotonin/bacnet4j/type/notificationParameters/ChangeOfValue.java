@@ -35,17 +35,17 @@ import com.serotonin.util.queue.ByteQueue;
 
 public class ChangeOfValue extends NotificationParameters {
     public static final byte TYPE_ID = 2;
-    
+
     private static List<Class<? extends Encodable>> classes;
     static {
         classes = new ArrayList<Class<? extends Encodable>>();
         classes.add(BitString.class);
         classes.add(Real.class);
     }
-    
+
     private final Choice newValue;
     private final StatusFlags statusFlags;
-    
+
     public ChangeOfValue(BitString newValue, StatusFlags statusFlags) {
         this.newValue = new Choice(0, newValue);
         this.statusFlags = statusFlags;
@@ -63,12 +63,10 @@ public class ChangeOfValue extends NotificationParameters {
     }
 
     public ChangeOfValue(ByteQueue queue) throws BACnetException {
-        popStart(queue, 0);
-        newValue = new Choice(queue, classes);
-        popEnd(queue, 0);
+        newValue = new Choice(queue, classes, 0);
         statusFlags = read(queue, StatusFlags.class, 1);
     }
-    
+
     @Override
     protected int getTypeId() {
         return TYPE_ID;
