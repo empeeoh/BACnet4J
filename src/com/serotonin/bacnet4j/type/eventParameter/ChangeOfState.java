@@ -22,6 +22,7 @@
  */
 package com.serotonin.bacnet4j.type.eventParameter;
 
+import com.serotonin.bacnet4j.exception.BACnetException;
 import com.serotonin.bacnet4j.type.constructed.PropertyStates;
 import com.serotonin.bacnet4j.type.constructed.SequenceOf;
 import com.serotonin.bacnet4j.type.primitive.UnsignedInteger;
@@ -29,19 +30,24 @@ import com.serotonin.util.queue.ByteQueue;
 
 public class ChangeOfState extends EventParameter {
     public static final byte TYPE_ID = 1;
-    
+
     private final UnsignedInteger timeDelay;
     private final SequenceOf<PropertyStates> listOfValues;
-    
+
     public ChangeOfState(UnsignedInteger timeDelay, SequenceOf<PropertyStates> listOfValues) {
         this.timeDelay = timeDelay;
         this.listOfValues = listOfValues;
     }
 
+    public ChangeOfState(ByteQueue queue) throws BACnetException {
+        timeDelay = read(queue, UnsignedInteger.class, 0);
+        listOfValues = readSequenceOf(queue, PropertyStates.class, 1);
+    }
+
     @Override
     protected void writeImpl(ByteQueue queue) {
-        timeDelay.write(queue, 0);
-        listOfValues.write(queue, 1);
+        write(queue, timeDelay, 0);
+        write(queue, listOfValues, 1);
     }
 
     @Override

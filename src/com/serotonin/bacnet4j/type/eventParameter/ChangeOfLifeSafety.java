@@ -22,6 +22,7 @@
  */
 package com.serotonin.bacnet4j.type.eventParameter;
 
+import com.serotonin.bacnet4j.exception.BACnetException;
 import com.serotonin.bacnet4j.type.constructed.DeviceObjectPropertyReference;
 import com.serotonin.bacnet4j.type.constructed.SequenceOf;
 import com.serotonin.bacnet4j.type.enumerated.LifeSafetyState;
@@ -30,13 +31,13 @@ import com.serotonin.util.queue.ByteQueue;
 
 public class ChangeOfLifeSafety extends EventParameter {
     public static final byte TYPE_ID = 8;
-    
+
     private final UnsignedInteger timeDelay;
     private final SequenceOf<LifeSafetyState> listOfLifeSafetyAlarmValues;
     private final SequenceOf<LifeSafetyState> listOfAlarmValues;
     private final DeviceObjectPropertyReference modePropertyReference;
-    
-    public ChangeOfLifeSafety(UnsignedInteger timeDelay, SequenceOf<LifeSafetyState> listOfLifeSafetyAlarmValues, 
+
+    public ChangeOfLifeSafety(UnsignedInteger timeDelay, SequenceOf<LifeSafetyState> listOfLifeSafetyAlarmValues,
             SequenceOf<LifeSafetyState> listOfAlarmValues, DeviceObjectPropertyReference modePropertyReference) {
         this.timeDelay = timeDelay;
         this.listOfLifeSafetyAlarmValues = listOfLifeSafetyAlarmValues;
@@ -46,12 +47,19 @@ public class ChangeOfLifeSafety extends EventParameter {
 
     @Override
     protected void writeImpl(ByteQueue queue) {
-        timeDelay.write(queue, 0);
-        listOfLifeSafetyAlarmValues.write(queue, 1);
-        listOfAlarmValues.write(queue, 2);
-        modePropertyReference.write(queue, 3);
+        write(queue, timeDelay, 0);
+        write(queue, listOfLifeSafetyAlarmValues, 1);
+        write(queue, listOfAlarmValues, 2);
+        write(queue, modePropertyReference, 3);
     }
-    
+
+    public ChangeOfLifeSafety(ByteQueue queue) throws BACnetException {
+        timeDelay = read(queue, UnsignedInteger.class, 0);
+        listOfLifeSafetyAlarmValues = readSequenceOf(queue, LifeSafetyState.class, 1);
+        listOfAlarmValues = readSequenceOf(queue, LifeSafetyState.class, 2);
+        modePropertyReference = read(queue, DeviceObjectPropertyReference.class, 3);
+    }
+
     @Override
     protected int getTypeId() {
         return TYPE_ID;

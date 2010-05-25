@@ -22,6 +22,7 @@
  */
 package com.serotonin.bacnet4j.type.eventParameter;
 
+import com.serotonin.bacnet4j.exception.BACnetException;
 import com.serotonin.bacnet4j.type.constructed.SequenceOf;
 import com.serotonin.bacnet4j.type.primitive.BitString;
 import com.serotonin.bacnet4j.type.primitive.UnsignedInteger;
@@ -29,23 +30,28 @@ import com.serotonin.util.queue.ByteQueue;
 
 public class ChangeOfBitString extends EventParameter {
     public static final byte TYPE_ID = 0;
-    
+
     private final UnsignedInteger timeDelay;
     private final BitString bitMask;
     private final SequenceOf<BitString> listOfBitstringValues;
-    
-    public ChangeOfBitString(UnsignedInteger timeDelay, BitString bitMask,
-            SequenceOf<BitString> listOfBitstringValues) {
+
+    public ChangeOfBitString(UnsignedInteger timeDelay, BitString bitMask, SequenceOf<BitString> listOfBitstringValues) {
         this.timeDelay = timeDelay;
         this.bitMask = bitMask;
         this.listOfBitstringValues = listOfBitstringValues;
     }
 
+    public ChangeOfBitString(ByteQueue queue) throws BACnetException {
+        timeDelay = read(queue, UnsignedInteger.class, 0);
+        bitMask = read(queue, BitString.class, 1);
+        listOfBitstringValues = readSequenceOf(queue, BitString.class, 2);
+    }
+
     @Override
     protected void writeImpl(ByteQueue queue) {
-        timeDelay.write(queue, 0);
-        bitMask.write(queue, 1);
-        listOfBitstringValues.write(queue, 2);
+        write(queue, timeDelay, 0);
+        write(queue, bitMask, 1);
+        write(queue, listOfBitstringValues, 2);
     }
 
     @Override

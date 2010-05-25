@@ -22,6 +22,12 @@
  */
 package com.serotonin.bacnet4j.type.eventParameter;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import com.serotonin.bacnet4j.exception.BACnetException;
+import com.serotonin.bacnet4j.type.Encodable;
+import com.serotonin.bacnet4j.type.constructed.Choice;
 import com.serotonin.bacnet4j.type.primitive.BitString;
 import com.serotonin.bacnet4j.type.primitive.Real;
 import com.serotonin.bacnet4j.type.primitive.UnsignedInteger;
@@ -29,30 +35,36 @@ import com.serotonin.util.queue.ByteQueue;
 
 public class ChangeOfValue extends EventParameter {
     public static final byte TYPE_ID = 2;
-    
+
+    private static List<Class<? extends Encodable>> classes;
+    static {
+        classes = new ArrayList<Class<? extends Encodable>>();
+        classes.add(BitString.class);
+        classes.add(Real.class);
+    }
+
     private final UnsignedInteger timeDelay;
-    private BitString bitmask;
-    private Real referencedPropertyIncrement;
-    
+    private final Choice newValue;
+
     public ChangeOfValue(UnsignedInteger timeDelay, BitString bitmask) {
         this.timeDelay = timeDelay;
-        this.bitmask = bitmask;
+        this.newValue = new Choice(0, bitmask);
     }
 
     public ChangeOfValue(UnsignedInteger timeDelay, Real referencedPropertyIncrement) {
         this.timeDelay = timeDelay;
-        this.referencedPropertyIncrement = referencedPropertyIncrement;
+        this.newValue = new Choice(1, referencedPropertyIncrement);
+    }
+
+    public ChangeOfValue(ByteQueue queue) throws BACnetException {
+        timeDelay = read(queue, UnsignedInteger.class, 0);
+        newValue = new Choice(queue, classes, 1);
     }
 
     @Override
     protected void writeImpl(ByteQueue queue) {
-        timeDelay.write(queue, 0);
-        writeContextTag(queue, 1, true);
-        if (bitmask != null)
-            bitmask.write(queue, 0);
-        else
-            referencedPropertyIncrement.write(queue, 1);
-        writeContextTag(queue, 1, false);
+        write(queue, timeDelay, 0);
+        write(queue, newValue, 1);
     }
 
     @Override
@@ -62,11 +74,10 @@ public class ChangeOfValue extends EventParameter {
 
     @Override
     public int hashCode() {
-        final int PRIME = 31;
+        final int prime = 31;
         int result = 1;
-        result = PRIME * result + ((bitmask == null) ? 0 : bitmask.hashCode());
-        result = PRIME * result + ((referencedPropertyIncrement == null) ? 0 : referencedPropertyIncrement.hashCode());
-        result = PRIME * result + ((timeDelay == null) ? 0 : timeDelay.hashCode());
+        result = prime * result + ((newValue == null) ? 0 : newValue.hashCode());
+        result = prime * result + ((timeDelay == null) ? 0 : timeDelay.hashCode());
         return result;
     }
 
@@ -78,18 +89,12 @@ public class ChangeOfValue extends EventParameter {
             return false;
         if (getClass() != obj.getClass())
             return false;
-        final ChangeOfValue other = (ChangeOfValue) obj;
-        if (bitmask == null) {
-            if (other.bitmask != null)
+        ChangeOfValue other = (ChangeOfValue) obj;
+        if (newValue == null) {
+            if (other.newValue != null)
                 return false;
         }
-        else if (!bitmask.equals(other.bitmask))
-            return false;
-        if (referencedPropertyIncrement == null) {
-            if (other.referencedPropertyIncrement != null)
-                return false;
-        }
-        else if (!referencedPropertyIncrement.equals(other.referencedPropertyIncrement))
+        else if (!newValue.equals(other.newValue))
             return false;
         if (timeDelay == null) {
             if (other.timeDelay != null)

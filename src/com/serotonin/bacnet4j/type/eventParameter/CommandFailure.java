@@ -22,16 +22,17 @@
  */
 package com.serotonin.bacnet4j.type.eventParameter;
 
+import com.serotonin.bacnet4j.exception.BACnetException;
 import com.serotonin.bacnet4j.type.constructed.DeviceObjectPropertyReference;
 import com.serotonin.bacnet4j.type.primitive.UnsignedInteger;
 import com.serotonin.util.queue.ByteQueue;
 
 public class CommandFailure extends EventParameter {
     public static final byte TYPE_ID = 3;
-    
+
     private final UnsignedInteger timeDelay;
     private final DeviceObjectPropertyReference feedbackPropertyReference;
-  
+
     public CommandFailure(UnsignedInteger timeDelay, DeviceObjectPropertyReference feedbackPropertyReference) {
         this.timeDelay = timeDelay;
         this.feedbackPropertyReference = feedbackPropertyReference;
@@ -39,8 +40,13 @@ public class CommandFailure extends EventParameter {
 
     @Override
     protected void writeImpl(ByteQueue queue) {
-        timeDelay.write(queue, 0);
-        feedbackPropertyReference.write(queue, 1);
+        write(queue, timeDelay, 0);
+        write(queue, feedbackPropertyReference, 1);
+    }
+
+    public CommandFailure(ByteQueue queue) throws BACnetException {
+        timeDelay = read(queue, UnsignedInteger.class, 0);
+        feedbackPropertyReference = read(queue, DeviceObjectPropertyReference.class, 1);
     }
 
     @Override

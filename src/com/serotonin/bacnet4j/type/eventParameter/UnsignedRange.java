@@ -22,16 +22,17 @@
  */
 package com.serotonin.bacnet4j.type.eventParameter;
 
+import com.serotonin.bacnet4j.exception.BACnetException;
 import com.serotonin.bacnet4j.type.primitive.UnsignedInteger;
 import com.serotonin.util.queue.ByteQueue;
 
 public class UnsignedRange extends EventParameter {
     public static final byte TYPE_ID = 11;
-    
+
     private final UnsignedInteger timeDelay;
     private final UnsignedInteger lowLimit;
     private final UnsignedInteger highLimit;
-    
+
     public UnsignedRange(UnsignedInteger timeDelay, UnsignedInteger lowLimit, UnsignedInteger highLimit) {
         this.timeDelay = timeDelay;
         this.lowLimit = lowLimit;
@@ -40,11 +41,17 @@ public class UnsignedRange extends EventParameter {
 
     @Override
     protected void writeImpl(ByteQueue queue) {
-        timeDelay.write(queue, 0);
-        lowLimit.write(queue, 1);
-        highLimit.write(queue, 2);
+        write(queue, timeDelay, 0);
+        write(queue, lowLimit, 1);
+        write(queue, highLimit, 2);
     }
-    
+
+    public UnsignedRange(ByteQueue queue) throws BACnetException {
+        timeDelay = read(queue, UnsignedInteger.class, 0);
+        lowLimit = read(queue, UnsignedInteger.class, 1);
+        highLimit = read(queue, UnsignedInteger.class, 2);
+    }
+
     @Override
     protected int getTypeId() {
         return TYPE_ID;

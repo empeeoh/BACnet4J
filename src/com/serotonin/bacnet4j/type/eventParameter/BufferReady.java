@@ -22,15 +22,16 @@
  */
 package com.serotonin.bacnet4j.type.eventParameter;
 
+import com.serotonin.bacnet4j.exception.BACnetException;
 import com.serotonin.bacnet4j.type.primitive.UnsignedInteger;
 import com.serotonin.util.queue.ByteQueue;
 
 public class BufferReady extends EventParameter {
     public static final byte TYPE_ID = 10;
-    
+
     private final UnsignedInteger notificationThreshold;
     private final UnsignedInteger previousNotificationCount;
-    
+
     public BufferReady(UnsignedInteger notificationThreshold, UnsignedInteger previousNotificationCount) {
         this.notificationThreshold = notificationThreshold;
         this.previousNotificationCount = previousNotificationCount;
@@ -38,10 +39,15 @@ public class BufferReady extends EventParameter {
 
     @Override
     protected void writeImpl(ByteQueue queue) {
-        notificationThreshold.write(queue, 0);
-        previousNotificationCount.write(queue, 1);
+        write(queue, notificationThreshold, 0);
+        write(queue, previousNotificationCount, 1);
     }
-    
+
+    public BufferReady(ByteQueue queue) throws BACnetException {
+        notificationThreshold = read(queue, UnsignedInteger.class, 0);
+        previousNotificationCount = read(queue, UnsignedInteger.class, 1);
+    }
+
     @Override
     protected int getTypeId() {
         return TYPE_ID;

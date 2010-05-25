@@ -22,6 +22,7 @@
  */
 package com.serotonin.bacnet4j.type.eventParameter;
 
+import com.serotonin.bacnet4j.exception.BACnetException;
 import com.serotonin.bacnet4j.type.constructed.DeviceObjectPropertyReference;
 import com.serotonin.bacnet4j.type.primitive.Real;
 import com.serotonin.bacnet4j.type.primitive.UnsignedInteger;
@@ -29,14 +30,15 @@ import com.serotonin.util.queue.ByteQueue;
 
 public class FloatingLimit extends EventParameter {
     public static final byte TYPE_ID = 4;
-    
+
     private final UnsignedInteger timeDelay;
     private final DeviceObjectPropertyReference setpointReference;
     private final Real lowDiffLimit;
     private final Real highDiffLimit;
     private final Real deadband;
-    
-    public FloatingLimit(UnsignedInteger timeDelay, DeviceObjectPropertyReference setpointReference, Real lowDiffLimit, Real highDiffLimit, Real deadband) {
+
+    public FloatingLimit(UnsignedInteger timeDelay, DeviceObjectPropertyReference setpointReference, Real lowDiffLimit,
+            Real highDiffLimit, Real deadband) {
         this.timeDelay = timeDelay;
         this.setpointReference = setpointReference;
         this.lowDiffLimit = lowDiffLimit;
@@ -46,13 +48,21 @@ public class FloatingLimit extends EventParameter {
 
     @Override
     protected void writeImpl(ByteQueue queue) {
-        timeDelay.write(queue, 0);
-        setpointReference.write(queue, 1);
-        lowDiffLimit.write(queue, 2);
-        highDiffLimit.write(queue, 3);
-        deadband.write(queue, 4);
+        write(queue, timeDelay, 0);
+        write(queue, setpointReference, 1);
+        write(queue, lowDiffLimit, 2);
+        write(queue, highDiffLimit, 3);
+        write(queue, deadband, 4);
     }
-    
+
+    public FloatingLimit(ByteQueue queue) throws BACnetException {
+        timeDelay = read(queue, UnsignedInteger.class, 0);
+        setpointReference = read(queue, DeviceObjectPropertyReference.class, 1);
+        lowDiffLimit = read(queue, Real.class, 2);
+        highDiffLimit = read(queue, Real.class, 3);
+        deadband = read(queue, Real.class, 4);
+    }
+
     @Override
     protected int getTypeId() {
         return TYPE_ID;
