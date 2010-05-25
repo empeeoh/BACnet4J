@@ -16,6 +16,7 @@ import com.serotonin.bacnet4j.type.enumerated.ErrorClass;
 import com.serotonin.bacnet4j.type.enumerated.ErrorCode;
 import com.serotonin.bacnet4j.type.enumerated.ObjectType;
 import com.serotonin.bacnet4j.type.enumerated.PropertyIdentifier;
+import com.serotonin.bacnet4j.type.eventParameter.EventParameter;
 import com.serotonin.bacnet4j.type.primitive.Null;
 import com.serotonin.bacnet4j.type.primitive.Primitive;
 import com.serotonin.bacnet4j.type.primitive.UnsignedInteger;
@@ -165,6 +166,9 @@ abstract public class Encodable {
             return clazz.getConstructor(new Class[] { ByteQueue.class }).newInstance(new Object[] { queue });
         }
         catch (Exception e) {
+            // Check if this is an EventParameter
+            if (clazz == EventParameter.class)
+                return (T) EventParameter.createEventParameter(queue);
             throw new BACnetException(e);
         }
     }
