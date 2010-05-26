@@ -504,7 +504,7 @@ public class IpMessageControl extends Thread {
             if (npci.getVersion() != 1)
                 throw new MessageValidationAssertionException("Invalid protocol version: " + npci.getVersion());
             if (npci.isNetworkMessage())
-                throw new MessageValidationAssertionException("Network messages are not supported");
+                return; // throw new MessageValidationAssertionException("Network messages are not supported");
 
             if (npci.hasSourceInfo())
                 fromNetwork = new Network(npci.getSourceNetwork(), npci.getSourceAddress());
@@ -575,7 +575,7 @@ public class IpMessageControl extends Thread {
                 AckAPDU ack = (AckAPDU) apdu;
 
                 // Used for testing only. This is required to test the parsing of service data in an ack.
-                //((ComplexACK) ack).parseServiceData();
+                // ((ComplexACK) ack).parseServiceData();
 
                 waitingRoom.notifyMember(new InetSocketAddress(fromAddr, fromPort), fromNetwork, ack
                         .getOriginalInvokeId(), ack.isServer(), ack);
