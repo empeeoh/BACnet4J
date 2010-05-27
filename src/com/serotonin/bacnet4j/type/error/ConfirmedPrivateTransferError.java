@@ -35,14 +35,15 @@ import com.serotonin.bacnet4j.type.primitive.UnsignedInteger;
 import com.serotonin.util.queue.ByteQueue;
 
 public class ConfirmedPrivateTransferError extends BaseError {
-    public static final Map<VendorServiceKey, SequenceDefinition> vendorServiceResolutions = 
-            new HashMap<VendorServiceKey, SequenceDefinition>();
-    
+    private static final long serialVersionUID = -4736829685989649711L;
+
+    public static final Map<VendorServiceKey, SequenceDefinition> vendorServiceResolutions = new HashMap<VendorServiceKey, SequenceDefinition>();
+
     private final UnsignedInteger vendorId;
     private final UnsignedInteger serviceNumber;
     private final Encodable errorParameters;
-    
-    public ConfirmedPrivateTransferError(byte choice, BACnetError error, UnsignedInteger vendorId, 
+
+    public ConfirmedPrivateTransferError(byte choice, BACnetError error, UnsignedInteger vendorId,
             UnsignedInteger serviceNumber, BaseType errorParameters) {
         super(choice, error);
         this.vendorId = vendorId;
@@ -58,7 +59,7 @@ public class ConfirmedPrivateTransferError extends BaseError {
         write(queue, serviceNumber, 2);
         writeOptional(queue, errorParameters, 3);
     }
-    
+
     ConfirmedPrivateTransferError(byte choice, ByteQueue queue) throws BACnetException {
         super(choice, queue, 0);
         vendorId = read(queue, UnsignedInteger.class, 1);

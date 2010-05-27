@@ -35,14 +35,16 @@ import com.serotonin.bacnet4j.type.primitive.UnsignedInteger;
 import com.serotonin.util.queue.ByteQueue;
 
 public class LifeSafetyOperationRequest extends ConfirmedRequestService {
+    private static final long serialVersionUID = -4852452672635267599L;
+
     public static final byte TYPE_ID = 27;
-    
+
     private final UnsignedInteger requestingProcessIdentifier;
     private final CharacterString requestingSource;
     private final LifeSafetyOperation request;
     private final ObjectIdentifier objectIdentifier;
-    
-    public LifeSafetyOperationRequest(UnsignedInteger requestingProcessIdentifier, CharacterString requestingSource, 
+
+    public LifeSafetyOperationRequest(UnsignedInteger requestingProcessIdentifier, CharacterString requestingSource,
             LifeSafetyOperation request, ObjectIdentifier objectIdentifier) {
         this.requestingProcessIdentifier = requestingProcessIdentifier;
         this.requestingSource = requestingSource;
@@ -56,8 +58,7 @@ public class LifeSafetyOperationRequest extends ConfirmedRequestService {
     }
 
     @Override
-    public AcknowledgementService handle(LocalDevice localDevice, Address from, Network network)
-            throws BACnetException {
+    public AcknowledgementService handle(LocalDevice localDevice, Address from, Network network) throws BACnetException {
         throw new NotImplementedException();
     }
 
@@ -68,12 +69,12 @@ public class LifeSafetyOperationRequest extends ConfirmedRequestService {
         write(queue, request, 2);
         writeOptional(queue, objectIdentifier, 3);
     }
-    
+
     LifeSafetyOperationRequest(ByteQueue queue) throws BACnetException {
-         requestingProcessIdentifier = read(queue, UnsignedInteger.class, 0);
-         requestingSource = read(queue, CharacterString.class, 1);
-         request = read(queue, LifeSafetyOperation.class, 2);
-         objectIdentifier = readOptional(queue, ObjectIdentifier.class, 3);
+        requestingProcessIdentifier = read(queue, UnsignedInteger.class, 0);
+        requestingSource = read(queue, CharacterString.class, 1);
+        request = read(queue, LifeSafetyOperation.class, 2);
+        objectIdentifier = readOptional(queue, ObjectIdentifier.class, 3);
     }
 
     @Override

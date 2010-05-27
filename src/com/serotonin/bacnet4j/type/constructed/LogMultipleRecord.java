@@ -26,6 +26,7 @@ import com.serotonin.bacnet4j.exception.BACnetException;
 import com.serotonin.util.queue.ByteQueue;
 
 public class LogMultipleRecord extends BaseType {
+    private static final long serialVersionUID = 3817374635968734673L;
     private final DateTime timestamp;
     private final LogData logData;
 
@@ -33,13 +34,13 @@ public class LogMultipleRecord extends BaseType {
         this.timestamp = timestamp;
         this.logData = logData;
     }
-    
+
     @Override
     public void write(ByteQueue queue) {
         write(queue, timestamp, 0);
         write(queue, logData, 1);
     }
-    
+
     public DateTime getTimestamp() {
         return timestamp;
     }

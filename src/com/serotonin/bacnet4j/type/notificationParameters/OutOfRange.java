@@ -28,20 +28,22 @@ import com.serotonin.bacnet4j.type.primitive.Real;
 import com.serotonin.util.queue.ByteQueue;
 
 public class OutOfRange extends NotificationParameters {
+    private static final long serialVersionUID = 8147853414874448191L;
+
     public static final byte TYPE_ID = 5;
-    
+
     private final Real exceedingValue;
     private final StatusFlags statusFlags;
     private final Real deadband;
     private final Real exceedingLimit;
-    
+
     public OutOfRange(Real exceedingValue, StatusFlags statusFlags, Real deadband, Real exceedingLimit) {
         this.exceedingValue = exceedingValue;
         this.statusFlags = statusFlags;
         this.deadband = deadband;
         this.exceedingLimit = exceedingLimit;
     }
-    
+
     @Override
     protected void writeImpl(ByteQueue queue) {
         write(queue, exceedingValue, 0);
@@ -49,14 +51,14 @@ public class OutOfRange extends NotificationParameters {
         write(queue, deadband, 2);
         write(queue, exceedingLimit, 3);
     }
-    
+
     public OutOfRange(ByteQueue queue) throws BACnetException {
         exceedingValue = read(queue, Real.class, 0);
         statusFlags = read(queue, StatusFlags.class, 1);
         deadband = read(queue, Real.class, 2);
         exceedingLimit = read(queue, Real.class, 3);
     }
-    
+
     @Override
     protected int getTypeId() {
         return TYPE_ID;

@@ -28,6 +28,8 @@ import com.serotonin.bacnet4j.type.primitive.UnsignedInteger;
 import com.serotonin.util.queue.ByteQueue;
 
 public class CommandFailure extends EventParameter {
+    private static final long serialVersionUID = 6903279389504770474L;
+
     public static final byte TYPE_ID = 3;
 
     private final UnsignedInteger timeDelay;

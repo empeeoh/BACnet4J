@@ -27,58 +27,60 @@ import java.math.BigInteger;
 import com.serotonin.util.queue.ByteQueue;
 
 public class SignedInteger extends Primitive {
+    private static final long serialVersionUID = 3344404709705407437L;
+
     public static final byte TYPE_ID = 3;
-    
+
     private int smallValue;
     private BigInteger bigValue;
-    
+
     public SignedInteger(int value) {
         smallValue = value;
     }
-    
+
     public SignedInteger(long value) {
         bigValue = BigInteger.valueOf(value);
     }
-    
+
     public SignedInteger(BigInteger value) {
         bigValue = value;
     }
-    
+
     public int intValue() {
         if (bigValue == null)
             return smallValue;
         return bigValue.intValue();
     }
-    
+
     public long longValue() {
         if (bigValue == null)
             return smallValue;
         return bigValue.longValue();
     }
-    
+
     public BigInteger bigIntegerValue() {
         if (bigValue == null)
             return BigInteger.valueOf(smallValue);
         return bigValue;
     }
-    
+
     //
     // Reading and writing
     //
     public SignedInteger(ByteQueue queue) {
         // Read the data length value.
-        int length = (int)readTag(queue);
-        
+        int length = (int) readTag(queue);
+
         byte[] bytes = new byte[length];
         queue.pop(bytes);
         BigInteger bi = new BigInteger(bytes);
-        
+
         if (length < 5)
             smallValue = bi.intValue();
         else
             bigValue = bi;
     }
-    
+
     @Override
     public void writeImpl(ByteQueue queue) {
         if (bigValue == null) {
@@ -132,7 +134,7 @@ public class SignedInteger extends Primitive {
         final SignedInteger other = (SignedInteger) obj;
         return bigIntegerValue().equals(other.bigIntegerValue());
     }
-    
+
     @Override
     public String toString() {
         if (bigValue == null)

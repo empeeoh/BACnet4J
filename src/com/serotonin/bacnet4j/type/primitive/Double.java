@@ -26,18 +26,20 @@ import com.serotonin.bacnet4j.base.BACnetUtils;
 import com.serotonin.util.queue.ByteQueue;
 
 public class Double extends Primitive {
+    private static final long serialVersionUID = -8758433354411016404L;
+
     public static final byte TYPE_ID = 5;
-    
+
     private final double value;
-    
+
     public Double(double value) {
         this.value = value;
     }
-    
+
     public double doubleValue() {
         return value;
     }
-    
+
     //
     // Reading and writing
     //
@@ -45,7 +47,7 @@ public class Double extends Primitive {
         readTag(queue);
         value = java.lang.Double.longBitsToDouble(BACnetUtils.popLong(queue));
     }
-    
+
     @Override
     public void writeImpl(ByteQueue queue) {
         BACnetUtils.pushLong(queue, java.lang.Double.doubleToLongBits(value));
@@ -84,7 +86,7 @@ public class Double extends Primitive {
             return false;
         return true;
     }
-    
+
     @Override
     public String toString() {
         return java.lang.Double.toString(value);

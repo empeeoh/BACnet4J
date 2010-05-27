@@ -30,64 +30,66 @@ import com.serotonin.bacnet4j.enums.Month;
 import com.serotonin.util.queue.ByteQueue;
 
 public class Date extends Primitive {
+    private static final long serialVersionUID = -5981590660136837990L;
+
     public static final byte TYPE_ID = 10;
-    
+
     private final int year;
     private final Month month;
     private final int day;
     private final DayOfWeek dayOfWeek;
-    
+
     public Date(int year, Month month, int day, DayOfWeek dayOfWeek) {
         if (year == -1)
             year = 255;
         if (day == -1)
             day = 255;
-        
+
         this.year = year;
         this.month = month;
         this.day = day;
         this.dayOfWeek = dayOfWeek;
     }
-    
+
     public Date() {
         this(new GregorianCalendar());
     }
-    
+
     public Date(GregorianCalendar now) {
         this.year = now.get(Calendar.YEAR);
-        this.month = Month.valueOf((byte)(now.get(Calendar.MONTH) + 1));
+        this.month = Month.valueOf((byte) (now.get(Calendar.MONTH) + 1));
         this.day = now.get(Calendar.DATE);
-        this.dayOfWeek = DayOfWeek.valueOf((byte)(((now.get(Calendar.DAY_OF_WEEK) + 5) % 7) + 1));
+        this.dayOfWeek = DayOfWeek.valueOf((byte) (((now.get(Calendar.DAY_OF_WEEK) + 5) % 7) + 1));
     }
-    
+
     public boolean isYearUnspecified() {
         return year == 255;
     }
-    
+
     public int getYear() {
         return year;
     }
-    
+
     public Month getMonth() {
         return month;
     }
-    
+
     public boolean isLastDayOfMonth() {
         return day == 32;
     }
-    
+
     public boolean isDayUnspecified() {
         return day == 255;
     }
-    
+
     public int getDay() {
         return day;
     }
-    
+
     public DayOfWeek getDayOfWeek() {
         return dayOfWeek;
     }
-    
+
     //
     // Reading and writing
     //
@@ -98,12 +100,12 @@ public class Date extends Primitive {
         day = queue.popU1B();
         dayOfWeek = DayOfWeek.valueOf(queue.pop());
     }
-    
+
     @Override
     public void writeImpl(ByteQueue queue) {
         queue.push(year - 1900);
         queue.push(month.getId());
-        queue.push((byte)day);
+        queue.push((byte) day);
         queue.push(dayOfWeek.getId());
     }
 
@@ -155,9 +157,9 @@ public class Date extends Primitive {
             return false;
         return true;
     }
-    
+
     @Override
     public String toString() {
-        return dayOfWeek +" "+ month +" "+ day +", "+ year;
+        return dayOfWeek + " " + month + " " + day + ", " + year;
     }
 }

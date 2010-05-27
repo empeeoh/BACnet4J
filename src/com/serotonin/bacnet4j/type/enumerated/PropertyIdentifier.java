@@ -26,6 +26,7 @@ import com.serotonin.bacnet4j.type.primitive.Enumerated;
 import com.serotonin.util.queue.ByteQueue;
 
 public class PropertyIdentifier extends Enumerated {
+    private static final long serialVersionUID = 7289026444729646422L;
     public static final PropertyIdentifier ackedTransitions = new PropertyIdentifier(0);
     public static final PropertyIdentifier ackRequired = new PropertyIdentifier(1);
     public static final PropertyIdentifier action = new PropertyIdentifier(2);
@@ -250,11 +251,11 @@ public class PropertyIdentifier extends Enumerated {
     public PropertyIdentifier(int value) {
         super(value);
     }
-    
+
     public PropertyIdentifier(ByteQueue queue) {
         super(queue);
     }
-    
+
     @Override
     public String toString() {
         int type = intValue();
@@ -698,6 +699,6 @@ public class PropertyIdentifier extends Enumerated {
             return "Masked Alarm Values";
         if (type == securedStatus.intValue())
             return "Secured Status";
-        return "Unknown: "+ type;
+        return "Unknown: " + type;
     }
 }

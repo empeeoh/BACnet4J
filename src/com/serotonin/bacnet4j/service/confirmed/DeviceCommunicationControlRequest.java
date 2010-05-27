@@ -34,8 +34,10 @@ import com.serotonin.bacnet4j.type.primitive.UnsignedInteger;
 import com.serotonin.util.queue.ByteQueue;
 
 public class DeviceCommunicationControlRequest extends ConfirmedRequestService {
+    private static final long serialVersionUID = 5975917456558517142L;
+
     public static final byte TYPE_ID = 17;
-    
+
     private final UnsignedInteger timeDuration;
     private final EnableDisable enableDisable;
     private final CharacterString password;
@@ -47,15 +49,14 @@ public class DeviceCommunicationControlRequest extends ConfirmedRequestService {
         this.enableDisable = enableDisable;
         this.password = password;
     }
-    
+
     @Override
     public byte getChoiceId() {
         return TYPE_ID;
     }
 
     @Override
-    public AcknowledgementService handle(LocalDevice localDevice, Address from, Network network)
-            throws BACnetException {
+    public AcknowledgementService handle(LocalDevice localDevice, Address from, Network network) throws BACnetException {
         throw new NotImplementedException();
     }
 
@@ -65,15 +66,15 @@ public class DeviceCommunicationControlRequest extends ConfirmedRequestService {
         write(queue, enableDisable, 1);
         writeOptional(queue, password, 2);
     }
-    
+
     DeviceCommunicationControlRequest(ByteQueue queue) throws BACnetException {
         timeDuration = readOptional(queue, UnsignedInteger.class, 0);
         enableDisable = read(queue, EnableDisable.class, 1);
         password = readOptional(queue, CharacterString.class, 2);
     }
-    
 
     public static class EnableDisable extends Enumerated {
+        private static final long serialVersionUID = -697975876817917708L;
         public static final EnableDisable enable = new EnableDisable(0);
         public static final EnableDisable disable = new EnableDisable(1);
         public static final EnableDisable disableInitiation = new EnableDisable(2);
@@ -81,7 +82,7 @@ public class DeviceCommunicationControlRequest extends ConfirmedRequestService {
         private EnableDisable(int value) {
             super(value);
         }
-        
+
         public EnableDisable(ByteQueue queue) {
             super(queue);
         }

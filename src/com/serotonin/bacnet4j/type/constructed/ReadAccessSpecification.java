@@ -31,16 +31,17 @@ import com.serotonin.bacnet4j.type.primitive.ObjectIdentifier;
 import com.serotonin.util.queue.ByteQueue;
 
 public class ReadAccessSpecification extends BaseType {
+    private static final long serialVersionUID = -9098153421380700655L;
     private final ObjectIdentifier objectIdentifier;
     private final SequenceOf<PropertyReference> listOfPropertyReferences;
-    
-    public ReadAccessSpecification(ObjectIdentifier objectIdentifier, 
+
+    public ReadAccessSpecification(ObjectIdentifier objectIdentifier,
             SequenceOf<PropertyReference> listOfPropertyReferences) {
         this.objectIdentifier = objectIdentifier;
         this.listOfPropertyReferences = listOfPropertyReferences;
     }
 
-    public ReadAccessSpecification(ObjectIdentifier objectIdentifier, PropertyIdentifier pid) { 
+    public ReadAccessSpecification(ObjectIdentifier objectIdentifier, PropertyIdentifier pid) {
         this.objectIdentifier = objectIdentifier;
         List<PropertyReference> refs = new ArrayList<PropertyReference>(1);
         refs.add(new PropertyReference(pid, null));
@@ -60,7 +61,7 @@ public class ReadAccessSpecification extends BaseType {
         write(queue, objectIdentifier, 0);
         write(queue, listOfPropertyReferences, 1);
     }
-    
+
     public ReadAccessSpecification(ByteQueue queue) throws BACnetException {
         objectIdentifier = read(queue, ObjectIdentifier.class, 0);
         listOfPropertyReferences = readSequenceOf(queue, PropertyReference.class, 1);

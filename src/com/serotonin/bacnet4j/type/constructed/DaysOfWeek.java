@@ -26,10 +26,12 @@ import com.serotonin.bacnet4j.type.primitive.BitString;
 import com.serotonin.util.queue.ByteQueue;
 
 public class DaysOfWeek extends BitString {
+    private static final long serialVersionUID = -7381461753680751900L;
+
     public DaysOfWeek() {
         super(new boolean[7]);
     }
-    
+
     public DaysOfWeek(boolean defaultValue) {
         super(7, defaultValue);
     }
@@ -37,7 +39,7 @@ public class DaysOfWeek extends BitString {
     public DaysOfWeek(ByteQueue queue) {
         super(queue);
     }
-    
+
     public boolean contains(int day) {
         return getValue()[day];
     }

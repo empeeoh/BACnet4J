@@ -5,6 +5,7 @@ import com.serotonin.bacnet4j.type.primitive.Boolean;
 import com.serotonin.util.queue.ByteQueue;
 
 public class AmbiguousValue extends Encodable {
+    private static final long serialVersionUID = -1554703777454557893L;
     private final ByteQueue data = new ByteQueue();
 
     public AmbiguousValue(ByteQueue queue) {

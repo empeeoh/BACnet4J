@@ -26,6 +26,7 @@ import com.serotonin.bacnet4j.type.primitive.Enumerated;
 import com.serotonin.util.queue.ByteQueue;
 
 public class AbortReason extends Enumerated {
+    private static final long serialVersionUID = -5845112557505021907L;
     public static final AbortReason other = new AbortReason(0);
     public static final AbortReason bufferOverflow = new AbortReason(1);
     public static final AbortReason invalidApduInThisState = new AbortReason(2);
@@ -35,11 +36,11 @@ public class AbortReason extends Enumerated {
     public AbortReason(int value) {
         super(value);
     }
-    
+
     public AbortReason(ByteQueue queue) {
         super(queue);
     }
-    
+
     @Override
     public String toString() {
         int type = intValue();
@@ -53,6 +54,6 @@ public class AbortReason extends Enumerated {
             return "Preempted by higher priority task";
         if (type == segmentationNotSupported.intValue())
             return "Segmentation not supported";
-        return "Unknown abort reason("+ type +")";
+        return "Unknown abort reason(" + type + ")";
     }
 }

@@ -39,6 +39,8 @@ import com.serotonin.bacnet4j.type.primitive.UnsignedInteger;
 import com.serotonin.util.queue.ByteQueue;
 
 public class ConfirmedEventNotificationRequest extends ConfirmedRequestService {
+    private static final long serialVersionUID = 1213823870240071042L;
+
     public static final byte TYPE_ID = 2;
 
     private final UnsignedInteger processIdentifier; // 0

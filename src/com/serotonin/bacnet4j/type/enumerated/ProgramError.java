@@ -26,6 +26,7 @@ import com.serotonin.bacnet4j.type.primitive.Enumerated;
 import com.serotonin.util.queue.ByteQueue;
 
 public class ProgramError extends Enumerated {
+    private static final long serialVersionUID = 4478176770591341682L;
     public static final ProgramError normal = new ProgramError(0);
     public static final ProgramError loadFailed = new ProgramError(1);
     public static final ProgramError internal = new ProgramError(2);
@@ -35,7 +36,7 @@ public class ProgramError extends Enumerated {
     public ProgramError(int value) {
         super(value);
     }
-    
+
     public ProgramError(ByteQueue queue) {
         super(queue);
     }

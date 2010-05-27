@@ -22,6 +22,7 @@
  */
 package com.serotonin.bacnet4j.obj;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -63,7 +64,9 @@ import com.serotonin.util.ObjectUtils;
  * @author x
  * 
  */
-public class BACnetObject {
+public class BACnetObject implements Serializable {
+    private static final long serialVersionUID = 569892306207282576L;
+
     private final LocalDevice localDevice;
     private final ObjectIdentifier id;
     private final Map<PropertyIdentifier, Encodable> properties = new HashMap<PropertyIdentifier, Encodable>();

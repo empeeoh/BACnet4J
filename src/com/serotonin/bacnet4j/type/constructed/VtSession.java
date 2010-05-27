@@ -27,10 +27,11 @@ import com.serotonin.bacnet4j.type.primitive.UnsignedInteger;
 import com.serotonin.util.queue.ByteQueue;
 
 public class VtSession extends BaseType {
+    private static final long serialVersionUID = 3655659977689484183L;
     private final UnsignedInteger localVtSessionId;
     private final UnsignedInteger remoteVtSessionId;
     private final Address remoteVtAddress;
-    
+
     public VtSession(UnsignedInteger localVtSessionId, UnsignedInteger remoteVtSessionId, Address remoteVtAddress) {
         this.localVtSessionId = localVtSessionId;
         this.remoteVtSessionId = remoteVtSessionId;

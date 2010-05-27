@@ -26,6 +26,7 @@ import com.serotonin.bacnet4j.type.primitive.Enumerated;
 import com.serotonin.util.queue.ByteQueue;
 
 public class ObjectType extends Enumerated {
+    private static final long serialVersionUID = 5428575132396799009L;
     public static final ObjectType analogInput = new ObjectType(0);
     public static final ObjectType analogOutput = new ObjectType(1);
     public static final ObjectType analogValue = new ObjectType(2);
@@ -60,11 +61,11 @@ public class ObjectType extends Enumerated {
     public ObjectType(int value) {
         super(value);
     }
-    
+
     public ObjectType(ByteQueue queue) {
         super(queue);
     }
-    
+
     @Override
     public String toString() {
         int type = intValue();
@@ -128,6 +129,6 @@ public class ObjectType extends Enumerated {
             return "Structured View";
         if (type == accessDoor.intValue())
             return "Access Door";
-        return "Vendor Specific ("+ type +")";
+        return "Vendor Specific (" + type + ")";
     }
 }

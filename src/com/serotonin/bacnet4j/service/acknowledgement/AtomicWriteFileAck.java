@@ -27,11 +27,13 @@ import com.serotonin.bacnet4j.type.primitive.SignedInteger;
 import com.serotonin.util.queue.ByteQueue;
 
 public class AtomicWriteFileAck extends AcknowledgementService {
+    private static final long serialVersionUID = -3122331020521995628L;
+
     public static final byte TYPE_ID = 7;
-    
+
     private final boolean recordAccess;
     private final SignedInteger fileStart;
-    
+
     public AtomicWriteFileAck(boolean recordAccess, SignedInteger fileStart) {
         this.recordAccess = recordAccess;
         this.fileStart = fileStart;
@@ -41,12 +43,12 @@ public class AtomicWriteFileAck extends AcknowledgementService {
     public byte getChoiceId() {
         return TYPE_ID;
     }
-    
+
     @Override
     public void write(ByteQueue queue) {
         write(queue, fileStart, recordAccess ? 1 : 0);
     }
-    
+
     AtomicWriteFileAck(ByteQueue queue) throws BACnetException {
         recordAccess = peekTagNumber(queue) == 1;
         fileStart = read(queue, SignedInteger.class, recordAccess ? 1 : 0);

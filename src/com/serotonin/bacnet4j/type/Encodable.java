@@ -1,5 +1,6 @@
 package com.serotonin.bacnet4j.type;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
@@ -22,7 +23,9 @@ import com.serotonin.bacnet4j.type.primitive.Primitive;
 import com.serotonin.bacnet4j.type.primitive.UnsignedInteger;
 import com.serotonin.util.queue.ByteQueue;
 
-abstract public class Encodable {
+abstract public class Encodable implements Serializable {
+    private static final long serialVersionUID = -4378016931626697698L;
+
     abstract public void write(ByteQueue queue);
 
     abstract public void write(ByteQueue queue, int contextId);

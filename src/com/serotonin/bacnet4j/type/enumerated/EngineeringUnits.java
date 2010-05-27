@@ -26,6 +26,7 @@ import com.serotonin.bacnet4j.type.primitive.Enumerated;
 import com.serotonin.util.queue.ByteQueue;
 
 public class EngineeringUnits extends Enumerated {
+    private static final long serialVersionUID = -1334755490239859845L;
     // Acceleration
     public static final EngineeringUnits metersPerSecondPerSecond = new EngineeringUnits(166);
     // Area
@@ -243,11 +244,11 @@ public class EngineeringUnits extends Enumerated {
     public EngineeringUnits(int value) {
         super(value);
     }
-    
+
     public EngineeringUnits(ByteQueue queue) {
         super(queue);
     }
-    
+
     @Override
     public String toString() {
         int type = intValue();
@@ -631,6 +632,6 @@ public class EngineeringUnits extends Enumerated {
             return "watts per meter per degree kelvin";
         if (type == wattsPerSquareMeterDegreeKelvin.intValue())
             return "watts per square meter degree kelvin";
-        return "Unknown: "+ type;
+        return "Unknown: " + type;
     }
 }

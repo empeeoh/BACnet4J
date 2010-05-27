@@ -31,6 +31,7 @@ import com.serotonin.bacnet4j.type.primitive.UnsignedInteger;
 import com.serotonin.util.queue.ByteQueue;
 
 public class ReadAccessResult extends BaseType {
+    private static final long serialVersionUID = -5046824677263394587L;
     private final ObjectIdentifier objectIdentifier;
     private final SequenceOf<Result> listOfResults;
 
@@ -44,12 +45,12 @@ public class ReadAccessResult extends BaseType {
         write(queue, objectIdentifier, 0);
         writeOptional(queue, listOfResults, 1);
     }
-    
+
     @Override
     public String toString() {
-        return "ReadAccessResult(oid="+ objectIdentifier +", results="+ listOfResults +")";
+        return "ReadAccessResult(oid=" + objectIdentifier + ", results=" + listOfResults + ")";
     }
-    
+
     public SequenceOf<Result> getListOfResults() {
         return listOfResults;
     }
@@ -64,25 +65,25 @@ public class ReadAccessResult extends BaseType {
         listOfResults = readOptionalSequenceOf(queue, Result.class, 1);
         ThreadLocalObjectType.remove();
     }
-    
+
     public static class Result extends BaseType {
+        private static final long serialVersionUID = -2539614773155916196L;
         private final PropertyIdentifier propertyIdentifier;
         private final UnsignedInteger propertyArrayIndex;
         private Choice readResult;
-        
+
         public Result(PropertyIdentifier propertyIdentifier, UnsignedInteger propertyArrayIndex, Encodable readResult) {
             this.propertyIdentifier = propertyIdentifier;
             this.propertyArrayIndex = propertyArrayIndex;
             this.readResult = new Choice(4, readResult);
         }
-        
-        public Result(PropertyIdentifier propertyIdentifier, UnsignedInteger propertyArrayIndex, 
-                BACnetError readResult) {
+
+        public Result(PropertyIdentifier propertyIdentifier, UnsignedInteger propertyArrayIndex, BACnetError readResult) {
             this.propertyIdentifier = propertyIdentifier;
             this.propertyArrayIndex = propertyArrayIndex;
             this.readResult = new Choice(5, readResult);
         }
-        
+
         public UnsignedInteger getPropertyArrayIndex() {
             return propertyArrayIndex;
         }
@@ -90,7 +91,7 @@ public class ReadAccessResult extends BaseType {
         public PropertyIdentifier getPropertyIdentifier() {
             return propertyIdentifier;
         }
-        
+
         public boolean isError() {
             return readResult.getContextId() == 5;
         }
@@ -101,9 +102,8 @@ public class ReadAccessResult extends BaseType {
 
         @Override
         public String toString() {
-            return "Result(pid="+ propertyIdentifier 
-                    +(propertyArrayIndex == null ? "" : ", pin="+ propertyArrayIndex) 
-                    +", value="+ readResult +")";
+            return "Result(pid=" + propertyIdentifier
+                    + (propertyArrayIndex == null ? "" : ", pin=" + propertyArrayIndex) + ", value=" + readResult + ")";
         }
 
         @Override
@@ -115,7 +115,7 @@ public class ReadAccessResult extends BaseType {
             else
                 write(queue, readResult.getDatum(), 5);
         }
-        
+
         public Result(ByteQueue queue) throws BACnetException {
             propertyIdentifier = read(queue, PropertyIdentifier.class, 2);
             propertyArrayIndex = readOptional(queue, UnsignedInteger.class, 3);

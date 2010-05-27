@@ -29,8 +29,9 @@ import com.serotonin.bacnet4j.type.primitive.UnsignedInteger;
 import com.serotonin.util.queue.ByteQueue;
 
 public class CreateObjectError extends BaseError {
+    private static final long serialVersionUID = 8965252214998403600L;
     private final UnsignedInteger firstFailedElementNumber;
-    
+
     public CreateObjectError(byte choice, BACnetError error, UnsignedInteger firstFailedElementNumber) {
         super(choice, error);
         this.firstFailedElementNumber = firstFailedElementNumber;
@@ -47,7 +48,7 @@ public class CreateObjectError extends BaseError {
         write(queue, error, 0);
         firstFailedElementNumber.write(queue, 1);
     }
-    
+
     CreateObjectError(byte choice, ByteQueue queue) throws BACnetException {
         super(choice, queue, 0);
         firstFailedElementNumber = read(queue, UnsignedInteger.class, 1);

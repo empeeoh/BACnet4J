@@ -26,6 +26,7 @@ import com.serotonin.bacnet4j.type.primitive.Enumerated;
 import com.serotonin.util.queue.ByteQueue;
 
 public class ProgramState extends Enumerated {
+    private static final long serialVersionUID = 9182595225658615643L;
     public static final ProgramState idle = new ProgramState(0);
     public static final ProgramState loading = new ProgramState(1);
     public static final ProgramState running = new ProgramState(2);
@@ -36,7 +37,7 @@ public class ProgramState extends Enumerated {
     public ProgramState(int value) {
         super(value);
     }
-    
+
     public ProgramState(ByteQueue queue) {
         super(queue);
     }

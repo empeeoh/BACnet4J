@@ -29,6 +29,8 @@ import com.serotonin.bacnet4j.type.primitive.UnsignedInteger;
 import com.serotonin.util.queue.ByteQueue;
 
 public class ChangeOfState extends EventParameter {
+    private static final long serialVersionUID = -2481408388822644602L;
+
     public static final byte TYPE_ID = 1;
 
     private final UnsignedInteger timeDelay;

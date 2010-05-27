@@ -26,6 +26,7 @@ import com.serotonin.bacnet4j.type.primitive.Enumerated;
 import com.serotonin.util.queue.ByteQueue;
 
 public class NotifyType extends Enumerated {
+    private static final long serialVersionUID = 3980483915280625804L;
     public static final NotifyType alarm = new NotifyType(0);
     public static final NotifyType event = new NotifyType(1);
     public static final NotifyType ackNotification = new NotifyType(2);
@@ -33,7 +34,7 @@ public class NotifyType extends Enumerated {
     public NotifyType(int value) {
         super(value);
     }
-    
+
     public NotifyType(ByteQueue queue) {
         super(queue);
     }

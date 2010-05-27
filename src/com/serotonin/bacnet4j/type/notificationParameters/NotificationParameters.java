@@ -30,6 +30,8 @@ import com.serotonin.bacnet4j.type.enumerated.ErrorCode;
 import com.serotonin.util.queue.ByteQueue;
 
 abstract public class NotificationParameters extends BaseType {
+    private static final long serialVersionUID = 7902337844295486044L;
+
     public static NotificationParameters createNotificationParameters(ByteQueue queue, int contextId)
             throws BACnetException {
         popStart(queue, contextId);
@@ -37,18 +39,18 @@ abstract public class NotificationParameters extends BaseType {
         popEnd(queue, contextId);
         return result;
     }
-    
+
     public static NotificationParameters createNotificationParametersOptional(ByteQueue queue, int contextId)
             throws BACnetException {
         if (readStart(queue) != contextId)
             return null;
         return createNotificationParameters(queue, contextId);
     }
-    
+
     public static NotificationParameters createNotificationParameters(ByteQueue queue) throws BACnetException {
         // Get the first byte. It will tell us what the service type is.
         int type = popStart(queue);
-        
+
         NotificationParameters result;
         if (type == ChangeOfBitString.TYPE_ID) // 0
             result = new ChangeOfBitString(queue);
@@ -74,19 +76,19 @@ abstract public class NotificationParameters extends BaseType {
             result = new UnsignedRange(queue);
         else
             throw new BACnetErrorException(ErrorClass.property, ErrorCode.invalidParameterDataType);
-        
+
         popEnd(queue, type);
         return result;
     }
-    
-    
+
     @Override
     final public void write(ByteQueue queue) {
         writeContextTag(queue, getTypeId(), true);
         writeImpl(queue);
         writeContextTag(queue, getTypeId(), false);
     }
-    
+
     abstract protected int getTypeId();
+
     abstract protected void writeImpl(ByteQueue queue);
 }

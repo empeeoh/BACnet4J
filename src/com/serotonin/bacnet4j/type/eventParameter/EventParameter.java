@@ -30,6 +30,8 @@ import com.serotonin.bacnet4j.type.enumerated.ErrorCode;
 import com.serotonin.util.queue.ByteQueue;
 
 abstract public class EventParameter extends BaseType {
+    private static final long serialVersionUID = -8202182792179896645L;
+
     public static EventParameter createEventParameter(ByteQueue queue) throws BACnetException {
         // Get the first byte. It will tell us what the parameter type is.
         int type = popStart(queue);

@@ -38,6 +38,8 @@ import com.serotonin.bacnet4j.type.primitive.UnsignedInteger;
 import com.serotonin.util.queue.ByteQueue;
 
 public class ReadPropertyRequest extends ConfirmedRequestService {
+    private static final long serialVersionUID = 4866163964355156811L;
+
     public static final byte TYPE_ID = 12;
 
     private final ObjectIdentifier objectIdentifier;

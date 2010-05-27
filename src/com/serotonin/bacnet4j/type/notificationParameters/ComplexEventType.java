@@ -28,23 +28,25 @@ import com.serotonin.bacnet4j.type.constructed.SequenceOf;
 import com.serotonin.util.queue.ByteQueue;
 
 public class ComplexEventType extends NotificationParameters {
+    private static final long serialVersionUID = -5125532863892322124L;
+
     public static final byte TYPE_ID = 6;
-    
+
     private final SequenceOf<PropertyValue> values;
 
     public ComplexEventType(SequenceOf<PropertyValue> values) {
         this.values = values;
     }
-    
+
     @Override
     protected void writeImpl(ByteQueue queue) {
         write(queue, values);
     }
-    
+
     public ComplexEventType(ByteQueue queue) throws BACnetException {
         values = readSequenceOf(queue, PropertyValue.class);
     }
-    
+
     @Override
     protected int getTypeId() {
         return TYPE_ID;

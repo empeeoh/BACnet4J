@@ -26,53 +26,55 @@ import com.serotonin.bacnet4j.type.enumerated.ObjectType;
 import com.serotonin.util.queue.ByteQueue;
 
 public class ObjectIdentifier extends Primitive {
+    private static final long serialVersionUID = 4171263406246161971L;
+
     public static final byte TYPE_ID = 12;
-    
+
     private ObjectType objectType;
     private int instanceNumber;
-    
+
     public ObjectIdentifier(ObjectType objectType, int instanceNumber) {
         setValues(objectType, instanceNumber);
     }
-    
+
     private void setValues(ObjectType objectType, int instanceNumber) {
         if (instanceNumber < 0 || instanceNumber > 0x3FFFFF)
-            throw new IllegalArgumentException("Illegal instance number: "+ instanceNumber);
-        
+            throw new IllegalArgumentException("Illegal instance number: " + instanceNumber);
+
         this.objectType = objectType;
         this.instanceNumber = instanceNumber;
     }
-    
+
     public ObjectType getObjectType() {
         return objectType;
     }
-    
+
     public int getInstanceNumber() {
         return instanceNumber;
     }
-    
+
     @Override
     public String toString() {
-        return objectType.toString() +" "+ instanceNumber;
+        return objectType.toString() + " " + instanceNumber;
     }
-    
+
     //
     // Reading and writing
     //
     public ObjectIdentifier(ByteQueue queue) {
         readTag(queue);
-        
+
         int objectType = queue.popU1B() << 2;
         int i = queue.popU1B();
         objectType |= i >> 6;
-        
+
         this.objectType = new ObjectType(objectType);
-        
+
         instanceNumber = (i & 0x3f) << 16;
         instanceNumber |= queue.popU1B() << 8;
         instanceNumber |= queue.popU1B();
     }
-    
+
     @Override
     public void writeImpl(ByteQueue queue) {
         int objectType = this.objectType.intValue();

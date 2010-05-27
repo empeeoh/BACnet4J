@@ -28,9 +28,10 @@ import com.serotonin.bacnet4j.type.primitive.Time;
 import com.serotonin.util.queue.ByteQueue;
 
 public class TimeValue extends BaseType {
+    private static final long serialVersionUID = 6449737212397369712L;
     private final Time time;
     private final Primitive value;
-    
+
     public TimeValue(Time time, Primitive value) {
         this.time = time;
         this.value = value;
@@ -41,7 +42,7 @@ public class TimeValue extends BaseType {
         write(queue, time);
         write(queue, value);
     }
-    
+
     public TimeValue(ByteQueue queue) throws BACnetException {
         time = read(queue, Time.class);
         value = read(queue, Primitive.class);

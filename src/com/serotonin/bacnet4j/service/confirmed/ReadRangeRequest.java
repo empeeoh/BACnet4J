@@ -42,6 +42,8 @@ import com.serotonin.bacnet4j.type.primitive.UnsignedInteger;
 import com.serotonin.util.queue.ByteQueue;
 
 public class ReadRangeRequest extends ConfirmedRequestService {
+    private static final long serialVersionUID = 7357639261721076121L;
+
     public static final byte TYPE_ID = 26;
 
     private static List<Class<? extends Encodable>> classes;
@@ -113,6 +115,7 @@ public class ReadRangeRequest extends ConfirmedRequestService {
     }
 
     abstract public static class Range extends BaseType {
+        private static final long serialVersionUID = 7079223629723797175L;
         protected SignedInteger count;
 
         public Range(SignedInteger count) {
@@ -125,6 +128,7 @@ public class ReadRangeRequest extends ConfirmedRequestService {
     }
 
     public static class ByPosition extends Range {
+        private static final long serialVersionUID = 4251374814674312091L;
         private final UnsignedInteger referenceIndex;
 
         public ByPosition(UnsignedInteger referenceIndex, SignedInteger count) {
@@ -145,6 +149,7 @@ public class ReadRangeRequest extends ConfirmedRequestService {
     }
 
     public static class BySequenceNumber extends Range {
+        private static final long serialVersionUID = 4218886072119156278L;
         private final UnsignedInteger referenceIndex;
 
         public BySequenceNumber(UnsignedInteger referenceIndex, SignedInteger count) {
@@ -165,6 +170,7 @@ public class ReadRangeRequest extends ConfirmedRequestService {
     }
 
     public static class ByTime extends Range {
+        private static final long serialVersionUID = 6322007580214441250L;
         private final DateTime referenceTime;
 
         public ByTime(DateTime referenceTime, SignedInteger count) {

@@ -32,8 +32,10 @@ import com.serotonin.bacnet4j.type.primitive.UnsignedInteger;
 import com.serotonin.util.queue.ByteQueue;
 
 public class TimeStamp extends BaseType {
+    private static final long serialVersionUID = 728644269380254714L;
+
     private final Choice choice;
-    
+
     private static List<Class<? extends Encodable>> classes;
     static {
         classes = new ArrayList<Class<? extends Encodable>>();
@@ -41,42 +43,42 @@ public class TimeStamp extends BaseType {
         classes.add(UnsignedInteger.class);
         classes.add(DateTime.class);
     }
-    
+
     public TimeStamp(Time time) {
         choice = new Choice(0, time);
     }
-    
+
     public TimeStamp(UnsignedInteger sequenceNumber) {
         choice = new Choice(1, sequenceNumber);
     }
-    
+
     public TimeStamp(DateTime dateTime) {
         choice = new Choice(2, dateTime);
     }
-    
+
     @Override
     public void write(ByteQueue queue) {
         write(queue, choice);
     }
-    
+
     public TimeStamp(ByteQueue queue) throws BACnetException {
         choice = new Choice(queue, classes);
     }
-    
+
     public boolean isSequenceNumber() {
         return choice.getContextId() == 1;
     }
-    
+
     public UnsignedInteger getSequenceNumber() {
-        return (UnsignedInteger)choice.getDatum();
+        return (UnsignedInteger) choice.getDatum();
     }
 
     public boolean isDateTime() {
         return choice.getContextId() == 2;
     }
-    
+
     public DateTime getDateTime() {
-        return (DateTime)choice.getDatum();
+        return (DateTime) choice.getDatum();
     }
 
     @Override

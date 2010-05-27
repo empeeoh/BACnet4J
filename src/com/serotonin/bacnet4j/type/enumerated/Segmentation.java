@@ -26,6 +26,7 @@ import com.serotonin.bacnet4j.type.primitive.Enumerated;
 import com.serotonin.util.queue.ByteQueue;
 
 public class Segmentation extends Enumerated {
+    private static final long serialVersionUID = -7301676227213297779L;
     public static final Segmentation segmentedBoth = new Segmentation(0);
     public static final Segmentation segmentedTransmit = new Segmentation(1);
     public static final Segmentation segmentedReceive = new Segmentation(2);
@@ -34,19 +35,19 @@ public class Segmentation extends Enumerated {
     public Segmentation(int value) {
         super(value);
     }
-    
+
     public Segmentation(ByteQueue queue) {
         super(queue);
     }
-    
+
     public boolean hasTransmitSegmentation() {
         return this.equals(segmentedBoth) || this.equals(segmentedTransmit);
     }
-    
+
     public boolean hasReceiveSegmentation() {
         return this.equals(segmentedBoth) || this.equals(segmentedReceive);
     }
-    
+
     @Override
     public String toString() {
         int type = intValue();
@@ -58,6 +59,6 @@ public class Segmentation extends Enumerated {
             return "receive";
         if (type == noSegmentation.intValue())
             return "none";
-        return "Unknown: "+ type;
+        return "Unknown: " + type;
     }
 }

@@ -34,15 +34,17 @@ import com.serotonin.bacnet4j.type.primitive.UnsignedInteger;
 import com.serotonin.util.queue.ByteQueue;
 
 public class AuthenticateRequest extends ConfirmedRequestService {
+    private static final long serialVersionUID = 4272319357309373386L;
+
     public static final byte TYPE_ID = 24;
-    
+
     private final UnsignedInteger pseudoRandomNumber;
     private final UnsignedInteger expectedInvokeID;
     private final CharacterString operatorName;
     private final CharacterString operatorPassword;
     private final Boolean startEncipheredSession;
-    
-    public AuthenticateRequest(UnsignedInteger pseudoRandomNumber, UnsignedInteger expectedInvokeID, 
+
+    public AuthenticateRequest(UnsignedInteger pseudoRandomNumber, UnsignedInteger expectedInvokeID,
             CharacterString operatorName, CharacterString operatorPassword, Boolean startEncipheredSession) {
         this.pseudoRandomNumber = pseudoRandomNumber;
         this.expectedInvokeID = expectedInvokeID;
@@ -57,8 +59,7 @@ public class AuthenticateRequest extends ConfirmedRequestService {
     }
 
     @Override
-    public AcknowledgementService handle(LocalDevice localDevice, Address from, Network network)
-            throws BACnetException {
+    public AcknowledgementService handle(LocalDevice localDevice, Address from, Network network) throws BACnetException {
         throw new NotImplementedException();
     }
 
@@ -70,7 +71,7 @@ public class AuthenticateRequest extends ConfirmedRequestService {
         writeOptional(queue, operatorPassword, 3);
         writeOptional(queue, startEncipheredSession, 4);
     }
-    
+
     AuthenticateRequest(ByteQueue queue) throws BACnetException {
         pseudoRandomNumber = read(queue, UnsignedInteger.class, 0);
         expectedInvokeID = readOptional(queue, UnsignedInteger.class, 1);

@@ -28,8 +28,9 @@ import com.serotonin.bacnet4j.type.primitive.UnsignedInteger;
 import com.serotonin.util.queue.ByteQueue;
 
 public class ChangeListError extends BaseError {
+    private static final long serialVersionUID = -466623385798604884L;
     private final UnsignedInteger firstFailedElementNumber;
-    
+
     public ChangeListError(byte choice, BACnetError error, UnsignedInteger firstFailedElementNumber) {
         super(choice, error);
         this.firstFailedElementNumber = firstFailedElementNumber;
@@ -41,7 +42,7 @@ public class ChangeListError extends BaseError {
         write(queue, error, 0);
         write(queue, firstFailedElementNumber, 1);
     }
-    
+
     ChangeListError(byte choice, ByteQueue queue) throws BACnetException {
         super(choice, queue, 0);
         firstFailedElementNumber = read(queue, UnsignedInteger.class, 1);

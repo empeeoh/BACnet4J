@@ -36,6 +36,8 @@ import com.serotonin.bacnet4j.type.primitive.UnsignedInteger;
 import com.serotonin.util.queue.ByteQueue;
 
 public class Extended extends EventParameter {
+    private static final long serialVersionUID = 4998428230393436920L;
+
     public static final byte TYPE_ID = 9;
 
     private final UnsignedInteger vendorId;
@@ -67,6 +69,7 @@ public class Extended extends EventParameter {
     }
 
     public static class Parameter extends BaseType {
+        private static final long serialVersionUID = -7664447316518921548L;
         private Primitive primitive;
         private DeviceObjectPropertyReference reference;
 

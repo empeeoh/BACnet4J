@@ -33,10 +33,12 @@ import com.serotonin.bacnet4j.type.primitive.ObjectIdentifier;
 import com.serotonin.util.queue.ByteQueue;
 
 public class DeleteObjectRequest extends ConfirmedRequestService {
+    private static final long serialVersionUID = 6629196264191258622L;
+
     public static final byte TYPE_ID = 11;
-    
+
     private final ObjectIdentifier objectIdentifier;
-    
+
     public DeleteObjectRequest(ObjectIdentifier objectIdentifier) {
         this.objectIdentifier = objectIdentifier;
     }
@@ -45,7 +47,7 @@ public class DeleteObjectRequest extends ConfirmedRequestService {
     public byte getChoiceId() {
         return TYPE_ID;
     }
-    
+
     @Override
     public AcknowledgementService handle(LocalDevice localDevice, Address from, Network network)
             throws BACnetErrorException {
@@ -55,16 +57,16 @@ public class DeleteObjectRequest extends ConfirmedRequestService {
         catch (BACnetServiceException e) {
             throw new BACnetErrorException(getChoiceId(), e);
         }
-            
+
         // Returning null sends a simple ack.
         return null;
     }
-    
+
     @Override
     public void write(ByteQueue queue) {
         write(queue, objectIdentifier);
     }
-    
+
     DeleteObjectRequest(ByteQueue queue) throws BACnetException {
         objectIdentifier = read(queue, ObjectIdentifier.class);
     }

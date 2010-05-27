@@ -26,6 +26,7 @@ import com.serotonin.bacnet4j.type.primitive.Enumerated;
 import com.serotonin.util.queue.ByteQueue;
 
 public class LifeSafetyState extends Enumerated {
+    private static final long serialVersionUID = 2161598068039518923L;
     public static final LifeSafetyState quiet = new LifeSafetyState(0);
     public static final LifeSafetyState preAlarm = new LifeSafetyState(1);
     public static final LifeSafetyState alarm = new LifeSafetyState(2);
@@ -54,11 +55,11 @@ public class LifeSafetyState extends Enumerated {
     public LifeSafetyState(int value) {
         super(value);
     }
-    
+
     public LifeSafetyState(ByteQueue queue) {
         super(queue);
     }
-    
+
     @Override
     public String toString() {
         int type = intValue();
@@ -110,8 +111,8 @@ public class LifeSafetyState extends Enumerated {
             return "Supervisory";
         if (type == testSupervisory.intValue())
             return "Test supervisory";
-        
-        return "Unknown: "+ type;
+
+        return "Unknown: " + type;
     }
 
 }

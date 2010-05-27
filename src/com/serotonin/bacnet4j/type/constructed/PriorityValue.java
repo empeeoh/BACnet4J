@@ -36,6 +36,7 @@ import com.serotonin.bacnet4j.type.primitive.UnsignedInteger;
 import com.serotonin.util.queue.ByteQueue;
 
 public class PriorityValue extends BaseType {
+    private static final long serialVersionUID = 213834169635261132L;
     private Null nullValue;
     private Real realValue;
     private BinaryPV binaryValue;

@@ -29,16 +29,17 @@ import com.serotonin.bacnet4j.type.primitive.UnsignedInteger;
 import com.serotonin.util.queue.ByteQueue;
 
 public class ObjectPropertyReference extends BaseType {
+    private static final long serialVersionUID = 5896660853668343357L;
     private final ObjectIdentifier objectIdentifier;
     private final PropertyIdentifier propertyIdentifier;
     private UnsignedInteger propertyArrayIndex;
-    
+
     public ObjectPropertyReference(ObjectIdentifier objectIdentifier, PropertyIdentifier propertyIdentifier) {
         this.objectIdentifier = objectIdentifier;
         this.propertyIdentifier = propertyIdentifier;
     }
 
-    public ObjectPropertyReference(ObjectIdentifier objectIdentifier, PropertyIdentifier propertyIdentifier, 
+    public ObjectPropertyReference(ObjectIdentifier objectIdentifier, PropertyIdentifier propertyIdentifier,
             UnsignedInteger propertyArrayIndex) {
         this.objectIdentifier = objectIdentifier;
         this.propertyIdentifier = propertyIdentifier;
@@ -51,13 +52,13 @@ public class ObjectPropertyReference extends BaseType {
         write(queue, propertyIdentifier, 1);
         writeOptional(queue, propertyArrayIndex, 2);
     }
-    
+
     public ObjectPropertyReference(ByteQueue queue) throws BACnetException {
         objectIdentifier = read(queue, ObjectIdentifier.class, 0);
         propertyIdentifier = read(queue, PropertyIdentifier.class, 1);
         propertyArrayIndex = readOptional(queue, UnsignedInteger.class, 2);
     }
-    
+
     public ObjectIdentifier getObjectIdentifier() {
         return objectIdentifier;
     }
@@ -69,11 +70,11 @@ public class ObjectPropertyReference extends BaseType {
     public UnsignedInteger getPropertyArrayIndex() {
         return propertyArrayIndex;
     }
-    
+
     @Override
-    public String toString () {
-        return "ObjectPropertyReference(objectIdentifier="+ objectIdentifier +", propertyIdentifier="+
-                propertyIdentifier +", propertyArrayIndex="+ propertyArrayIndex +")";
+    public String toString() {
+        return "ObjectPropertyReference(objectIdentifier=" + objectIdentifier + ", propertyIdentifier="
+                + propertyIdentifier + ", propertyArrayIndex=" + propertyArrayIndex + ")";
     }
 
     @Override

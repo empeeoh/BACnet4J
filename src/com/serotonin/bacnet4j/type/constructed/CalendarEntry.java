@@ -31,6 +31,7 @@ import com.serotonin.bacnet4j.type.primitive.Date;
 import com.serotonin.util.queue.ByteQueue;
 
 public class CalendarEntry extends BaseType {
+    private static final long serialVersionUID = -4210434764578714766L;
     private static List<Class<? extends Encodable>> classes;
     static {
         classes = new ArrayList<Class<? extends Encodable>>();
@@ -38,17 +39,17 @@ public class CalendarEntry extends BaseType {
         classes.add(DateRange.class);
         classes.add(WeekNDay.class);
     }
-    
+
     private final Choice entry;
-    
+
     public CalendarEntry(Date date) {
         entry = new Choice(0, date);
     }
-    
+
     public CalendarEntry(DateRange dateRange) {
         entry = new Choice(1, dateRange);
     }
-    
+
     public CalendarEntry(WeekNDay weekNDay) {
         entry = new Choice(2, weekNDay);
     }
@@ -57,11 +58,11 @@ public class CalendarEntry extends BaseType {
     public void write(ByteQueue queue) {
         write(queue, entry);
     }
-    
+
     public CalendarEntry(ByteQueue queue) throws BACnetException {
         entry = new Choice(queue, classes);
     }
-    
+
     public boolean isDate() {
         return entry.getContextId() == 0;
     }
@@ -73,17 +74,17 @@ public class CalendarEntry extends BaseType {
     public boolean isWeekNDay() {
         return entry.getContextId() == 2;
     }
-    
+
     public Date getDate() {
-        return (Date)entry.getDatum();
+        return (Date) entry.getDatum();
     }
-    
+
     public DateRange getDateRange() {
-        return (DateRange)entry.getDatum();
+        return (DateRange) entry.getDatum();
     }
-    
+
     public WeekNDay getWeekNDay() {
-        return (WeekNDay)entry.getDatum();
+        return (WeekNDay) entry.getDatum();
     }
 
     @Override

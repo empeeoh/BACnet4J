@@ -31,8 +31,9 @@ import com.serotonin.bacnet4j.type.enumerated.ErrorCode;
 import com.serotonin.util.queue.ByteQueue;
 
 public class CharacterString extends Primitive {
+    private static final long serialVersionUID = -3146333907363025078L;
     public static final byte TYPE_ID = 7;
-    
+
     public interface Encodings {
         byte ANSI_X3_4 = 0;
         byte IBM_MS_DBCS = 1;
@@ -41,15 +42,15 @@ public class CharacterString extends Primitive {
         byte ISO_10646_UCS_2 = 4;
         byte ISO_8859_1 = 5;
     }
-    
+
     private byte encoding;
     private final String value;
-    
+
     public CharacterString(String value) {
         encoding = Encodings.ANSI_X3_4;
         this.value = value;
     }
-    
+
     public CharacterString(byte encoding, String value) {
         try {
             validateEncoding(encoding);
@@ -61,30 +62,30 @@ public class CharacterString extends Primitive {
         this.encoding = encoding;
         this.value = value;
     }
-    
+
     public byte getEncoding() {
         return encoding;
     }
-    
+
     public String getValue() {
         return value;
     }
-    
+
     //
     // Reading and writing
     //
-    public CharacterString(ByteQueue queue) throws BACnetErrorException  {
-        int length = (int)readTag(queue);
-        
+    public CharacterString(ByteQueue queue) throws BACnetErrorException {
+        int length = (int) readTag(queue);
+
         byte encoding = queue.pop();
         validateEncoding(encoding);
-        
+
         byte[] bytes = new byte[length - 1];
         queue.pop(bytes);
-        
+
         value = decode(encoding, bytes);
     }
-    
+
     @Override
     public void writeImpl(ByteQueue queue) {
         queue.push(encoding);
@@ -100,13 +101,13 @@ public class CharacterString extends Primitive {
     protected byte getTypeId() {
         return TYPE_ID;
     }
-    
+
     private static byte[] encode(byte encoding, String value) {
         try {
             switch (encoding) {
-            case Encodings.ANSI_X3_4 :
+            case Encodings.ANSI_X3_4:
                 return value.getBytes("UTF-8");
-            case Encodings.ISO_8859_1 :
+            case Encodings.ISO_8859_1:
                 return value.getBytes("ISO-8859-1");
             }
         }
@@ -116,13 +117,13 @@ public class CharacterString extends Primitive {
         }
         return null;
     }
-    
+
     private static String decode(byte encoding, byte[] bytes) {
         try {
             switch (encoding) {
-            case Encodings.ANSI_X3_4 :
+            case Encodings.ANSI_X3_4:
                 return new String(bytes, "UTF-8");
-            case Encodings.ISO_8859_1 :
+            case Encodings.ISO_8859_1:
                 return new String(bytes, "ISO-8859-1");
             }
         }
@@ -132,11 +133,11 @@ public class CharacterString extends Primitive {
         }
         return null;
     }
-    
+
     private void validateEncoding(byte encoding) throws BACnetErrorException {
         if (encoding != Encodings.ANSI_X3_4 && encoding != Encodings.ISO_8859_1)
-            throw new BACnetErrorException(ErrorClass.property, ErrorCode.characterSetNotSupported,
-                    Byte.toString(encoding));
+            throw new BACnetErrorException(ErrorClass.property, ErrorCode.characterSetNotSupported, Byte
+                    .toString(encoding));
     }
 
     @Override
@@ -166,7 +167,7 @@ public class CharacterString extends Primitive {
             return false;
         return true;
     }
-    
+
     @Override
     public String toString() {
         return value;

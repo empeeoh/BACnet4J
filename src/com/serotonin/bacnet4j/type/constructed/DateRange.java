@@ -27,9 +27,10 @@ import com.serotonin.bacnet4j.type.primitive.Date;
 import com.serotonin.util.queue.ByteQueue;
 
 public class DateRange extends BaseType {
+    private static final long serialVersionUID = 7219491325251523667L;
     private final Date startDate;
     private final Date endDate;
-    
+
     public DateRange(Date startDate, Date endDate) {
         this.startDate = startDate;
         this.endDate = endDate;
@@ -40,7 +41,7 @@ public class DateRange extends BaseType {
         write(queue, startDate);
         write(queue, endDate);
     }
-    
+
     public DateRange(ByteQueue queue) throws BACnetException {
         startDate = read(queue, Date.class);
         endDate = read(queue, Date.class);

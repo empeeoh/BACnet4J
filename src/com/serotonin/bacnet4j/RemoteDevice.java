@@ -22,6 +22,7 @@
  */
 package com.serotonin.bacnet4j;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -34,7 +35,8 @@ import com.serotonin.bacnet4j.type.enumerated.Segmentation;
 import com.serotonin.bacnet4j.type.primitive.ObjectIdentifier;
 import com.serotonin.bacnet4j.type.primitive.UnsignedInteger;
 
-public class RemoteDevice {
+public class RemoteDevice implements Serializable {
+    private static final long serialVersionUID = 6338537708566242078L;
     private final int instanceNumber;
     private final Address address;
     private final Network network;
@@ -47,50 +49,45 @@ public class RemoteDevice {
     private ServicesSupported servicesSupported;
     private final Map<ObjectIdentifier, RemoteObject> objects = new HashMap<ObjectIdentifier, RemoteObject>();
     private Object userData;
-    
-//    public RemoteDevice(int instanceNumber, Address address) {
-//        this(instanceNumber, address, null);
-//    }
-    
+
+    // public RemoteDevice(int instanceNumber, Address address) {
+    // this(instanceNumber, address, null);
+    // }
+
     public RemoteDevice(int instanceNumber, Address address, Network network) {
         this.instanceNumber = instanceNumber;
         this.address = address;
         this.network = network;
     }
-    
+
     public ObjectIdentifier getObjectIdentifier() {
         return new ObjectIdentifier(ObjectType.device, instanceNumber);
     }
-    
+
     @Override
     public String toString() {
-        return "RemoteDevice(instanceNumber="+ instanceNumber +", address="+ address +", network="+ network +")";
+        return "RemoteDevice(instanceNumber=" + instanceNumber + ", address=" + address + ", network=" + network + ")";
     }
 
     public String toExtendedString() {
-        return "RemoteDevice(instanceNumber="+ instanceNumber
-                +", address="+ address
-                +", network="+ network
-                +", maxAPDULengthAccepted="+ maxAPDULengthAccepted
-                +", segmentationSupported="+ segmentationSupported
-                +", vendorId="+ vendorId
-                +", name="+ name
-                +", servicesSupported="+ servicesSupported
-                +", objects="+ objects +")";
+        return "RemoteDevice(instanceNumber=" + instanceNumber + ", address=" + address + ", network=" + network
+                + ", maxAPDULengthAccepted=" + maxAPDULengthAccepted + ", segmentationSupported="
+                + segmentationSupported + ", vendorId=" + vendorId + ", name=" + name + ", servicesSupported="
+                + servicesSupported + ", objects=" + objects + ")";
     }
 
     public void setObject(RemoteObject o) {
         objects.put(o.getObjectIdentifier(), o);
     }
-    
+
     public RemoteObject getObject(ObjectIdentifier oid) {
         return objects.get(oid);
     }
-    
+
     public List<RemoteObject> getObjects() {
         return new ArrayList<RemoteObject>(objects.values());
     }
-    
+
     public Address getAddress() {
         return address;
     }

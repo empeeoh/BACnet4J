@@ -29,13 +29,14 @@ import com.serotonin.bacnet4j.type.primitive.UnsignedInteger;
 import com.serotonin.util.queue.ByteQueue;
 
 public class CovSubscription extends BaseType {
+    private static final long serialVersionUID = -455474598550254295L;
     private final RecipientProcess recipient;
     private final ObjectPropertyReference monitoredPropertyReference;
     private final Boolean issueConfirmedNotifications;
     private final UnsignedInteger timeRemaining;
     private final Real covIncrement;
-    
-    public CovSubscription(RecipientProcess recipient, ObjectPropertyReference monitoredPropertyReference, 
+
+    public CovSubscription(RecipientProcess recipient, ObjectPropertyReference monitoredPropertyReference,
             Boolean issueConfirmedNotifications, UnsignedInteger timeRemaining, Real covIncrement) {
         this.recipient = recipient;
         this.monitoredPropertyReference = monitoredPropertyReference;
@@ -52,7 +53,7 @@ public class CovSubscription extends BaseType {
         write(queue, timeRemaining, 3);
         writeOptional(queue, covIncrement, 4);
     }
-    
+
     public CovSubscription(ByteQueue queue) throws BACnetException {
         recipient = read(queue, RecipientProcess.class, 0);
         monitoredPropertyReference = read(queue, ObjectPropertyReference.class, 1);

@@ -25,18 +25,20 @@ package com.serotonin.bacnet4j.type.primitive;
 import com.serotonin.util.queue.ByteQueue;
 
 public class Boolean extends Primitive {
+    private static final long serialVersionUID = -161562645674050036L;
+
     public static final byte TYPE_ID = 1;
-    
+
     protected boolean value;
-    
+
     public Boolean(boolean value) {
         this.value = value;
     }
-    
+
     public boolean booleanValue() {
         return value;
     }
-    
+
     public Boolean(ByteQueue queue) {
         long length = readTag(queue);
         if (contextSpecific)
@@ -44,18 +46,18 @@ public class Boolean extends Primitive {
         else
             value = length == 1;
     }
-    
+
     @Override
     public void writeImpl(ByteQueue queue) {
         if (contextSpecific)
-            queue.push((byte)(value ? 1 : 0));
+            queue.push((byte) (value ? 1 : 0));
     }
 
     @Override
     protected long getLength() {
         if (contextSpecific)
             return 1;
-        return (byte)(value ? 1 : 0);
+        return (byte) (value ? 1 : 0);
     }
 
     @Override
@@ -84,7 +86,7 @@ public class Boolean extends Primitive {
             return false;
         return true;
     }
-    
+
     @Override
     public String toString() {
         return java.lang.Boolean.toString(value);

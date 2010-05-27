@@ -30,6 +30,8 @@ import com.serotonin.bacnet4j.type.primitive.UnsignedInteger;
 import com.serotonin.util.queue.ByteQueue;
 
 public class ChangeOfLifeSafety extends EventParameter {
+    private static final long serialVersionUID = 2568744221261483561L;
+
     public static final byte TYPE_ID = 8;
 
     private final UnsignedInteger timeDelay;

@@ -37,42 +37,44 @@ import com.serotonin.bacnet4j.type.primitive.UnsignedInteger;
 import com.serotonin.util.queue.ByteQueue;
 
 public class LogData extends BaseType {
+    private static final long serialVersionUID = -1976023645603339559L;
+
     public static Choice booleanElement(Boolean datum) {
         return new Choice(0, datum);
     }
-    
+
     public static Choice realElement(Real datum) {
         return new Choice(1, datum);
     }
-    
+
     public static Choice enumElement(Enumerated datum) {
         return new Choice(2, datum);
     }
-    
+
     public static Choice unsignedElement(UnsignedInteger datum) {
         return new Choice(3, datum);
     }
-    
+
     public static Choice signedElement(SignedInteger datum) {
         return new Choice(4, datum);
     }
-    
+
     public static Choice bitstringElement(BitString datum) {
         return new Choice(5, datum);
     }
-    
+
     public static Choice nullElement(Null datum) {
         return new Choice(6, datum);
     }
-    
+
     public static Choice failureElement(BACnetError datum) {
         return new Choice(7, datum);
     }
-    
+
     public static Choice anyElement(BaseType datum) {
         return new Choice(8, datum);
     }
-    
+
     private static List<Class<? extends Encodable>> classes;
     static {
         classes = new ArrayList<Class<? extends Encodable>>();
@@ -86,7 +88,7 @@ public class LogData extends BaseType {
         classes.add(BACnetError.class);
         classes.add(Encodable.class);
     }
-    
+
     private final LogStatus logStatus;
     private final SequenceOf<Choice> logData;
     private final Real timeChange;
@@ -96,7 +98,7 @@ public class LogData extends BaseType {
         this.logData = logData;
         this.timeChange = timeChange;
     }
-    
+
     @Override
     public void write(ByteQueue queue) {
         write(queue, logStatus, 0);
@@ -115,50 +117,50 @@ public class LogData extends BaseType {
     public Real getTimeChange() {
         return timeChange;
     }
-    
+
     public int getChoiceType(int indexBase1) {
         return logData.get(indexBase1).getContextId();
     }
-    
+
     public Boolean getBoolean(int indexBase1) {
-        return (Boolean)logData.get(indexBase1).getDatum();
+        return (Boolean) logData.get(indexBase1).getDatum();
     }
-    
+
     public Real getReal(int indexBase1) {
-        return (Real)logData.get(indexBase1).getDatum();
+        return (Real) logData.get(indexBase1).getDatum();
     }
-    
+
     public Enumerated getEnumerated(int indexBase1) {
-        return (Enumerated)logData.get(indexBase1).getDatum();
+        return (Enumerated) logData.get(indexBase1).getDatum();
     }
-    
+
     public UnsignedInteger getUnsignedInteger(int indexBase1) {
-        return (UnsignedInteger)logData.get(indexBase1).getDatum();
+        return (UnsignedInteger) logData.get(indexBase1).getDatum();
     }
-    
+
     public SignedInteger getSignedInteger(int indexBase1) {
-        return (SignedInteger)logData.get(indexBase1).getDatum();
+        return (SignedInteger) logData.get(indexBase1).getDatum();
     }
-    
+
     public BitString getBitString(int indexBase1) {
-        return (BitString)logData.get(indexBase1).getDatum();
+        return (BitString) logData.get(indexBase1).getDatum();
     }
-    
+
     public Null getNull(int indexBase1) {
-        return (Null)logData.get(indexBase1).getDatum();
+        return (Null) logData.get(indexBase1).getDatum();
     }
-    
+
     public BACnetError getBACnetError(int indexBase1) {
-        return (BACnetError)logData.get(indexBase1).getDatum();
+        return (BACnetError) logData.get(indexBase1).getDatum();
     }
-    
+
     public BaseType getAny(int indexBase1) {
-        return (BaseType)logData.get(indexBase1).getDatum();
+        return (BaseType) logData.get(indexBase1).getDatum();
     }
 
     public LogData(ByteQueue queue) throws BACnetException {
         logStatus = read(queue, LogStatus.class, 0);
-        logData = readSequenceOfChoice(queue,classes, 1);
+        logData = readSequenceOfChoice(queue, classes, 1);
         timeChange = read(queue, Real.class, 2);
     }
 

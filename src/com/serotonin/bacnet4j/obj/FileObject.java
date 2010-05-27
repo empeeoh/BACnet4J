@@ -27,20 +27,22 @@ import com.serotonin.io.StreamUtils;
  * @author Matthew Lohbihler
  */
 public class FileObject extends BACnetObject {
+    private static final long serialVersionUID = 1089963077847602732L;
+
     /**
      * The actual file that this object represents.
      */
     private final File file;
-    
+
     public FileObject(LocalDevice localDevice, ObjectIdentifier oid, File file, FileAccessMethod fileAccessMethod) {
         super(localDevice, oid);
         this.file = file;
-        
+
         if (file.isDirectory())
             throw new BACnetRuntimeException("File is a directory");
-        
+
         updateProperties();
-        
+
         try {
             setProperty(PropertyIdentifier.fileAccessMethod, fileAccessMethod);
         }
@@ -49,7 +51,7 @@ public class FileObject extends BACnetObject {
             throw new BACnetRuntimeException(e);
         }
     }
-    
+
     public void updateProperties() {
         try {
             // TODO this is only a snapshot. Property read methods need to be overridden to report real time values.
@@ -62,11 +64,11 @@ public class FileObject extends BACnetObject {
             throw new BACnetRuntimeException(e);
         }
     }
-    
+
     public long length() {
         return file.length();
     }
-    
+
     public OctetString readData(long start, long length) throws IOException {
         FileInputStream in = new FileInputStream(file);
         try {
@@ -79,7 +81,7 @@ public class FileObject extends BACnetObject {
             in.close();
         }
     }
-    
+
     public void writeData(long start, OctetString fileData) throws IOException {
         RandomAccessFile raf = new RandomAccessFile(file, "rw");
         try {
@@ -92,12 +94,12 @@ public class FileObject extends BACnetObject {
         finally {
             raf.close();
         }
-        
+
         updateProperties();
-    }    
-    
-//    
-//    public SequenceOf<OctetString> readRecords(int start, int length) throws IOException {
-//        
-//    }
+    }
+
+    //    
+    // public SequenceOf<OctetString> readRecords(int start, int length) throws IOException {
+    //        
+    // }
 }

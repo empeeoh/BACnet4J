@@ -27,6 +27,8 @@ import com.serotonin.bacnet4j.type.primitive.UnsignedInteger;
 import com.serotonin.util.queue.ByteQueue;
 
 public class UnsignedRange extends EventParameter {
+    private static final long serialVersionUID = 8057621493864254453L;
+
     public static final byte TYPE_ID = 11;
 
     private final UnsignedInteger timeDelay;

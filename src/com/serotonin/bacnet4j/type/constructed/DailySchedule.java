@@ -26,6 +26,7 @@ import com.serotonin.bacnet4j.exception.BACnetException;
 import com.serotonin.util.queue.ByteQueue;
 
 public class DailySchedule extends BaseType {
+    private static final long serialVersionUID = -8539541069909649459L;
     private final SequenceOf<TimeValue> daySchedule;
 
     public DailySchedule(SequenceOf<TimeValue> daySchedule) {
@@ -40,7 +41,7 @@ public class DailySchedule extends BaseType {
     public void write(ByteQueue queue) {
         write(queue, daySchedule, 0);
     }
-    
+
     public DailySchedule(ByteQueue queue) throws BACnetException {
         daySchedule = readSequenceOf(queue, TimeValue.class, 0);
     }

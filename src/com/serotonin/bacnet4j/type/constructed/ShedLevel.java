@@ -17,6 +17,7 @@ import com.serotonin.util.queue.ByteQueue;
  * @author Matthew Lohbihler
  */
 public class ShedLevel extends BaseType {
+    private static final long serialVersionUID = 8550443800962401306L;
     private static List<Class<? extends Encodable>> classes;
     static {
         classes = new ArrayList<Class<? extends Encodable>>();
@@ -24,7 +25,7 @@ public class ShedLevel extends BaseType {
         classes.add(UnsignedInteger.class);
         classes.add(Real.class);
     }
-    
+
     private final Choice choice;
 
     public ShedLevel(UnsignedInteger datum, boolean percent) {
@@ -42,19 +43,19 @@ public class ShedLevel extends BaseType {
     public void write(ByteQueue queue) {
         write(queue, choice);
     }
-    
+
     public UnsignedInteger getPercent() {
-        return (UnsignedInteger)choice.getDatum();
+        return (UnsignedInteger) choice.getDatum();
     }
 
     public UnsignedInteger getLevel() {
-        return (UnsignedInteger)choice.getDatum();
+        return (UnsignedInteger) choice.getDatum();
     }
 
     public Real getAmount() {
-        return (Real)choice.getDatum();
+        return (Real) choice.getDatum();
     }
-    
+
     public int getChoiceType() {
         return choice.getContextId();
     }

@@ -28,8 +28,9 @@ import com.serotonin.bacnet4j.type.constructed.ObjectPropertyReference;
 import com.serotonin.util.queue.ByteQueue;
 
 public class WritePropertyMultipleError extends BaseError {
+    private static final long serialVersionUID = 7893783677289456368L;
     private final ObjectPropertyReference firstFailedWriteAttempt;
-    
+
     public WritePropertyMultipleError(byte choice, BACnetError error, ObjectPropertyReference firstFailedWriteAttempt) {
         super(choice, error);
         this.firstFailedWriteAttempt = firstFailedWriteAttempt;
@@ -41,7 +42,7 @@ public class WritePropertyMultipleError extends BaseError {
         write(queue, error, 0);
         firstFailedWriteAttempt.write(queue, 1);
     }
-    
+
     WritePropertyMultipleError(byte choice, ByteQueue queue) throws BACnetException {
         super(choice, queue, 0);
         firstFailedWriteAttempt = read(queue, ObjectPropertyReference.class, 1);

@@ -32,10 +32,12 @@ import com.serotonin.bacnet4j.type.primitive.UnsignedInteger;
 import com.serotonin.util.queue.ByteQueue;
 
 public class GetEnrollmentSummaryAck extends AcknowledgementService {
+    private static final long serialVersionUID = 415671392143018598L;
+
     public static final byte TYPE_ID = 4;
-    
+
     private final SequenceOf<EnrollmentSummary> values;
-    
+
     public GetEnrollmentSummaryAck(SequenceOf<EnrollmentSummary> values) {
         this.values = values;
     }
@@ -49,7 +51,7 @@ public class GetEnrollmentSummaryAck extends AcknowledgementService {
     public void write(ByteQueue queue) {
         write(queue, values);
     }
-    
+
     GetEnrollmentSummaryAck(ByteQueue queue) throws BACnetException {
         values = readSequenceOf(queue, EnrollmentSummary.class);
     }
@@ -57,15 +59,17 @@ public class GetEnrollmentSummaryAck extends AcknowledgementService {
     public SequenceOf<EnrollmentSummary> getValues() {
         return values;
     }
-    
+
     public static class EnrollmentSummary extends BaseType {
+        private static final long serialVersionUID = 2268948228193727440L;
         private final ObjectIdentifier objectIdentifier;
         private final EventType eventType;
         private final EventState eventState;
         private final UnsignedInteger priority;
         private final UnsignedInteger notificationClass; // optional
-        
-        public EnrollmentSummary(ObjectIdentifier objectIdentifier, EventType eventType, EventState eventState, UnsignedInteger priority, UnsignedInteger notificationClass) {
+
+        public EnrollmentSummary(ObjectIdentifier objectIdentifier, EventType eventType, EventState eventState,
+                UnsignedInteger priority, UnsignedInteger notificationClass) {
             this.objectIdentifier = objectIdentifier;
             this.eventType = eventType;
             this.eventState = eventState;
@@ -81,7 +85,7 @@ public class GetEnrollmentSummaryAck extends AcknowledgementService {
             write(queue, priority);
             writeOptional(queue, notificationClass);
         }
-        
+
         public EnrollmentSummary(ByteQueue queue) throws BACnetException {
             objectIdentifier = read(queue, ObjectIdentifier.class);
             eventType = read(queue, EventType.class);
@@ -166,8 +170,7 @@ public class GetEnrollmentSummaryAck extends AcknowledgementService {
                 return false;
             return true;
         }
-        
-        
+
     }
 
     @Override

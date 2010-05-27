@@ -26,6 +26,7 @@ import com.serotonin.bacnet4j.type.primitive.Enumerated;
 import com.serotonin.util.queue.ByteQueue;
 
 public class LifeSafetyOperation extends Enumerated {
+    private static final long serialVersionUID = -8453182789389518551L;
     public static final LifeSafetyOperation none = new LifeSafetyOperation(0);
     public static final LifeSafetyOperation silence = new LifeSafetyOperation(1);
     public static final LifeSafetyOperation silenceAudible = new LifeSafetyOperation(2);
@@ -40,7 +41,7 @@ public class LifeSafetyOperation extends Enumerated {
     public LifeSafetyOperation(int value) {
         super(value);
     }
-    
+
     public LifeSafetyOperation(ByteQueue queue) {
         super(queue);
     }

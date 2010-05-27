@@ -36,72 +36,75 @@ import com.serotonin.bacnet4j.type.primitive.UnsignedInteger;
 import com.serotonin.util.queue.ByteQueue;
 
 public class Extended extends NotificationParameters {
+    private static final long serialVersionUID = 7986979868840729311L;
+
     public static final byte TYPE_ID = 9;
-    
+
     private final UnsignedInteger vendorId;
     private final UnsignedInteger extendedEventType;
     private final SequenceOf<Parameter> parameters;
-    
+
     public Extended(UnsignedInteger vendorId, UnsignedInteger extendedEventType, SequenceOf<Parameter> parameters) {
         this.vendorId = vendorId;
         this.extendedEventType = extendedEventType;
         this.parameters = parameters;
     }
-    
+
     @Override
     protected void writeImpl(ByteQueue queue) {
         write(queue, vendorId, 0);
         write(queue, extendedEventType, 1);
         write(queue, parameters, 2);
     }
-    
+
     public Extended(ByteQueue queue) throws BACnetException {
         vendorId = read(queue, UnsignedInteger.class, 0);
         extendedEventType = read(queue, UnsignedInteger.class, 1);
         parameters = readSequenceOf(queue, Parameter.class, 2);
     }
-    
+
     @Override
     protected int getTypeId() {
         return TYPE_ID;
     }
-    
+
     public static class Parameter extends BaseType {
+        private static final long serialVersionUID = 9016759459458667665L;
         private Primitive primitive;
         private DeviceObjectPropertyReference reference;
-        
+
         public Parameter(Null primitive) {
             this.primitive = primitive;
         }
-        
+
         public Parameter(Real primitive) {
             this.primitive = primitive;
         }
-        
+
         public Parameter(UnsignedInteger primitive) {
             this.primitive = primitive;
         }
-        
+
         public Parameter(com.serotonin.bacnet4j.type.primitive.Boolean primitive) {
             this.primitive = primitive;
         }
-        
+
         public Parameter(com.serotonin.bacnet4j.type.primitive.Double primitive) {
             this.primitive = primitive;
         }
-        
+
         public Parameter(OctetString primitive) {
             this.primitive = primitive;
         }
-        
+
         public Parameter(BitString primitive) {
             this.primitive = primitive;
         }
-        
+
         public Parameter(Enumerated primitive) {
             this.primitive = primitive;
         }
-        
+
         public Parameter(DeviceObjectPropertyReference reference) {
             this.reference = reference;
         }

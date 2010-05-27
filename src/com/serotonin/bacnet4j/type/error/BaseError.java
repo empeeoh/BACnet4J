@@ -28,25 +28,27 @@ import com.serotonin.bacnet4j.type.constructed.BaseType;
 import com.serotonin.util.queue.ByteQueue;
 
 public class BaseError extends BaseType {
+    private static final long serialVersionUID = 8363160647986011176L;
+
     public static BaseError createBaseError(ByteQueue queue) throws BACnetException {
         byte choice = queue.pop();
-        
+
         switch (choice) {
-        case 8 :
-        case 9 :
+        case 8:
+        case 9:
             return new ChangeListError(choice, queue);
-        case 10 :
+        case 10:
             return new CreateObjectError(choice, queue);
-        case 16 :
+        case 16:
             return new WritePropertyMultipleError(choice, queue);
-        case 18 :
+        case 18:
             return new ConfirmedPrivateTransferError(choice, queue);
-        case 22 :
+        case 22:
             return new VTCloseError(choice, queue);
         }
         return new BaseError(choice, queue);
     }
-    
+
     protected byte choice;
     protected BACnetError error;
 
@@ -54,28 +56,28 @@ public class BaseError extends BaseType {
         this.choice = choice;
         this.error = error;
     }
-    
+
     @Override
     public void write(ByteQueue queue) {
         queue.push(choice);
         write(queue, error);
     }
-    
+
     public BaseError(byte choice, ByteQueue queue) throws BACnetException {
         this.choice = choice;
         error = read(queue, BACnetError.class);
     }
-    
+
     public BaseError(byte choice, ByteQueue queue, int contextId) throws BACnetException {
         this.choice = choice;
         error = read(queue, BACnetError.class, contextId);
     }
-    
+
     @Override
     public String toString() {
-        return "choice="+ (choice & 0xff) +", "+ error;
+        return "choice=" + (choice & 0xff) + ", " + error;
     }
-    
+
     public BACnetError getError() {
         return error;
     }

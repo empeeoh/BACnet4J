@@ -11,6 +11,7 @@ import com.serotonin.util.queue.ByteQueue;
  * @author Matthew Lohbihler
  */
 public class DoorSecuredStatus extends Enumerated {
+    private static final long serialVersionUID = 7337105893343734773L;
     public static final DoorSecuredStatus secured = new DoorSecuredStatus(0);
     public static final DoorSecuredStatus unsecured = new DoorSecuredStatus(1);
     public static final DoorSecuredStatus unknown = new DoorSecuredStatus(2);
@@ -18,7 +19,7 @@ public class DoorSecuredStatus extends Enumerated {
     public DoorSecuredStatus(int value) {
         super(value);
     }
-    
+
     public DoorSecuredStatus(ByteQueue queue) {
         super(queue);
     }

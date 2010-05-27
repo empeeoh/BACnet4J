@@ -27,6 +27,8 @@ import com.serotonin.bacnet4j.type.primitive.UnsignedInteger;
 import com.serotonin.util.queue.ByteQueue;
 
 public class BufferReady extends EventParameter {
+    private static final long serialVersionUID = -6744922575783894743L;
+
     public static final byte TYPE_ID = 10;
 
     private final UnsignedInteger notificationThreshold;

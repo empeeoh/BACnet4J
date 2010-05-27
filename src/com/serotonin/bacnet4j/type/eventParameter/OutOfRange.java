@@ -28,6 +28,8 @@ import com.serotonin.bacnet4j.type.primitive.UnsignedInteger;
 import com.serotonin.util.queue.ByteQueue;
 
 public class OutOfRange extends EventParameter {
+    private static final long serialVersionUID = 6279370879628323322L;
+
     public static final byte TYPE_ID = 5;
 
     private final UnsignedInteger timeDelay;

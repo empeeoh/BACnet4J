@@ -37,6 +37,8 @@ import com.serotonin.bacnet4j.type.primitive.UnsignedInteger;
 import com.serotonin.util.queue.ByteQueue;
 
 public class ConfirmedPrivateTransferRequest extends ConfirmedRequestService {
+    private static final long serialVersionUID = 621779506703151368L;
+
     public static final Map<VendorServiceKey, SequenceDefinition> vendorServiceResolutions = new HashMap<VendorServiceKey, SequenceDefinition>();
 
     public static final byte TYPE_ID = 18;

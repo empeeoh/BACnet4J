@@ -28,11 +28,13 @@ import com.serotonin.bacnet4j.type.primitive.UnsignedInteger;
 import com.serotonin.util.queue.ByteQueue;
 
 public class VtDataAck extends AcknowledgementService {
+    private static final long serialVersionUID = -178402574862840705L;
+
     public static final byte TYPE_ID = 23;
-    
+
     private final Boolean allNewDataAccepted;
     private final UnsignedInteger acceptedOctetCount;
-    
+
     public VtDataAck(Boolean allNewDataAccepted, UnsignedInteger acceptedOctetCount) {
         this.allNewDataAccepted = allNewDataAccepted;
         this.acceptedOctetCount = acceptedOctetCount;
@@ -48,12 +50,12 @@ public class VtDataAck extends AcknowledgementService {
         write(queue, allNewDataAccepted, 0);
         writeOptional(queue, acceptedOctetCount, 1);
     }
-    
+
     VtDataAck(ByteQueue queue) throws BACnetException {
         allNewDataAccepted = read(queue, Boolean.class, 0);
         acceptedOctetCount = readOptional(queue, UnsignedInteger.class, 1);
     }
-    
+
     public Boolean getAllNewDataAccepted() {
         return allNewDataAccepted;
     }

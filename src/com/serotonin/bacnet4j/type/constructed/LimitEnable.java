@@ -26,8 +26,10 @@ import com.serotonin.bacnet4j.type.primitive.BitString;
 import com.serotonin.util.queue.ByteQueue;
 
 public class LimitEnable extends BitString {
+    private static final long serialVersionUID = -8754983228968085042L;
+
     public LimitEnable(boolean lowLimitEnable, boolean highLimitEnable) {
-        super(new boolean[] {lowLimitEnable, highLimitEnable});
+        super(new boolean[] { lowLimitEnable, highLimitEnable });
     }
 
     public LimitEnable(ByteQueue queue) {
@@ -37,7 +39,7 @@ public class LimitEnable extends BitString {
     public boolean isLowLimitEnable() {
         return getValue()[0];
     }
-    
+
     public boolean isHighLimitEnable() {
         return getValue()[1];
     }

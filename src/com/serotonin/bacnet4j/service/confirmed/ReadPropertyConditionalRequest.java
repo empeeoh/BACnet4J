@@ -39,12 +39,14 @@ import com.serotonin.bacnet4j.type.primitive.UnsignedInteger;
 import com.serotonin.util.queue.ByteQueue;
 
 public class ReadPropertyConditionalRequest extends ConfirmedRequestService {
+    private static final long serialVersionUID = 5502083051063390548L;
+
     public static final byte TYPE_ID = 13;
-    
+
     private final ObjectSelectionCriteria objectSelectionCriteria;
     private final SequenceOf<PropertyReference> listOfPropertyReferences;
-    
-    public ReadPropertyConditionalRequest(ObjectSelectionCriteria objectSelectionCriteria, 
+
+    public ReadPropertyConditionalRequest(ObjectSelectionCriteria objectSelectionCriteria,
             SequenceOf<PropertyReference> listOfPropertyReferences) {
         this.objectSelectionCriteria = objectSelectionCriteria;
         this.listOfPropertyReferences = listOfPropertyReferences;
@@ -54,10 +56,9 @@ public class ReadPropertyConditionalRequest extends ConfirmedRequestService {
     public byte getChoiceId() {
         return TYPE_ID;
     }
-    
+
     @Override
-    public AcknowledgementService handle(LocalDevice localDevice, Address from, Network network)
-            throws BACnetException {
+    public AcknowledgementService handle(LocalDevice localDevice, Address from, Network network) throws BACnetException {
         throw new NotImplementedException();
     }
 
@@ -66,17 +67,18 @@ public class ReadPropertyConditionalRequest extends ConfirmedRequestService {
         write(queue, objectSelectionCriteria, 0);
         writeOptional(queue, listOfPropertyReferences, 1);
     }
-    
+
     ReadPropertyConditionalRequest(ByteQueue queue) throws BACnetException {
         objectSelectionCriteria = read(queue, ObjectSelectionCriteria.class, 0);
         listOfPropertyReferences = readOptionalSequenceOf(queue, PropertyReference.class, 1);
     }
-    
+
     public static class ObjectSelectionCriteria extends BaseType {
+        private static final long serialVersionUID = 7736612332488174653L;
         private final SelectionLogic selectionLogic;
         private final SequenceOf<SelectionCriteria> listOfSelectionCriteria;
-        
-        public ObjectSelectionCriteria(SelectionLogic selectionLogic, 
+
+        public ObjectSelectionCriteria(SelectionLogic selectionLogic,
                 SequenceOf<SelectionCriteria> listOfSelectionCriteria) {
             this.selectionLogic = selectionLogic;
             this.listOfSelectionCriteria = listOfSelectionCriteria;
@@ -87,13 +89,14 @@ public class ReadPropertyConditionalRequest extends ConfirmedRequestService {
             write(queue, selectionLogic, 0);
             writeOptional(queue, listOfSelectionCriteria, 1);
         }
-        
+
         public ObjectSelectionCriteria(ByteQueue queue) throws BACnetException {
             selectionLogic = read(queue, SelectionLogic.class, 0);
             listOfSelectionCriteria = readOptionalSequenceOf(queue, SelectionCriteria.class, 1);
         }
 
         public static class SelectionLogic extends Enumerated {
+            private static final long serialVersionUID = -2364163447254123848L;
             public static final SelectionLogic and = new SelectionLogic(0);
             public static final SelectionLogic or = new SelectionLogic(1);
             public static final SelectionLogic all = new SelectionLogic(2);
@@ -101,19 +104,20 @@ public class ReadPropertyConditionalRequest extends ConfirmedRequestService {
             private SelectionLogic(int value) {
                 super(value);
             }
-            
+
             public SelectionLogic(ByteQueue queue) {
                 super(queue);
             }
         }
-        
+
         public static class SelectionCriteria extends BaseType {
+            private static final long serialVersionUID = 5715604510097038002L;
             private final PropertyIdentifier propertyIdentifier;
             private final UnsignedInteger propertyArrayIndex;
             private final RelationSpecifier relationSpecifier;
             private final Encodable comparisonValue;
 
-            public SelectionCriteria(PropertyIdentifier propertyIdentifier, UnsignedInteger propertyArrayIndex, 
+            public SelectionCriteria(PropertyIdentifier propertyIdentifier, UnsignedInteger propertyArrayIndex,
                     RelationSpecifier relationSpecifier, Encodable comparisonValue) {
                 this.propertyIdentifier = propertyIdentifier;
                 this.propertyArrayIndex = propertyArrayIndex;
@@ -128,7 +132,7 @@ public class ReadPropertyConditionalRequest extends ConfirmedRequestService {
                 write(queue, relationSpecifier, 2);
                 writeEncodable(queue, comparisonValue, 3);
             }
-            
+
             public SelectionCriteria(ByteQueue queue) throws BACnetException {
                 propertyIdentifier = read(queue, PropertyIdentifier.class, 0);
                 propertyArrayIndex = readOptional(queue, UnsignedInteger.class, 1);
@@ -137,17 +141,18 @@ public class ReadPropertyConditionalRequest extends ConfirmedRequestService {
             }
 
             public static class RelationSpecifier extends Enumerated {
+                private static final long serialVersionUID = -1;
                 public static final RelationSpecifier equal = new RelationSpecifier(0);
                 public static final RelationSpecifier notEqual = new RelationSpecifier(1);
                 public static final RelationSpecifier lessThan = new RelationSpecifier(2);
                 public static final RelationSpecifier greaterThan = new RelationSpecifier(3);
                 public static final RelationSpecifier lessThanOrEqual = new RelationSpecifier(4);
                 public static final RelationSpecifier greaterThanOrEqual = new RelationSpecifier(5);
-                
+
                 private RelationSpecifier(int value) {
                     super(value);
                 }
-                
+
                 public RelationSpecifier(ByteQueue queue) {
                     super(queue);
                 }

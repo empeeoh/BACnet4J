@@ -32,14 +32,16 @@ import com.serotonin.bacnet4j.type.primitive.ObjectIdentifier;
 import com.serotonin.util.queue.ByteQueue;
 
 public class RequestKeyRequest extends ConfirmedRequestService {
+    private static final long serialVersionUID = 6550270345275044608L;
+
     public static final byte TYPE_ID = 25;
-    
+
     private final ObjectIdentifier requestingDeviceIdentifier;
     private final Address requestingDeviceAddress;
     private final ObjectIdentifier remoteDeviceIdentifier;
     private final Address remoteDeviceAddress;
-    
-    public RequestKeyRequest(ObjectIdentifier requestingDeviceIdentifier, Address requestingDeviceAddress, 
+
+    public RequestKeyRequest(ObjectIdentifier requestingDeviceIdentifier, Address requestingDeviceAddress,
             ObjectIdentifier remoteDeviceIdentifier, Address remoteDeviceAddress) {
         this.requestingDeviceIdentifier = requestingDeviceIdentifier;
         this.requestingDeviceAddress = requestingDeviceAddress;
@@ -59,7 +61,7 @@ public class RequestKeyRequest extends ConfirmedRequestService {
         write(queue, remoteDeviceIdentifier);
         write(queue, remoteDeviceAddress);
     }
-    
+
     RequestKeyRequest(ByteQueue queue) throws BACnetException {
         requestingDeviceIdentifier = read(queue, ObjectIdentifier.class);
         requestingDeviceAddress = read(queue, Address.class);
@@ -68,8 +70,7 @@ public class RequestKeyRequest extends ConfirmedRequestService {
     }
 
     @Override
-    public AcknowledgementService handle(LocalDevice localDevice, Address from, Network network)
-            throws BACnetException {
+    public AcknowledgementService handle(LocalDevice localDevice, Address from, Network network) throws BACnetException {
         throw new NotImplementedException();
     }
 

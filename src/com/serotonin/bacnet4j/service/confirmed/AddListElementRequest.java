@@ -45,14 +45,16 @@ import com.serotonin.bacnet4j.type.primitive.UnsignedInteger;
 import com.serotonin.util.queue.ByteQueue;
 
 public class AddListElementRequest extends ConfirmedRequestService {
+    private static final long serialVersionUID = 6984164609601014611L;
+
     public static final byte TYPE_ID = 8;
-    
+
     private final ObjectIdentifier objectIdentifier;
     private final PropertyIdentifier propertyIdentifier;
     private final UnsignedInteger propertyArrayIndex;
     private final SequenceOf<? extends Encodable> listOfElements;
-    
-    public AddListElementRequest(ObjectIdentifier objectIdentifier, PropertyIdentifier propertyIdentifier, 
+
+    public AddListElementRequest(ObjectIdentifier objectIdentifier, PropertyIdentifier propertyIdentifier,
             UnsignedInteger propertyArrayIndex, SequenceOf<? extends Encodable> listOfElements) {
         this.objectIdentifier = objectIdentifier;
         this.propertyIdentifier = propertyIdentifier;
@@ -64,15 +66,14 @@ public class AddListElementRequest extends ConfirmedRequestService {
     public byte getChoiceId() {
         return TYPE_ID;
     }
-    
+
     @SuppressWarnings("unchecked")
     @Override
-    public AcknowledgementService handle(LocalDevice localDevice, Address from, Network network)
-            throws BACnetException {
+    public AcknowledgementService handle(LocalDevice localDevice, Address from, Network network) throws BACnetException {
         BACnetObject obj = localDevice.getObject(objectIdentifier);
         if (obj == null)
             throw createException(ErrorClass.property, ErrorCode.writeAccessDenied, new UnsignedInteger(1));
-        
+
         Encodable e;
         try {
             e = obj.getProperty(propertyIdentifier, propertyArrayIndex);
@@ -82,28 +83,28 @@ public class AddListElementRequest extends ConfirmedRequestService {
         }
         if (!(e instanceof SequenceOf<?>))
             throw createException(ErrorClass.property, ErrorCode.propertyIsNotAnArray, new UnsignedInteger(1));
-        
-        SequenceOf<Encodable> propList = (SequenceOf<Encodable>)e;
-        
+
+        SequenceOf<Encodable> propList = (SequenceOf<Encodable>) e;
+
         PropertyValue pv = new PropertyValue(propertyIdentifier, propertyArrayIndex, listOfElements, null);
         if (localDevice.getEventHandler().checkAllowPropertyWrite(obj, pv)) {
             for (Encodable pr : listOfElements) {
                 if (!propList.contains(pr))
                     propList.add(pr);
             }
-            
+
             localDevice.getEventHandler().propertyWritten(obj, pv);
         }
         else
             throw createException(ErrorClass.property, ErrorCode.writeAccessDenied, new UnsignedInteger(1));
-        
+
         return null;
     }
-    
+
     private BACnetErrorException createException(ErrorClass errorClass, ErrorCode errorCode,
             UnsignedInteger firstFailedElementNumber) {
-        return new BACnetErrorException(new ChangeListError(getChoiceId(),
-                new BACnetError(errorClass, errorCode), firstFailedElementNumber));
+        return new BACnetErrorException(new ChangeListError(getChoiceId(), new BACnetError(errorClass, errorCode),
+                firstFailedElementNumber));
     }
 
     @Override
@@ -113,16 +114,16 @@ public class AddListElementRequest extends ConfirmedRequestService {
         writeOptional(queue, propertyArrayIndex, 2);
         writeEncodable(queue, listOfElements, 3);
     }
-    
+
     AddListElementRequest(ByteQueue queue) throws BACnetException {
         objectIdentifier = read(queue, ObjectIdentifier.class, 0);
         propertyIdentifier = read(queue, PropertyIdentifier.class, 1);
         propertyArrayIndex = readOptional(queue, UnsignedInteger.class, 2);
-        PropertyTypeDefinition def = ObjectProperties.getPropertyTypeDefinition(
-                objectIdentifier.getObjectType(), propertyIdentifier);
+        PropertyTypeDefinition def = ObjectProperties.getPropertyTypeDefinition(objectIdentifier.getObjectType(),
+                propertyIdentifier);
         listOfElements = readSequenceOf(queue, def.getClazz(), 3);
-//        listOfElements = readEncodable(queue, objectIdentifier.getObjectType(), propertyIdentifier,
-//                propertyArrayIndex, 3);
+        // listOfElements = readEncodable(queue, objectIdentifier.getObjectType(), propertyIdentifier,
+        // propertyArrayIndex, 3);
     }
 
     @Override

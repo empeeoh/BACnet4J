@@ -38,6 +38,8 @@ import com.serotonin.bacnet4j.type.primitive.UnsignedInteger;
 import com.serotonin.util.queue.ByteQueue;
 
 public class UnconfirmedTextMessageRequest extends UnconfirmedRequestService {
+    private static final long serialVersionUID = 1555323189158421374L;
+
     public static final byte TYPE_ID = 5;
 
     private static List<Class<? extends Encodable>> classes;

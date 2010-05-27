@@ -47,6 +47,8 @@ import com.serotonin.bacnet4j.type.primitive.UnsignedInteger;
 import com.serotonin.util.queue.ByteQueue;
 
 public class AtomicWriteFileRequest extends ConfirmedRequestService {
+    private static final long serialVersionUID = 2426317127743066428L;
+
     public static final byte TYPE_ID = 7;
 
     private final ObjectIdentifier fileIdentifier;

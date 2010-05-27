@@ -36,14 +36,15 @@ import com.serotonin.bacnet4j.type.primitive.UnsignedInteger;
 import com.serotonin.util.queue.ByteQueue;
 
 public class GetEnrollmentSummaryRequest extends ConfirmedRequestService {
+    private static final long serialVersionUID = -6947534972488875567L;
     public static final byte TYPE_ID = 4;
-    
+
     public interface AcknowledgmentFilters {
         int all = 0;
         int acked = 1;
         int notAcked = 2;
     }
-    
+
     public interface EventStateFilter {
         int offnormal = 0;
         int fault = 1;
@@ -51,16 +52,16 @@ public class GetEnrollmentSummaryRequest extends ConfirmedRequestService {
         int all = 3;
         int active = 4;
     }
-    
-    private final Enumerated acknowledgmentFilter;  // 0
-    private final RecipientProcess enrollmentFilter;  // 1 optional
-    private final Enumerated eventStateFilter;  // 2 optional
-    private final EventType eventTypeFilter;  // 3 optional
-    private final PriorityFilter priorityFilter;  // 4 optional
-    private final UnsignedInteger notificationClassFilter;  // 5 optional
-    
-    public GetEnrollmentSummaryRequest(Enumerated acknowledgmentFilter, RecipientProcess enrollmentFilter, 
-            Enumerated eventStateFilter, EventType eventTypeFilter, PriorityFilter priorityFilter, 
+
+    private final Enumerated acknowledgmentFilter; // 0
+    private final RecipientProcess enrollmentFilter; // 1 optional
+    private final Enumerated eventStateFilter; // 2 optional
+    private final EventType eventTypeFilter; // 3 optional
+    private final PriorityFilter priorityFilter; // 4 optional
+    private final UnsignedInteger notificationClassFilter; // 5 optional
+
+    public GetEnrollmentSummaryRequest(Enumerated acknowledgmentFilter, RecipientProcess enrollmentFilter,
+            Enumerated eventStateFilter, EventType eventTypeFilter, PriorityFilter priorityFilter,
             UnsignedInteger notificationClassFilter) {
         this.acknowledgmentFilter = acknowledgmentFilter;
         this.enrollmentFilter = enrollmentFilter;
@@ -76,8 +77,7 @@ public class GetEnrollmentSummaryRequest extends ConfirmedRequestService {
     }
 
     @Override
-    public AcknowledgementService handle(LocalDevice localDevice, Address from, Network network)
-            throws BACnetException {
+    public AcknowledgementService handle(LocalDevice localDevice, Address from, Network network) throws BACnetException {
         throw new NotImplementedException();
     }
 
@@ -90,7 +90,7 @@ public class GetEnrollmentSummaryRequest extends ConfirmedRequestService {
         writeOptional(queue, priorityFilter, 4);
         writeOptional(queue, notificationClassFilter, 5);
     }
-    
+
     GetEnrollmentSummaryRequest(ByteQueue queue) throws BACnetException {
         acknowledgmentFilter = read(queue, Enumerated.class, 0);
         enrollmentFilter = readOptional(queue, RecipientProcess.class, 1);
@@ -99,11 +99,12 @@ public class GetEnrollmentSummaryRequest extends ConfirmedRequestService {
         priorityFilter = readOptional(queue, PriorityFilter.class, 4);
         notificationClassFilter = readOptional(queue, UnsignedInteger.class, 5);
     }
-    
+
     public static class PriorityFilter extends BaseType {
+        private static final long serialVersionUID = 5900940972459086689L;
         private final UnsignedInteger minPriority;
         private final UnsignedInteger maxPriority;
-        
+
         public PriorityFilter(UnsignedInteger minPriority, UnsignedInteger maxPriority) {
             this.minPriority = minPriority;
             this.maxPriority = maxPriority;
@@ -114,7 +115,7 @@ public class GetEnrollmentSummaryRequest extends ConfirmedRequestService {
             minPriority.write(queue, 0);
             maxPriority.write(queue, 1);
         }
-        
+
         public PriorityFilter(ByteQueue queue) throws BACnetException {
             minPriority = read(queue, UnsignedInteger.class, 0);
             maxPriority = read(queue, UnsignedInteger.class, 1);

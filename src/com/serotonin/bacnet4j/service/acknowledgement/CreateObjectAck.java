@@ -27,10 +27,12 @@ import com.serotonin.bacnet4j.type.primitive.ObjectIdentifier;
 import com.serotonin.util.queue.ByteQueue;
 
 public class CreateObjectAck extends AcknowledgementService {
+    private static final long serialVersionUID = -4870461712919333717L;
+
     public static final byte TYPE_ID = 10;
-    
+
     private final ObjectIdentifier objectIdentifier;
-    
+
     public CreateObjectAck(ObjectIdentifier objectIdentifier) {
         this.objectIdentifier = objectIdentifier;
     }
@@ -39,7 +41,7 @@ public class CreateObjectAck extends AcknowledgementService {
     public byte getChoiceId() {
         return TYPE_ID;
     }
-    
+
     public ObjectIdentifier getObjectIdentifier() {
         return objectIdentifier;
     }
@@ -48,14 +50,14 @@ public class CreateObjectAck extends AcknowledgementService {
     public void write(ByteQueue queue) {
         write(queue, objectIdentifier);
     }
-    
+
     CreateObjectAck(ByteQueue queue) throws BACnetException {
         objectIdentifier = read(queue, ObjectIdentifier.class);
     }
-    
+
     @Override
     public String toString() {
-        return "CreateObjectAck("+ objectIdentifier +")";
+        return "CreateObjectAck(" + objectIdentifier + ")";
     }
 
     @Override

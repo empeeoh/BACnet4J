@@ -30,20 +30,23 @@ import com.serotonin.bacnet4j.type.enumerated.LifeSafetyState;
 import com.serotonin.util.queue.ByteQueue;
 
 public class ChangeOfLifeSafety extends NotificationParameters {
+    private static final long serialVersionUID = -3145779272869271053L;
+
     public static final byte TYPE_ID = 8;
-  
+
     private final LifeSafetyState newState;
     private final LifeSafetyMode newMode;
     private final StatusFlags statusFlags;
     private final LifeSafetyOperation operationExpected;
-    
-    public ChangeOfLifeSafety(LifeSafetyState newState, LifeSafetyMode newMode, StatusFlags statusFlags, LifeSafetyOperation operationExpected) {
+
+    public ChangeOfLifeSafety(LifeSafetyState newState, LifeSafetyMode newMode, StatusFlags statusFlags,
+            LifeSafetyOperation operationExpected) {
         this.newState = newState;
         this.newMode = newMode;
         this.statusFlags = statusFlags;
         this.operationExpected = operationExpected;
     }
-    
+
     @Override
     protected void writeImpl(ByteQueue queue) {
         write(queue, newState, 0);
@@ -51,14 +54,14 @@ public class ChangeOfLifeSafety extends NotificationParameters {
         write(queue, newMode, 2);
         write(queue, operationExpected, 3);
     }
-    
+
     public ChangeOfLifeSafety(ByteQueue queue) throws BACnetException {
         newState = read(queue, LifeSafetyState.class, 0);
         newMode = read(queue, LifeSafetyMode.class, 1);
         statusFlags = read(queue, StatusFlags.class, 2);
         operationExpected = read(queue, LifeSafetyOperation.class, 3);
     }
-    
+
     @Override
     protected int getTypeId() {
         return TYPE_ID;

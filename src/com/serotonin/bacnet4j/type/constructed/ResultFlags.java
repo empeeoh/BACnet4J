@@ -26,8 +26,10 @@ import com.serotonin.bacnet4j.type.primitive.BitString;
 import com.serotonin.util.queue.ByteQueue;
 
 public class ResultFlags extends BitString {
+    private static final long serialVersionUID = 7657134249555371620L;
+
     public ResultFlags(boolean firstItem, boolean lastItem, boolean moreItems) {
-        super(new boolean[] {firstItem, lastItem, moreItems});
+        super(new boolean[] { firstItem, lastItem, moreItems });
     }
 
     public ResultFlags(ByteQueue queue) {
@@ -37,11 +39,11 @@ public class ResultFlags extends BitString {
     public boolean isFirstItem() {
         return getValue()[0];
     }
-    
+
     public boolean isLastItem() {
         return getValue()[1];
     }
-    
+
     public boolean isMoreItems() {
         return getValue()[2];
     }

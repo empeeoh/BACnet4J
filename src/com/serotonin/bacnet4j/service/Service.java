@@ -25,5 +25,7 @@ package com.serotonin.bacnet4j.service;
 import com.serotonin.bacnet4j.type.constructed.BaseType;
 
 abstract public class Service extends BaseType {
+    private static final long serialVersionUID = 6310521953905282247L;
+
     abstract public byte getChoiceId();
 }

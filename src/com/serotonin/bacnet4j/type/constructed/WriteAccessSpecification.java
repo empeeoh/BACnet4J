@@ -28,9 +28,10 @@ import com.serotonin.bacnet4j.type.primitive.ObjectIdentifier;
 import com.serotonin.util.queue.ByteQueue;
 
 public class WriteAccessSpecification extends BaseType {
+    private static final long serialVersionUID = -676251352183146270L;
     private final ObjectIdentifier objectIdentifier;
     private final SequenceOf<PropertyValue> listOfProperties;
-    
+
     public WriteAccessSpecification(ObjectIdentifier objectIdentifier, SequenceOf<PropertyValue> listOfProperties) {
         this.objectIdentifier = objectIdentifier;
         this.listOfProperties = listOfProperties;
@@ -41,7 +42,7 @@ public class WriteAccessSpecification extends BaseType {
         write(queue, objectIdentifier, 0);
         write(queue, listOfProperties, 1);
     }
-    
+
     public WriteAccessSpecification(ByteQueue queue) throws BACnetException {
         objectIdentifier = read(queue, ObjectIdentifier.class, 0);
         ThreadLocalObjectType.set(objectIdentifier.getObjectType());

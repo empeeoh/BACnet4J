@@ -30,14 +30,16 @@ import com.serotonin.bacnet4j.type.primitive.UnsignedInteger;
 import com.serotonin.util.queue.ByteQueue;
 
 public class ReadPropertyAck extends AcknowledgementService {
+    private static final long serialVersionUID = -2645125939312830968L;
+
     public static final byte TYPE_ID = 12;
-    
+
     private final ObjectIdentifier eventObjectIdentifier;
     private final PropertyIdentifier propertyIdentifier;
     private final UnsignedInteger propertyArrayIndex;
     private final Encodable value;
-    
-    public ReadPropertyAck(ObjectIdentifier eventObjectIdentifier, PropertyIdentifier propertyIdentifier, 
+
+    public ReadPropertyAck(ObjectIdentifier eventObjectIdentifier, PropertyIdentifier propertyIdentifier,
             UnsignedInteger propertyArrayIndex, Encodable value) {
         this.eventObjectIdentifier = eventObjectIdentifier;
         this.propertyIdentifier = propertyIdentifier;
@@ -52,9 +54,9 @@ public class ReadPropertyAck extends AcknowledgementService {
 
     @Override
     public String toString() {
-        return "ReadPropertyAck("+ value +")";
+        return "ReadPropertyAck(" + value + ")";
     }
-    
+
     public ObjectIdentifier getEventObjectIdentifier() {
         return eventObjectIdentifier;
     }
@@ -78,7 +80,7 @@ public class ReadPropertyAck extends AcknowledgementService {
         writeOptional(queue, propertyArrayIndex, 2);
         writeEncodable(queue, value, 3);
     }
-    
+
     ReadPropertyAck(ByteQueue queue) throws BACnetException {
         eventObjectIdentifier = read(queue, ObjectIdentifier.class, 0);
         propertyIdentifier = read(queue, PropertyIdentifier.class, 1);

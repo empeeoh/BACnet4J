@@ -26,6 +26,8 @@ import com.serotonin.bacnet4j.type.primitive.BitString;
 import com.serotonin.util.queue.ByteQueue;
 
 public class ObjectTypesSupported extends BitString {
+    private static final long serialVersionUID = 4916909530588071979L;
+
     public ObjectTypesSupported() {
         super(new boolean[31]);
     }
@@ -201,7 +203,7 @@ public class ObjectTypesSupported extends BitString {
     public void setTrendLog(boolean trendLog) {
         getValue()[20] = trendLog;
     }
-    
+
     public boolean isLifeSafetyPoint() {
         return getValue()[21];
     }
@@ -233,43 +235,43 @@ public class ObjectTypesSupported extends BitString {
     public void setPulseConverter(boolean pulseConverter) {
         getValue()[24] = pulseConverter;
     }
-    
+
     public boolean isEventLog() {
         return getValue()[25];
     }
-    
+
     public void setEventLog(boolean eventLog) {
         getValue()[25] = eventLog;
     }
-    
+
     public boolean isTrendLogMultiple() {
         return getValue()[27];
     }
-    
+
     public void setTrendLogMultiple(boolean trendLogMultiple) {
         getValue()[27] = trendLogMultiple;
     }
-    
+
     public boolean isLoadControl() {
         return getValue()[28];
     }
-    
+
     public void setLoadControl(boolean loadControl) {
         getValue()[28] = loadControl;
     }
-    
+
     public boolean isStructuredView() {
         return getValue()[29];
     }
-    
+
     public void setStructuredView(boolean structuredView) {
         getValue()[29] = structuredView;
     }
-    
+
     public boolean isAccessDoor() {
         return getValue()[30];
     }
-    
+
     public void setAccessDoor(boolean accessDoor) {
         getValue()[30] = accessDoor;
     }

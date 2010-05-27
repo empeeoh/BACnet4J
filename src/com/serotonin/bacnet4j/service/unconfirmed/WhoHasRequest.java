@@ -39,6 +39,8 @@ import com.serotonin.bacnet4j.type.primitive.UnsignedInteger;
 import com.serotonin.util.queue.ByteQueue;
 
 public class WhoHasRequest extends UnconfirmedRequestService {
+    private static final long serialVersionUID = -3261764708955375488L;
+
     public static final byte TYPE_ID = 7;
 
     private static List<Class<? extends Encodable>> classes;
@@ -112,6 +114,7 @@ public class WhoHasRequest extends UnconfirmedRequestService {
     }
 
     public static class Limits extends BaseType {
+        private static final long serialVersionUID = -2736168226229323897L;
         private UnsignedInteger deviceInstanceRangeLowLimit;
         private UnsignedInteger deviceInstanceRangeHighLimit;
 

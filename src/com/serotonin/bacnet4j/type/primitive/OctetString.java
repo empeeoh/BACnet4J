@@ -28,6 +28,8 @@ import com.serotonin.util.ArrayUtils;
 import com.serotonin.util.queue.ByteQueue;
 
 public class OctetString extends Primitive {
+    private static final long serialVersionUID = -3557657941142811228L;
+
     public static final byte TYPE_ID = 6;
 
     private final byte[] value;

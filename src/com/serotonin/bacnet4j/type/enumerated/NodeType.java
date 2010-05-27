@@ -11,6 +11,7 @@ import com.serotonin.util.queue.ByteQueue;
  * @author Matthew Lohbihler
  */
 public class NodeType extends Enumerated {
+    private static final long serialVersionUID = -1462203629019212150L;
     public static final NodeType unknown = new NodeType(0);
     public static final NodeType system = new NodeType(1);
     public static final NodeType network = new NodeType(2);
@@ -27,7 +28,7 @@ public class NodeType extends Enumerated {
     public NodeType(int value) {
         super(value);
     }
-    
+
     public NodeType(ByteQueue queue) {
         super(queue);
     }

@@ -26,18 +26,20 @@ import com.serotonin.bacnet4j.base.BACnetUtils;
 import com.serotonin.util.queue.ByteQueue;
 
 public class Real extends Primitive {
+    private static final long serialVersionUID = -165304995181723832L;
+
     public static final byte TYPE_ID = 4;
-    
+
     private final float value;
-    
+
     public Real(float value) {
         this.value = value;
     }
-    
+
     public float floatValue() {
         return value;
     }
-    
+
     //
     // Reading and writing
     //
@@ -45,7 +47,7 @@ public class Real extends Primitive {
         readTag(queue);
         value = Float.intBitsToFloat(BACnetUtils.popInt(queue));
     }
-    
+
     @Override
     public void writeImpl(ByteQueue queue) {
         BACnetUtils.pushInt(queue, Float.floatToIntBits(value));
@@ -82,7 +84,7 @@ public class Real extends Primitive {
             return false;
         return true;
     }
-    
+
     @Override
     public String toString() {
         return Float.toString(value);

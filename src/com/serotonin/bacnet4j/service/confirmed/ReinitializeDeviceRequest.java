@@ -36,6 +36,8 @@ import com.serotonin.util.StringUtils;
 import com.serotonin.util.queue.ByteQueue;
 
 public class ReinitializeDeviceRequest extends ConfirmedRequestService {
+    private static final long serialVersionUID = -1121790418202250804L;
+
     public static final byte TYPE_ID = 20;
 
     private final ReinitializedStateOfDevice reinitializedStateOfDevice;
@@ -63,6 +65,7 @@ public class ReinitializeDeviceRequest extends ConfirmedRequestService {
     }
 
     public static class ReinitializedStateOfDevice extends Enumerated {
+        private static final long serialVersionUID = -819543984468869678L;
         public static final ReinitializedStateOfDevice coldstart = new ReinitializedStateOfDevice(0);
         public static final ReinitializedStateOfDevice warmstart = new ReinitializedStateOfDevice(1);
         public static final ReinitializedStateOfDevice startbackup = new ReinitializedStateOfDevice(2);

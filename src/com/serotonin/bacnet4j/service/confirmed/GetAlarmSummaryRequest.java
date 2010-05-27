@@ -31,20 +31,20 @@ import com.serotonin.bacnet4j.type.constructed.Address;
 import com.serotonin.util.queue.ByteQueue;
 
 public class GetAlarmSummaryRequest extends ConfirmedRequestService {
+    private static final long serialVersionUID = 7026623260581737268L;
     public static final byte TYPE_ID = 3;
-    
+
     @Override
     public byte getChoiceId() {
         return TYPE_ID;
     }
-    
+
     public GetAlarmSummaryRequest() {
         // no op
     }
 
     @Override
-    public AcknowledgementService handle(LocalDevice localDevice, Address from, Network network)
-            throws BACnetException {
+    public AcknowledgementService handle(LocalDevice localDevice, Address from, Network network) throws BACnetException {
         throw new NotImplementedException();
     }
 
@@ -52,11 +52,11 @@ public class GetAlarmSummaryRequest extends ConfirmedRequestService {
     public void write(ByteQueue queue) {
         // no op
     }
-    
-    GetAlarmSummaryRequest(@SuppressWarnings("unused")ByteQueue queue) {
+
+    GetAlarmSummaryRequest(@SuppressWarnings("unused") ByteQueue queue) {
         // no op
     }
-    
+
     @Override
     public boolean equals(Object obj) {
         if (this == obj)

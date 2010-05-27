@@ -31,11 +31,13 @@ import com.serotonin.bacnet4j.type.primitive.UnsignedInteger;
 import com.serotonin.util.queue.ByteQueue;
 
 public class WhoIsRequest extends UnconfirmedRequestService {
+    private static final long serialVersionUID = 4853007370475322913L;
+
     public static final byte TYPE_ID = 8;
-    
+
     private UnsignedInteger deviceInstanceRangeLowLimit;
     private UnsignedInteger deviceInstanceRangeHighLimit;
-    
+
     public WhoIsRequest() {
         // no op
     }
@@ -53,14 +55,14 @@ public class WhoIsRequest extends UnconfirmedRequestService {
     @Override
     public void handle(LocalDevice localDevice, Address from, Network network) throws BACnetException {
         BACnetObject local = localDevice.getConfiguration();
-        
+
         // Check if we're in the device id range.
         if (deviceInstanceRangeLowLimit != null && local.getInstanceId() < deviceInstanceRangeLowLimit.intValue())
             return;
-        
+
         if (deviceInstanceRangeHighLimit != null && local.getInstanceId() > deviceInstanceRangeHighLimit.intValue())
             return;
-        
+
         // Return the result in a i am message.
         IAmRequest iam = localDevice.getIAm();
         localDevice.sendUnconfirmed(from, network, iam);
@@ -71,7 +73,7 @@ public class WhoIsRequest extends UnconfirmedRequestService {
         writeOptional(queue, deviceInstanceRangeLowLimit, 0);
         writeOptional(queue, deviceInstanceRangeHighLimit, 1);
     }
-    
+
     WhoIsRequest(ByteQueue queue) throws BACnetException {
         deviceInstanceRangeLowLimit = readOptional(queue, UnsignedInteger.class, 0);
         deviceInstanceRangeHighLimit = readOptional(queue, UnsignedInteger.class, 1);
@@ -81,7 +83,8 @@ public class WhoIsRequest extends UnconfirmedRequestService {
     public int hashCode() {
         final int PRIME = 31;
         int result = 1;
-        result = PRIME * result + ((deviceInstanceRangeHighLimit == null) ? 0 : deviceInstanceRangeHighLimit.hashCode());
+        result = PRIME * result
+                + ((deviceInstanceRangeHighLimit == null) ? 0 : deviceInstanceRangeHighLimit.hashCode());
         result = PRIME * result + ((deviceInstanceRangeLowLimit == null) ? 0 : deviceInstanceRangeLowLimit.hashCode());
         return result;
     }

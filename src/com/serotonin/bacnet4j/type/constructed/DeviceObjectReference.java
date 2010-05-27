@@ -27,20 +27,21 @@ import com.serotonin.bacnet4j.type.primitive.ObjectIdentifier;
 import com.serotonin.util.queue.ByteQueue;
 
 public class DeviceObjectReference extends BaseType {
+    private static final long serialVersionUID = -8598474203699924153L;
     private final ObjectIdentifier deviceIdentifier;
     private final ObjectIdentifier objectIdentifier;
-    
+
     public DeviceObjectReference(ObjectIdentifier deviceIdentifier, ObjectIdentifier objectIdentifier) {
         this.deviceIdentifier = deviceIdentifier;
         this.objectIdentifier = objectIdentifier;
     }
-    
+
     @Override
     public void write(ByteQueue queue) {
         writeOptional(queue, deviceIdentifier, 0);
         write(queue, objectIdentifier, 1);
     }
-    
+
     public DeviceObjectReference(ByteQueue queue) throws BACnetException {
         deviceIdentifier = readOptional(queue, ObjectIdentifier.class, 0);
         objectIdentifier = read(queue, ObjectIdentifier.class, 1);

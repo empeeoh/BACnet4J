@@ -36,6 +36,7 @@ import com.serotonin.bacnet4j.type.primitive.Enumerated;
 import com.serotonin.util.queue.ByteQueue;
 
 public class EventType extends Enumerated {
+    private static final long serialVersionUID = -3342337624733065326L;
     public static final EventType changeOfBitstring = new EventType(ChangeOfBitString.TYPE_ID);
     public static final EventType changeOfState = new EventType(ChangeOfState.TYPE_ID);
     public static final EventType changeOfValue = new EventType(ChangeOfValue.TYPE_ID);
@@ -50,7 +51,7 @@ public class EventType extends Enumerated {
     public EventType(int value) {
         super(value);
     }
-    
+
     public EventType(ByteQueue queue) {
         super(queue);
     }

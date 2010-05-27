@@ -28,6 +28,8 @@ import com.serotonin.bacnet4j.type.primitive.Real;
 import com.serotonin.util.queue.ByteQueue;
 
 public class FloatingLimit extends NotificationParameters {
+    private static final long serialVersionUID = 7176330185332756654L;
+
     public static final byte TYPE_ID = 4;
 
     private final Real referenceValue;

@@ -34,17 +34,17 @@ import com.serotonin.bacnet4j.type.primitive.UnsignedInteger;
 import com.serotonin.util.queue.ByteQueue;
 
 public class ConfirmedPrivateTransferAck extends AcknowledgementService {
-    public static final Map<VendorServiceKey, SequenceDefinition> vendorServiceResolutions = 
-        new HashMap<VendorServiceKey, SequenceDefinition>();
-    
+    private static final long serialVersionUID = -2452028785449989142L;
+
+    public static final Map<VendorServiceKey, SequenceDefinition> vendorServiceResolutions = new HashMap<VendorServiceKey, SequenceDefinition>();
+
     public static final byte TYPE_ID = 18;
-    
+
     private final UnsignedInteger vendorId;
     private final UnsignedInteger serviceNumber;
     private final Encodable resultBlock;
-    
-    public ConfirmedPrivateTransferAck(UnsignedInteger vendorId, UnsignedInteger serviceNumber, 
-            BaseType resultBlock) {
+
+    public ConfirmedPrivateTransferAck(UnsignedInteger vendorId, UnsignedInteger serviceNumber, BaseType resultBlock) {
         this.vendorId = vendorId;
         this.serviceNumber = serviceNumber;
         this.resultBlock = resultBlock;
@@ -54,14 +54,14 @@ public class ConfirmedPrivateTransferAck extends AcknowledgementService {
     public byte getChoiceId() {
         return TYPE_ID;
     }
-    
+
     @Override
     public void write(ByteQueue queue) {
         write(queue, vendorId, 0);
         write(queue, serviceNumber, 1);
         writeOptional(queue, resultBlock, 2);
     }
-    
+
     ConfirmedPrivateTransferAck(ByteQueue queue) throws BACnetException {
         vendorId = read(queue, UnsignedInteger.class, 0);
         serviceNumber = read(queue, UnsignedInteger.class, 1);

@@ -26,6 +26,7 @@ import com.serotonin.bacnet4j.type.primitive.Enumerated;
 import com.serotonin.util.queue.ByteQueue;
 
 public class ErrorCode extends Enumerated {
+    private static final long serialVersionUID = -6627023845995429296L;
     public static final ErrorCode other = new ErrorCode(0);
     public static final ErrorCode authenticationFailed = new ErrorCode(1);
     public static final ErrorCode configurationInProgress = new ErrorCode(2);
@@ -105,15 +106,15 @@ public class ErrorCode extends Enumerated {
     public static final ErrorCode noPropertySpecified = new ErrorCode(77);
     public static final ErrorCode notConfiguredForTriggeredLogging = new ErrorCode(78);
     public static final ErrorCode communicationDisabled = new ErrorCode(83);
-    
+
     public ErrorCode(int value) {
         super(value);
     }
-    
+
     public ErrorCode(ByteQueue queue) {
         super(queue);
     }
-    
+
     @Override
     public String toString() {
         int type = intValue();
@@ -275,6 +276,6 @@ public class ErrorCode extends Enumerated {
             return "Not Configured For Triggered Logging";
         if (type == communicationDisabled.intValue())
             return "Communication Disabled";
-        return "Unknown: "+ type;
+        return "Unknown: " + type;
     }
 }

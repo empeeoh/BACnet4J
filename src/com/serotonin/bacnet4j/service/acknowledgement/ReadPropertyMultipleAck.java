@@ -28,10 +28,12 @@ import com.serotonin.bacnet4j.type.constructed.SequenceOf;
 import com.serotonin.util.queue.ByteQueue;
 
 public class ReadPropertyMultipleAck extends AcknowledgementService {
+    private static final long serialVersionUID = 5389362813511389512L;
+
     public static final byte TYPE_ID = 14;
-    
+
     private final SequenceOf<ReadAccessResult> listOfReadAccessResults;
-    
+
     public ReadPropertyMultipleAck(SequenceOf<ReadAccessResult> listOfReadAccessResults) {
         this.listOfReadAccessResults = listOfReadAccessResults;
     }
@@ -40,19 +42,19 @@ public class ReadPropertyMultipleAck extends AcknowledgementService {
     public byte getChoiceId() {
         return TYPE_ID;
     }
-    
+
     @Override
     public void write(ByteQueue queue) {
         write(queue, listOfReadAccessResults);
     }
-    
+
     ReadPropertyMultipleAck(ByteQueue queue) throws BACnetException {
         listOfReadAccessResults = readSequenceOf(queue, ReadAccessResult.class);
     }
 
     @Override
     public String toString() {
-        return "ReadPropertyMultipleAck("+ listOfReadAccessResults +")";
+        return "ReadPropertyMultipleAck(" + listOfReadAccessResults + ")";
     }
 
     public SequenceOf<ReadAccessResult> getListOfReadAccessResults() {

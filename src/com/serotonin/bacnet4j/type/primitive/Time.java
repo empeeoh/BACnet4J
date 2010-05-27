@@ -28,65 +28,68 @@ import java.util.GregorianCalendar;
 import com.serotonin.util.queue.ByteQueue;
 
 public class Time extends Primitive {
+    private static final long serialVersionUID = -5256831366663750858L;
+
     public static final byte TYPE_ID = 11;
-    
+
     private final int hour;
     private final int minute;
     private final int second;
     private final int hundredth;
-    
+
     public Time(int hour, int minute, int second, int hundredth) {
         this.hour = hour;
         this.minute = minute;
         this.second = second;
         this.hundredth = hundredth;
     }
-    
+
     public Time() {
         this(new GregorianCalendar());
     }
-    
+
     public Time(GregorianCalendar now) {
         this.hour = now.get(Calendar.HOUR_OF_DAY);
         this.minute = now.get(Calendar.MINUTE);
         this.second = now.get(Calendar.SECOND);
         this.hundredth = now.get(Calendar.MILLISECOND) / 10;
     }
-    
+
     public boolean isHourUnspecified() {
         return hour == 255;
     }
-    
+
     public int getHour() {
         return hour;
     }
-    
+
     public boolean isMinuteUnspecified() {
         return minute == 255;
     }
-    
+
     public int getMinute() {
         return minute;
     }
-    
+
     public boolean isSecondUnspecified() {
         return second == 255;
     }
-    
+
     public int getSecond() {
         return second;
     }
-    
+
     public boolean isHundredthUnspecified() {
         return hundredth == 255;
     }
-    
+
     public int getHundredth() {
         return hundredth;
     }
-    
+
     /**
-     * @param that The time with which to compare this
+     * @param that
+     *            The time with which to compare this
      * @return true if this < that.
      */
     public boolean before(Time that) {
@@ -96,29 +99,30 @@ public class Time extends Primitive {
             if (this.hour > that.hour)
                 return false;
         }
-        
+
         if (!this.isMinuteUnspecified() && !that.isMinuteUnspecified()) {
             if (this.minute < that.minute)
                 return true;
             if (this.minute > that.minute)
                 return false;
         }
-        
+
         if (!this.isSecondUnspecified() && !that.isSecondUnspecified()) {
             if (this.second < that.second)
                 return true;
             if (this.second > that.second)
                 return false;
         }
-        
+
         if (this.isHundredthUnspecified() || that.isHundredthUnspecified())
             return false;
-        
+
         return this.hundredth < that.hundredth;
     }
-    
+
     /**
-     * @param that The time with which to compare this
+     * @param that
+     *            The time with which to compare this
      * @return true if this >= that
      */
     public boolean after(Time that) {
@@ -128,27 +132,27 @@ public class Time extends Primitive {
             if (this.hour < that.hour)
                 return false;
         }
-        
+
         if (!this.isMinuteUnspecified() && !that.isMinuteUnspecified()) {
             if (this.minute > that.minute)
                 return true;
             if (this.minute < that.minute)
                 return false;
         }
-        
+
         if (!this.isSecondUnspecified() && !that.isSecondUnspecified()) {
             if (this.second > that.second)
                 return true;
             if (this.second < that.second)
                 return false;
         }
-        
+
         if (this.isHundredthUnspecified() || that.isHundredthUnspecified())
             return true;
-        
+
         return this.hundredth >= that.hundredth;
     }
-    
+
     //
     // Reading and writing
     //
@@ -159,13 +163,13 @@ public class Time extends Primitive {
         second = queue.popU1B();
         hundredth = queue.popU1B();
     }
-    
+
     @Override
     public void writeImpl(ByteQueue queue) {
-        queue.push((byte)hour);
-        queue.push((byte)minute);
-        queue.push((byte)second);
-        queue.push((byte)hundredth);
+        queue.push((byte) hour);
+        queue.push((byte) minute);
+        queue.push((byte) second);
+        queue.push((byte) hundredth);
     }
 
     @Override
@@ -208,10 +212,11 @@ public class Time extends Primitive {
             return false;
         return true;
     }
-    
+
     @Override
     public String toString() {
-        return Integer.toString(hour) +":"+ Integer.toString(minute) +":"+ Integer.toString(second) +"."+ hundredth;
+        return Integer.toString(hour) + ":" + Integer.toString(minute) + ":" + Integer.toString(second) + "."
+                + hundredth;
 
     }
 }

@@ -36,6 +36,8 @@ import com.serotonin.bacnet4j.type.primitive.UnsignedInteger;
 import com.serotonin.util.queue.ByteQueue;
 
 public class SubscribeCOVPropertyRequest extends ConfirmedRequestService {
+    private static final long serialVersionUID = -7867811158882313310L;
+
     public static final byte TYPE_ID = 28;
 
     private final UnsignedInteger subscriberProcessIdentifier;

@@ -26,6 +26,8 @@ import com.serotonin.bacnet4j.type.Encodable;
 import com.serotonin.util.queue.ByteQueue;
 
 abstract public class BaseType extends Encodable {
+    private static final long serialVersionUID = -2536344211247711774L;
+
     @Override
     public void write(ByteQueue queue, int contextId) {
         // Write a start tag

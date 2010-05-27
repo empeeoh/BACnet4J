@@ -28,11 +28,13 @@ import com.serotonin.bacnet4j.type.constructed.StatusFlags;
 import com.serotonin.util.queue.ByteQueue;
 
 public class ChangeOfState extends NotificationParameters {
+    private static final long serialVersionUID = -3581834332371728769L;
+
     public static final byte TYPE_ID = 1;
-    
+
     private final PropertyStates newState;
     private final StatusFlags statusFlags;
-    
+
     public ChangeOfState(PropertyStates newState, StatusFlags statusFlags) {
         this.newState = newState;
         this.statusFlags = statusFlags;
@@ -48,7 +50,7 @@ public class ChangeOfState extends NotificationParameters {
         newState = read(queue, PropertyStates.class, 0);
         statusFlags = read(queue, StatusFlags.class, 1);
     }
-    
+
     @Override
     protected int getTypeId() {
         return TYPE_ID;

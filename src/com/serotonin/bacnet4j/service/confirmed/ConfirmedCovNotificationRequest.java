@@ -35,6 +35,8 @@ import com.serotonin.bacnet4j.type.primitive.UnsignedInteger;
 import com.serotonin.util.queue.ByteQueue;
 
 public class ConfirmedCovNotificationRequest extends ConfirmedRequestService {
+    private static final long serialVersionUID = 3246652613921887403L;
+
     public static final byte TYPE_ID = 1;
 
     private final UnsignedInteger subscriberProcessIdentifier;

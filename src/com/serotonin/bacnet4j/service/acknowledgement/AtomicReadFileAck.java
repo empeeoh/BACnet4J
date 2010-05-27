@@ -34,14 +34,16 @@ import com.serotonin.bacnet4j.type.primitive.UnsignedInteger;
 import com.serotonin.util.queue.ByteQueue;
 
 public class AtomicReadFileAck extends AcknowledgementService {
+    private static final long serialVersionUID = 7850183659621947037L;
+
     public static final byte TYPE_ID = 6;
-    
+
     private final Boolean endOfFile;
     private final SignedInteger fileStartPosition;
     private final OctetString fileData;
     private final UnsignedInteger returnedRecordCount;
     private final SequenceOf<OctetString> fileRecordData;
-    
+
     public AtomicReadFileAck(Boolean endOfFile, SignedInteger fileStartPosition, OctetString fileData) {
         super();
         this.endOfFile = endOfFile;
@@ -51,7 +53,7 @@ public class AtomicReadFileAck extends AcknowledgementService {
         fileRecordData = null;
     }
 
-    public AtomicReadFileAck(Boolean endOfFile, SignedInteger fileStartPosition, UnsignedInteger returnedRecordCount, 
+    public AtomicReadFileAck(Boolean endOfFile, SignedInteger fileStartPosition, UnsignedInteger returnedRecordCount,
             SequenceOf<OctetString> fileRecordData) {
         super();
         this.endOfFile = endOfFile;
@@ -65,7 +67,7 @@ public class AtomicReadFileAck extends AcknowledgementService {
     public byte getChoiceId() {
         return TYPE_ID;
     }
-    
+
     @Override
     public void write(ByteQueue queue) {
         write(queue, endOfFile);
@@ -83,7 +85,7 @@ public class AtomicReadFileAck extends AcknowledgementService {
             writeContextTag(queue, 1, false);
         }
     }
-    
+
     AtomicReadFileAck(ByteQueue queue) throws BACnetException {
         endOfFile = read(queue, Boolean.class);
         if (popStart(queue) == 0) {
@@ -98,7 +100,7 @@ public class AtomicReadFileAck extends AcknowledgementService {
             returnedRecordCount = read(queue, UnsignedInteger.class);
             fileData = null;
             List<OctetString> records = new ArrayList<OctetString>();
-            for (int i=0; i<returnedRecordCount.intValue(); i++)
+            for (int i = 0; i < returnedRecordCount.intValue(); i++)
                 records.add(read(queue, OctetString.class));
             fileRecordData = new SequenceOf<OctetString>(records);
             popEnd(queue, 1);

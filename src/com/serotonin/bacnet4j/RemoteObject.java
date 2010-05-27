@@ -22,20 +22,23 @@
  */
 package com.serotonin.bacnet4j;
 
+import java.io.Serializable;
+
 import com.serotonin.bacnet4j.type.primitive.ObjectIdentifier;
 
-public class RemoteObject {
+public class RemoteObject implements Serializable {
+    private static final long serialVersionUID = 2962046198697775365L;
     private final ObjectIdentifier oid;
     private String objectName;
-    
+
     public RemoteObject(ObjectIdentifier oid) {
         this.oid = oid;
     }
-    
+
     public ObjectIdentifier getObjectIdentifier() {
         return oid;
     }
-    
+
     public void setObjectName(String objectName) {
         this.objectName = objectName;
     }
@@ -43,7 +46,7 @@ public class RemoteObject {
     public String getObjectName() {
         return objectName;
     }
-    
+
     @Override
     public String toString() {
         return oid.toString();

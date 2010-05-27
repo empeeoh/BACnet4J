@@ -26,6 +26,7 @@ import com.serotonin.bacnet4j.type.primitive.Enumerated;
 import com.serotonin.util.queue.ByteQueue;
 
 public class EventState extends Enumerated {
+    private static final long serialVersionUID = -8567972022145562375L;
     public static final EventState normal = new EventState(0);
     public static final EventState fault = new EventState(1);
     public static final EventState offnormal = new EventState(2);
@@ -36,11 +37,11 @@ public class EventState extends Enumerated {
     public EventState(int value) {
         super(value);
     }
-    
+
     public EventState(ByteQueue queue) {
         super(queue);
     }
-    
+
     @Override
     public String toString() {
         if (intValue() == 0)

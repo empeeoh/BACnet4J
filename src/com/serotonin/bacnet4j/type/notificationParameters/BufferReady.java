@@ -28,31 +28,34 @@ import com.serotonin.bacnet4j.type.primitive.UnsignedInteger;
 import com.serotonin.util.queue.ByteQueue;
 
 public class BufferReady extends NotificationParameters {
+    private static final long serialVersionUID = 1210370718867995350L;
+
     public static final byte TYPE_ID = 10;
-  
+
     private final DeviceObjectPropertyReference bufferProperty;
     private final UnsignedInteger previousNotification;
     private final UnsignedInteger currentNotification;
-    
-    public BufferReady(DeviceObjectPropertyReference bufferProperty, UnsignedInteger previousNotification, UnsignedInteger currentNotification) {
+
+    public BufferReady(DeviceObjectPropertyReference bufferProperty, UnsignedInteger previousNotification,
+            UnsignedInteger currentNotification) {
         this.bufferProperty = bufferProperty;
         this.previousNotification = previousNotification;
         this.currentNotification = currentNotification;
     }
-    
+
     @Override
     protected void writeImpl(ByteQueue queue) {
         write(queue, bufferProperty, 0);
         write(queue, previousNotification, 1);
         write(queue, currentNotification, 2);
     }
-    
+
     public BufferReady(ByteQueue queue) throws BACnetException {
         bufferProperty = read(queue, DeviceObjectPropertyReference.class, 0);
         previousNotification = read(queue, UnsignedInteger.class, 1);
         currentNotification = read(queue, UnsignedInteger.class, 2);
     }
-    
+
     @Override
     protected int getTypeId() {
         return TYPE_ID;

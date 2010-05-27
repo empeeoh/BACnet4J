@@ -27,9 +27,10 @@ import com.serotonin.bacnet4j.type.primitive.UnsignedInteger;
 import com.serotonin.util.queue.ByteQueue;
 
 public class Prescale extends BaseType {
+    private static final long serialVersionUID = -4499669866775224187L;
     private final UnsignedInteger multiplier;
     private final UnsignedInteger moduloDivide;
-    
+
     public Prescale(UnsignedInteger multiplier, UnsignedInteger moduloDivide) {
         this.multiplier = multiplier;
         this.moduloDivide = moduloDivide;
@@ -40,7 +41,7 @@ public class Prescale extends BaseType {
         write(queue, multiplier, 0);
         write(queue, moduloDivide, 1);
     }
-    
+
     public Prescale(ByteQueue queue) throws BACnetException {
         multiplier = read(queue, UnsignedInteger.class, 0);
         moduloDivide = read(queue, UnsignedInteger.class, 1);

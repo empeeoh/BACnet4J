@@ -28,31 +28,33 @@ import com.serotonin.bacnet4j.type.primitive.UnsignedInteger;
 import com.serotonin.util.queue.ByteQueue;
 
 public class UnsignedRange extends NotificationParameters {
+    private static final long serialVersionUID = 3208335506254265781L;
+
     public static final byte TYPE_ID = 11;
-    
+
     private final UnsignedInteger exceedingValue;
     private final StatusFlags statusFlags;
     private final UnsignedInteger exceedingLimit;
-    
+
     public UnsignedRange(UnsignedInteger exceedingValue, StatusFlags statusFlags, UnsignedInteger exceedingLimit) {
         this.exceedingValue = exceedingValue;
         this.statusFlags = statusFlags;
         this.exceedingLimit = exceedingLimit;
     }
-    
+
     @Override
     protected void writeImpl(ByteQueue queue) {
         write(queue, exceedingValue, 0);
         write(queue, statusFlags, 1);
         write(queue, exceedingLimit, 2);
     }
-    
+
     public UnsignedRange(ByteQueue queue) throws BACnetException {
         exceedingValue = read(queue, UnsignedInteger.class, 0);
         statusFlags = read(queue, StatusFlags.class, 1);
         exceedingLimit = read(queue, UnsignedInteger.class, 2);
     }
-    
+
     @Override
     protected int getTypeId() {
         return TYPE_ID;

@@ -31,10 +31,12 @@ import com.serotonin.bacnet4j.type.primitive.ObjectIdentifier;
 import com.serotonin.util.queue.ByteQueue;
 
 public class GetAlarmSummaryAck extends AcknowledgementService {
+    private static final long serialVersionUID = 6838220512669552863L;
+
     public static final byte TYPE_ID = 3;
-    
+
     private final SequenceOf<AlarmSummary> values;
-    
+
     public GetAlarmSummaryAck(SequenceOf<AlarmSummary> values) {
         this.values = values;
     }
@@ -48,7 +50,7 @@ public class GetAlarmSummaryAck extends AcknowledgementService {
     public void write(ByteQueue queue) {
         write(queue, values);
     }
-    
+
     GetAlarmSummaryAck(ByteQueue queue) throws BACnetException {
         values = readSequenceOf(queue, AlarmSummary.class);
     }
@@ -56,12 +58,13 @@ public class GetAlarmSummaryAck extends AcknowledgementService {
     public SequenceOf<AlarmSummary> getValues() {
         return values;
     }
-    
+
     public static class AlarmSummary extends BaseType {
+        private static final long serialVersionUID = -3442490797564872769L;
         private final ObjectIdentifier objectIdentifier;
         private final EventState alarmState;
         private final EventTransitionBits acknowledgedTransitions;
-        
+
         public AlarmSummary(ObjectIdentifier objectIdentifier, EventState alarmState,
                 EventTransitionBits acknowledgedTransitions) {
             this.objectIdentifier = objectIdentifier;
@@ -75,7 +78,7 @@ public class GetAlarmSummaryAck extends AcknowledgementService {
             alarmState.write(queue);
             acknowledgedTransitions.write(queue);
         }
-        
+
         public AlarmSummary(ByteQueue queue) throws BACnetException {
             objectIdentifier = read(queue, ObjectIdentifier.class);
             alarmState = read(queue, EventState.class);

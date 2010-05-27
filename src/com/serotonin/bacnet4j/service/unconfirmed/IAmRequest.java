@@ -33,14 +33,16 @@ import com.serotonin.bacnet4j.type.primitive.UnsignedInteger;
 import com.serotonin.util.queue.ByteQueue;
 
 public class IAmRequest extends UnconfirmedRequestService {
+    private static final long serialVersionUID = -5896735458454994754L;
+
     public static final byte TYPE_ID = 0;
-    
+
     private final ObjectIdentifier iAmDeviceIdentifier;
     private final UnsignedInteger maxAPDULengthAccepted;
     private final Segmentation segmentationSupported;
     private final UnsignedInteger vendorId;
-    
-    public IAmRequest(ObjectIdentifier iamDeviceIdentifier, UnsignedInteger maxAPDULengthAccepted, 
+
+    public IAmRequest(ObjectIdentifier iamDeviceIdentifier, UnsignedInteger maxAPDULengthAccepted,
             Segmentation segmentationSupported, UnsignedInteger vendorId) {
         this.iAmDeviceIdentifier = iamDeviceIdentifier;
         this.maxAPDULengthAccepted = maxAPDULengthAccepted;
@@ -58,13 +60,13 @@ public class IAmRequest extends UnconfirmedRequestService {
         // Make sure we're not hearing from ourselves.
         if (iAmDeviceIdentifier.getInstanceNumber() == localDevice.getConfiguration().getInstanceId())
             return;
-        
+
         // Register the device in the list of known devices.
         RemoteDevice d = localDevice.getRemoteDeviceCreate(iAmDeviceIdentifier.getInstanceNumber(), from, network);
         d.setMaxAPDULengthAccepted(maxAPDULengthAccepted.intValue());
         d.setSegmentationSupported(segmentationSupported);
         d.setVendorId(vendorId.intValue());
-        
+
         // Fire the appropriate event.
         localDevice.getEventHandler().fireIAmReceived(d);
     }
@@ -76,7 +78,7 @@ public class IAmRequest extends UnconfirmedRequestService {
         write(queue, segmentationSupported);
         write(queue, vendorId);
     }
-    
+
     IAmRequest(ByteQueue queue) throws BACnetException {
         iAmDeviceIdentifier = read(queue, ObjectIdentifier.class);
         maxAPDULengthAccepted = read(queue, UnsignedInteger.class);

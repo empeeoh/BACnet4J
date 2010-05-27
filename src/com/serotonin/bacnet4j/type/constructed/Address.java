@@ -34,6 +34,7 @@ import com.serotonin.util.IpAddressUtils;
 import com.serotonin.util.queue.ByteQueue;
 
 public class Address extends BaseType {
+    private static final long serialVersionUID = -3376358193474831753L;
     private final Unsigned16 networkNumber;
     private final OctetString macAddress;
 

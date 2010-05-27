@@ -25,16 +25,17 @@ package com.serotonin.bacnet4j.type.primitive;
 import com.serotonin.util.queue.ByteQueue;
 
 public class Null extends Primitive {
+    private static final long serialVersionUID = 4511984655190634429L;
     public static final byte TYPE_ID = 0;
-    
+
     public Null() {
         // no op
     }
-    
+
     public Null(ByteQueue queue) {
         readTag(queue);
     }
-    
+
     @Override
     public void writeImpl(ByteQueue queue) {
         // no op
@@ -49,7 +50,7 @@ public class Null extends Primitive {
     protected byte getTypeId() {
         return TYPE_ID;
     }
-    
+
     @Override
     public boolean equals(Object obj) {
         if (this == obj)
@@ -60,7 +61,7 @@ public class Null extends Primitive {
             return false;
         return true;
     }
-    
+
     @Override
     public String toString() {
         return "Null";

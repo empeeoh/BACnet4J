@@ -26,14 +26,16 @@ import com.serotonin.bacnet4j.type.primitive.BitString;
 import com.serotonin.util.queue.ByteQueue;
 
 public class ServicesSupported extends BitString {
+    private static final long serialVersionUID = -6528563197920379775L;
+
     public ServicesSupported() {
         super(new boolean[40]);
     }
-    
+
     public ServicesSupported(ByteQueue queue) {
         super(queue);
     }
-    
+
     public boolean isAcknowledgeAlarm() {
         return getValue()[0];
     }
@@ -73,7 +75,7 @@ public class ServicesSupported extends BitString {
     public void setGetEnrollmentSummary(boolean getEnrollmentSummary) {
         getValue()[4] = getEnrollmentSummary;
     }
-    
+
     public boolean isSubscribeCov() {
         return getValue()[5];
     }
@@ -169,7 +171,7 @@ public class ServicesSupported extends BitString {
     public void setWritePropertyMultiple(boolean writePropertyMultiple) {
         getValue()[16] = writePropertyMultiple;
     }
-    
+
     public boolean isDeviceCommunicationControl() {
         return getValue()[17];
     }

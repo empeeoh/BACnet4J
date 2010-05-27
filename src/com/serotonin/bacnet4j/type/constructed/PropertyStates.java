@@ -46,6 +46,7 @@ import com.serotonin.bacnet4j.type.primitive.UnsignedInteger;
 import com.serotonin.util.queue.ByteQueue;
 
 public class PropertyStates extends BaseType {
+    private static final long serialVersionUID = 1112998027203005048L;
     private static List<Class<? extends Encodable>> classes;
     static {
         classes = new ArrayList<Class<? extends Encodable>>();
@@ -66,7 +67,7 @@ public class PropertyStates extends BaseType {
         classes.add(RestartReason.class);
         classes.add(DoorAlarmState.class);
     }
-    
+
     public interface Types {
         int BOOLEAN = 0;
         int BINARY_PV = 1;
@@ -85,26 +86,26 @@ public class PropertyStates extends BaseType {
         int RESTART_REASON = 14;
         int DOOR_ALARM_STATE = 15;
     }
-    
+
     private final Choice state;
-    
+
     public PropertyStates(int type, BaseType state) {
         this.state = new Choice(type, state);
     }
-    
+
     public int getType() {
         return state.getContextId();
     }
-    
+
     public BaseType getState() {
-        return (BaseType)state.getDatum();
+        return (BaseType) state.getDatum();
     }
 
     @Override
     public void write(ByteQueue queue) {
         write(queue, state);
     }
-    
+
     public PropertyStates(ByteQueue queue) throws BACnetException {
         state = new Choice(queue, classes);
     }

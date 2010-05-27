@@ -32,25 +32,26 @@ import com.serotonin.bacnet4j.type.primitive.UnsignedInteger;
 import com.serotonin.util.queue.ByteQueue;
 
 public class SpecialEvent extends BaseType {
+    private static final long serialVersionUID = -5828791384033258372L;
     private static List<Class<? extends Encodable>> classes;
     static {
         classes = new ArrayList<Class<? extends Encodable>>();
         classes.add(CalendarEntry.class);
         classes.add(ObjectIdentifier.class);
     }
-    
+
     private final Choice calendar;
     private final SequenceOf<TimeValue> listOfTimeValues;
     private final UnsignedInteger eventPriority;
-    
-    public SpecialEvent(CalendarEntry calendarEntry, SequenceOf<TimeValue> listOfTimeValues, 
+
+    public SpecialEvent(CalendarEntry calendarEntry, SequenceOf<TimeValue> listOfTimeValues,
             UnsignedInteger eventPriority) {
         calendar = new Choice(0, calendarEntry);
         this.listOfTimeValues = listOfTimeValues;
         this.eventPriority = eventPriority;
     }
-    
-    public SpecialEvent(ObjectIdentifier calendarReference, SequenceOf<TimeValue> listOfTimeValues, 
+
+    public SpecialEvent(ObjectIdentifier calendarReference, SequenceOf<TimeValue> listOfTimeValues,
             UnsignedInteger eventPriority) {
         calendar = new Choice(1, calendarReference);
         this.listOfTimeValues = listOfTimeValues;
@@ -63,19 +64,19 @@ public class SpecialEvent extends BaseType {
         write(queue, listOfTimeValues, 2);
         write(queue, eventPriority, 3);
     }
-    
+
     public boolean isCalendarReference() {
         return calendar.getContextId() == 1;
     }
-    
+
     public CalendarEntry getCalendarEntry() {
-        return (CalendarEntry)calendar.getDatum();
+        return (CalendarEntry) calendar.getDatum();
     }
-    
+
     public ObjectIdentifier getCalendarReference() {
-        return (ObjectIdentifier)calendar.getDatum();
+        return (ObjectIdentifier) calendar.getDatum();
     }
-    
+
     public SequenceOf<TimeValue> getListOfTimeValues() {
         return listOfTimeValues;
     }

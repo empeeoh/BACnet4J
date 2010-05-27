@@ -29,8 +29,9 @@ import com.serotonin.bacnet4j.type.primitive.UnsignedInteger;
 import com.serotonin.util.queue.ByteQueue;
 
 public class VTCloseError extends BaseError {
+    private static final long serialVersionUID = 7817379391677615141L;
     private final SequenceOf<UnsignedInteger> listOfVTSessionIdentifiers;
-    
+
     public VTCloseError(byte choice, BACnetError error, SequenceOf<UnsignedInteger> listOfVTSessionIdentifiers) {
         super(choice, error);
         this.listOfVTSessionIdentifiers = listOfVTSessionIdentifiers;
@@ -42,7 +43,7 @@ public class VTCloseError extends BaseError {
         write(queue, error, 0);
         writeOptional(queue, listOfVTSessionIdentifiers, 1);
     }
-    
+
     VTCloseError(byte choice, ByteQueue queue) throws BACnetException {
         super(choice, queue, 0);
         listOfVTSessionIdentifiers = readOptionalSequenceOf(queue, UnsignedInteger.class, 1);

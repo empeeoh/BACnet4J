@@ -26,6 +26,7 @@ import com.serotonin.bacnet4j.type.primitive.Enumerated;
 import com.serotonin.util.queue.ByteQueue;
 
 public class RejectReason extends Enumerated {
+    private static final long serialVersionUID = 3672606740809550085L;
     public static final RejectReason other = new RejectReason(0);
     public static final RejectReason bufferOverflow = new RejectReason(1);
     public static final RejectReason inconsistentParameters = new RejectReason(2);
@@ -40,7 +41,7 @@ public class RejectReason extends Enumerated {
     public RejectReason(int value) {
         super(value);
     }
-    
+
     public RejectReason(ByteQueue queue) {
         super(queue);
     }

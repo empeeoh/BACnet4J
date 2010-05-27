@@ -37,6 +37,7 @@ import com.serotonin.bacnet4j.type.primitive.UnsignedInteger;
 import com.serotonin.util.queue.ByteQueue;
 
 public class LogRecord extends BaseType {
+    private static final long serialVersionUID = -158114439196293884L;
     private static List<Class<? extends Encodable>> classes;
     static {
         classes = new ArrayList<Class<? extends Encodable>>();
@@ -52,7 +53,7 @@ public class LogRecord extends BaseType {
         classes.add(Real.class);
         classes.add(Encodable.class);
     }
-    
+
     private final DateTime timestamp;
     private Choice choice;
     private final StatusFlags statusFlags;
@@ -61,7 +62,7 @@ public class LogRecord extends BaseType {
         this.timestamp = timestamp;
         this.statusFlags = statusFlags;
     }
-    
+
     public LogRecord(DateTime timestamp, LogStatus datum, StatusFlags statusFlags) {
         this(timestamp, statusFlags);
         choice = new Choice(0, datum);
@@ -118,7 +119,7 @@ public class LogRecord extends BaseType {
         write(queue, choice, 1);
         writeOptional(queue, statusFlags, 2);
     }
-    
+
     public DateTime getTimestamp() {
         return timestamp;
     }
@@ -126,51 +127,51 @@ public class LogRecord extends BaseType {
     public StatusFlags getStatusFlags() {
         return statusFlags;
     }
-    
+
     public LogStatus getLogStatus() {
-        return (LogStatus)choice.getDatum();
+        return (LogStatus) choice.getDatum();
     }
-    
+
     public Boolean getBoolean() {
-        return (Boolean)choice.getDatum();
+        return (Boolean) choice.getDatum();
     }
-    
+
     public Real getReal() {
-        return (Real)choice.getDatum();
+        return (Real) choice.getDatum();
     }
-    
+
     public Real getTimeChange() {
-        return (Real)choice.getDatum();
+        return (Real) choice.getDatum();
     }
-    
+
     public Enumerated getEnumerated() {
-        return (Enumerated)choice.getDatum();
+        return (Enumerated) choice.getDatum();
     }
-    
+
     public UnsignedInteger getUnsignedInteger() {
-        return (UnsignedInteger)choice.getDatum();
+        return (UnsignedInteger) choice.getDatum();
     }
-    
+
     public SignedInteger getSignedInteger() {
-        return (SignedInteger)choice.getDatum();
+        return (SignedInteger) choice.getDatum();
     }
-    
+
     public BitString getBitString() {
-        return (BitString)choice.getDatum();
+        return (BitString) choice.getDatum();
     }
-    
+
     public Null getNull() {
-        return (Null)choice.getDatum();
+        return (Null) choice.getDatum();
     }
-    
+
     public BACnetError getBACnetError() {
-        return (BACnetError)choice.getDatum();
+        return (BACnetError) choice.getDatum();
     }
-    
+
     public BaseType getBaseType() {
-        return (BaseType)choice.getDatum();
+        return (BaseType) choice.getDatum();
     }
-    
+
     public int getChoiceType() {
         return choice.getContextId();
     }

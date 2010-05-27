@@ -17,6 +17,7 @@ import com.serotonin.util.queue.ByteQueue;
  * @author Matthew Lohbihler
  */
 public class EventLogRecord extends BaseType {
+    private static final long serialVersionUID = 7506599418976133752L;
     private static List<Class<? extends Encodable>> classes;
     static {
         classes = new ArrayList<Class<? extends Encodable>>();
@@ -24,7 +25,7 @@ public class EventLogRecord extends BaseType {
         classes.add(ConfirmedEventNotificationRequest.class);
         classes.add(Real.class);
     }
-    
+
     private final DateTime timestamp;
     private final Choice choice;
 
@@ -48,23 +49,23 @@ public class EventLogRecord extends BaseType {
         write(queue, timestamp, 0);
         write(queue, choice, 1);
     }
-    
+
     public DateTime getTimestamp() {
         return timestamp;
     }
 
     public LogStatus getLogStatus() {
-        return (LogStatus)choice.getDatum();
+        return (LogStatus) choice.getDatum();
     }
-    
+
     public ConfirmedEventNotificationRequest getConfirmedEventNotificationRequest() {
-        return (ConfirmedEventNotificationRequest)choice.getDatum();
+        return (ConfirmedEventNotificationRequest) choice.getDatum();
     }
-    
+
     public Real getReal() {
-        return (Real)choice.getDatum();
+        return (Real) choice.getDatum();
     }
-    
+
     public int getChoiceType() {
         return choice.getContextId();
     }

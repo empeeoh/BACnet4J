@@ -11,6 +11,7 @@ import com.serotonin.util.queue.ByteQueue;
  * @author Matthew Lohbihler
  */
 public class DoorStatus extends Enumerated {
+    private static final long serialVersionUID = -2813060268315235754L;
     public static final DoorStatus closed = new DoorStatus(0);
     public static final DoorStatus open = new DoorStatus(1);
     public static final DoorStatus unknown = new DoorStatus(2);
@@ -18,7 +19,7 @@ public class DoorStatus extends Enumerated {
     public DoorStatus(int value) {
         super(value);
     }
-    
+
     public DoorStatus(ByteQueue queue) {
         super(queue);
     }

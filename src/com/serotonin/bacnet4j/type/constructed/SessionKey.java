@@ -27,9 +27,10 @@ import com.serotonin.bacnet4j.type.primitive.OctetString;
 import com.serotonin.util.queue.ByteQueue;
 
 public class SessionKey extends BaseType {
+    private static final long serialVersionUID = 2276895536699919255L;
     private final OctetString sessionKey;
     private final Address peerAddress;
-    
+
     public SessionKey(OctetString sessionKey, Address peerAddress) {
         this.sessionKey = sessionKey;
         this.peerAddress = peerAddress;
@@ -40,7 +41,7 @@ public class SessionKey extends BaseType {
         write(queue, sessionKey);
         write(queue, peerAddress);
     }
-    
+
     public SessionKey(ByteQueue queue) throws BACnetException {
         sessionKey = read(queue, OctetString.class);
         peerAddress = read(queue, Address.class);

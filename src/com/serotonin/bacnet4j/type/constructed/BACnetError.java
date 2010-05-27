@@ -29,31 +29,31 @@ import com.serotonin.bacnet4j.type.enumerated.ErrorCode;
 import com.serotonin.util.queue.ByteQueue;
 
 public class BACnetError extends BaseType {
+    private static final long serialVersionUID = -2894184233450540796L;
     private final ErrorClass errorClass;
     private final ErrorCode errorCode;
-    
+
     public BACnetError(ErrorClass errorClass, ErrorCode errorCode) {
         this.errorClass = errorClass;
         this.errorCode = errorCode;
     }
-    
+
     public BACnetError(BACnetServiceException e) {
         this.errorClass = e.getErrorClass();
         this.errorCode = e.getErrorCode();
     }
-    
+
     @Override
     public void write(ByteQueue queue) {
         write(queue, errorClass);
         write(queue, errorCode);
     }
 
-
     public BACnetError(ByteQueue queue) throws BACnetException {
         errorClass = read(queue, ErrorClass.class);
         errorCode = read(queue, ErrorCode.class);
     }
-    
+
     public ErrorClass getErrorClass() {
         return errorClass;
     }
@@ -61,7 +61,7 @@ public class BACnetError extends BaseType {
     public ErrorCode getErrorCode() {
         return errorCode;
     }
-    
+
     public boolean equals(ErrorClass errorClass, ErrorCode errorCode) {
         return this.errorClass.equals(errorClass) && this.errorCode.equals(errorCode);
     }
@@ -74,10 +74,10 @@ public class BACnetError extends BaseType {
         result = PRIME * result + ((errorCode == null) ? 0 : errorCode.hashCode());
         return result;
     }
-    
+
     @Override
     public String toString() {
-        return "errorClass="+ errorClass +", errorCode="+ errorCode;
+        return "errorClass=" + errorClass + ", errorCode=" + errorCode;
     }
 
     @Override

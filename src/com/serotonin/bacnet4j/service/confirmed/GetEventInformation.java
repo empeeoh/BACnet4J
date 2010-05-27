@@ -32,10 +32,12 @@ import com.serotonin.bacnet4j.type.primitive.ObjectIdentifier;
 import com.serotonin.util.queue.ByteQueue;
 
 public class GetEventInformation extends ConfirmedRequestService {
+    private static final long serialVersionUID = 5920365345189498832L;
+
     public static final byte TYPE_ID = 29;
-    
+
     private final ObjectIdentifier lastReceivedObjectIdentifier;
-    
+
     public GetEventInformation(ObjectIdentifier lastReceivedObjectIdentifier) {
         this.lastReceivedObjectIdentifier = lastReceivedObjectIdentifier;
     }
@@ -46,8 +48,7 @@ public class GetEventInformation extends ConfirmedRequestService {
     }
 
     @Override
-    public AcknowledgementService handle(LocalDevice localDevice, Address from, Network network)
-            throws BACnetException {
+    public AcknowledgementService handle(LocalDevice localDevice, Address from, Network network) throws BACnetException {
         throw new NotImplementedException();
     }
 
@@ -55,7 +56,7 @@ public class GetEventInformation extends ConfirmedRequestService {
     public void write(ByteQueue queue) {
         writeOptional(queue, lastReceivedObjectIdentifier, 0);
     }
-    
+
     GetEventInformation(ByteQueue queue) throws BACnetException {
         lastReceivedObjectIdentifier = readOptional(queue, ObjectIdentifier.class, 0);
     }
@@ -64,7 +65,8 @@ public class GetEventInformation extends ConfirmedRequestService {
     public int hashCode() {
         final int PRIME = 31;
         int result = 1;
-        result = PRIME * result + ((lastReceivedObjectIdentifier == null) ? 0 : lastReceivedObjectIdentifier.hashCode());
+        result = PRIME * result
+                + ((lastReceivedObjectIdentifier == null) ? 0 : lastReceivedObjectIdentifier.hashCode());
         return result;
     }
 

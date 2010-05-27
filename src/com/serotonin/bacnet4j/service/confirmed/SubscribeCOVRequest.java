@@ -36,25 +36,28 @@ import com.serotonin.bacnet4j.type.primitive.UnsignedInteger;
 import com.serotonin.util.queue.ByteQueue;
 
 public class SubscribeCOVRequest extends ConfirmedRequestService {
+    private static final long serialVersionUID = -4264911944887357155L;
+
     public static final byte TYPE_ID = 5;
-    
+
     private final UnsignedInteger subscriberProcessIdentifier;
     private final ObjectIdentifier monitoredObjectIdentifier;
     private final Boolean issueConfirmedNotifications;
     private final UnsignedInteger lifetime;
-    
-    public SubscribeCOVRequest(UnsignedInteger subscriberProcessIdentifier, ObjectIdentifier monitoredObjectIdentifier, Boolean issueConfirmedNotifications, UnsignedInteger lifetime) {
+
+    public SubscribeCOVRequest(UnsignedInteger subscriberProcessIdentifier, ObjectIdentifier monitoredObjectIdentifier,
+            Boolean issueConfirmedNotifications, UnsignedInteger lifetime) {
         this.subscriberProcessIdentifier = subscriberProcessIdentifier;
         this.monitoredObjectIdentifier = monitoredObjectIdentifier;
         this.issueConfirmedNotifications = issueConfirmedNotifications;
         this.lifetime = lifetime;
     }
-    
+
     @Override
     public byte getChoiceId() {
         return TYPE_ID;
     }
-    
+
     @Override
     public void write(ByteQueue queue) {
         write(queue, subscriberProcessIdentifier, 0);
@@ -62,7 +65,7 @@ public class SubscribeCOVRequest extends ConfirmedRequestService {
         writeOptional(queue, issueConfirmedNotifications, 2);
         writeOptional(queue, lifetime, 3);
     }
-    
+
     SubscribeCOVRequest(ByteQueue queue) throws BACnetException {
         subscriberProcessIdentifier = read(queue, UnsignedInteger.class, 0);
         monitoredObjectIdentifier = read(queue, ObjectIdentifier.class, 1);
@@ -71,8 +74,7 @@ public class SubscribeCOVRequest extends ConfirmedRequestService {
     }
 
     @Override
-    public AcknowledgementService handle(LocalDevice localDevice, Address from, Network network)
-            throws BACnetException {
+    public AcknowledgementService handle(LocalDevice localDevice, Address from, Network network) throws BACnetException {
         try {
             BACnetObject obj = localDevice.getObjectRequired(monitoredObjectIdentifier);
             if (issueConfirmedNotifications == null && lifetime == null)

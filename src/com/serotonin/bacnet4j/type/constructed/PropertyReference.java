@@ -28,18 +28,19 @@ import com.serotonin.bacnet4j.type.primitive.UnsignedInteger;
 import com.serotonin.util.queue.ByteQueue;
 
 public class PropertyReference extends BaseType {
+    private static final long serialVersionUID = 1375764258364665118L;
     private final PropertyIdentifier propertyIdentifier;
     private UnsignedInteger propertyArrayIndex;
-    
+
     public PropertyReference(PropertyIdentifier propertyIdentifier, UnsignedInteger propertyArrayIndex) {
         this.propertyIdentifier = propertyIdentifier;
         this.propertyArrayIndex = propertyArrayIndex;
     }
-    
+
     public PropertyReference(PropertyIdentifier propertyIdentifier) {
         this.propertyIdentifier = propertyIdentifier;
     }
-    
+
     public UnsignedInteger getPropertyArrayIndex() {
         return propertyArrayIndex;
     }
@@ -53,7 +54,7 @@ public class PropertyReference extends BaseType {
         write(queue, propertyIdentifier, 0);
         writeOptional(queue, propertyArrayIndex, 1);
     }
-    
+
     public PropertyReference(ByteQueue queue) throws BACnetException {
         propertyIdentifier = read(queue, PropertyIdentifier.class, 0);
         propertyArrayIndex = readOptional(queue, UnsignedInteger.class, 1);

@@ -29,6 +29,8 @@ import com.serotonin.bacnet4j.type.primitive.UnsignedInteger;
 import com.serotonin.util.queue.ByteQueue;
 
 public class ChangeOfBitString extends EventParameter {
+    private static final long serialVersionUID = -3812561432266744183L;
+
     public static final byte TYPE_ID = 0;
 
     private final UnsignedInteger timeDelay;

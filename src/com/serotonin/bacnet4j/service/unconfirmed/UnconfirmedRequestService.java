@@ -30,6 +30,8 @@ import com.serotonin.bacnet4j.type.constructed.Address;
 import com.serotonin.util.queue.ByteQueue;
 
 abstract public class UnconfirmedRequestService extends Service {
+    private static final long serialVersionUID = 8962921362279665295L;
+
     public static UnconfirmedRequestService createUnconfirmedRequestService(byte type, ByteQueue queue)
             throws BACnetException {
         if (type == IAmRequest.TYPE_ID)
@@ -52,9 +54,9 @@ abstract public class UnconfirmedRequestService extends Service {
             return new WhoIsRequest(queue);
         if (type == UTCTimeSynchronizationRequest.TYPE_ID)
             return new UTCTimeSynchronizationRequest(queue);
-        
-        throw new BACnetException("Unsupported unconfirmed service: "+ (type & 0xff));
+
+        throw new BACnetException("Unsupported unconfirmed service: " + (type & 0xff));
     }
-    
+
     abstract public void handle(LocalDevice localDevice, Address from, Network network) throws BACnetException;
 }

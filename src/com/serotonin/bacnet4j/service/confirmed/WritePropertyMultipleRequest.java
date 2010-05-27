@@ -41,10 +41,12 @@ import com.serotonin.bacnet4j.type.error.WritePropertyMultipleError;
 import com.serotonin.util.queue.ByteQueue;
 
 public class WritePropertyMultipleRequest extends ConfirmedRequestService {
+    private static final long serialVersionUID = 4702397545138383955L;
+
     public static final byte TYPE_ID = 16;
-    
+
     private final SequenceOf<WriteAccessSpecification> listOfWriteAccessSpecifications;
-    
+
     public WritePropertyMultipleRequest(SequenceOf<WriteAccessSpecification> listOfWriteAccessSpecifications) {
         this.listOfWriteAccessSpecifications = listOfWriteAccessSpecifications;
     }
@@ -53,25 +55,24 @@ public class WritePropertyMultipleRequest extends ConfirmedRequestService {
     public byte getChoiceId() {
         return TYPE_ID;
     }
-    
+
     @Override
     public void write(ByteQueue queue) {
         write(queue, listOfWriteAccessSpecifications);
     }
-    
+
     WritePropertyMultipleRequest(ByteQueue queue) throws BACnetException {
         listOfWriteAccessSpecifications = readSequenceOf(queue, WriteAccessSpecification.class);
     }
 
     @Override
-    public AcknowledgementService handle(LocalDevice localDevice, Address from, Network network)
-            throws BACnetException {
+    public AcknowledgementService handle(LocalDevice localDevice, Address from, Network network) throws BACnetException {
         BACnetObject obj;
         for (WriteAccessSpecification spec : listOfWriteAccessSpecifications) {
             obj = localDevice.getObject(spec.getObjectIdentifier());
             if (obj == null)
                 throw createException(ErrorClass.property, ErrorCode.writeAccessDenied, spec, null);
-            
+
             for (PropertyValue pv : spec.getListOfProperties()) {
                 try {
                     if (localDevice.getEventHandler().checkAllowPropertyWrite(obj, pv)) {
@@ -86,25 +87,25 @@ public class WritePropertyMultipleRequest extends ConfirmedRequestService {
                 }
             }
         }
-        
+
         return null;
     }
-    
+
     private BACnetErrorException createException(ErrorClass errorClass, ErrorCode errorCode,
             WriteAccessSpecification spec, PropertyValue pv) {
         if (pv == null)
             pv = spec.getListOfProperties().get(1);
-        return new BACnetErrorException(new WritePropertyMultipleError(getChoiceId(),
-                new BACnetError(errorClass, errorCode),
-                new ObjectPropertyReference(spec.getObjectIdentifier(), pv.getPropertyIdentifier(),
-                        pv.getPropertyArrayIndex())));
+        return new BACnetErrorException(new WritePropertyMultipleError(getChoiceId(), new BACnetError(errorClass,
+                errorCode), new ObjectPropertyReference(spec.getObjectIdentifier(), pv.getPropertyIdentifier(), pv
+                .getPropertyArrayIndex())));
     }
 
     @Override
     public int hashCode() {
         final int PRIME = 31;
         int result = 1;
-        result = PRIME * result + ((listOfWriteAccessSpecifications == null) ? 0 : listOfWriteAccessSpecifications.hashCode());
+        result = PRIME * result
+                + ((listOfWriteAccessSpecifications == null) ? 0 : listOfWriteAccessSpecifications.hashCode());
         return result;
     }
 

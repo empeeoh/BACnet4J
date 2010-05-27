@@ -29,9 +29,10 @@ import com.serotonin.bacnet4j.type.Encodable;
 import com.serotonin.util.queue.ByteQueue;
 
 public class Choice extends BaseType {
+    private static final long serialVersionUID = 7942157718147383894L;
     private int contextId;
     private Encodable datum;
-    
+
     public Choice(int contextId, Encodable datum) {
         this.contextId = contextId;
         this.datum = datum;
@@ -49,17 +50,17 @@ public class Choice extends BaseType {
     public void write(ByteQueue queue) {
         write(queue, datum, contextId);
     }
-    
+
     public Choice(ByteQueue queue, List<Class<? extends Encodable>> classes) throws BACnetException {
         read(queue, classes);
     }
-    
+
     public Choice(ByteQueue queue, List<Class<? extends Encodable>> classes, int contextId) throws BACnetException {
         popStart(queue, contextId);
         read(queue, classes);
         popEnd(queue, contextId);
     }
-    
+
     public void read(ByteQueue queue, List<Class<? extends Encodable>> classes) throws BACnetException {
         contextId = peekTagNumber(queue);
         datum = read(queue, classes.get(contextId), contextId);
@@ -69,7 +70,7 @@ public class Choice extends BaseType {
     public String toString() {
         return datum.toString();
     }
-    
+
     @Override
     public int hashCode() {
         final int PRIME = 31;

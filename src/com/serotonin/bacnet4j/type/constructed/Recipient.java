@@ -31,44 +31,46 @@ import com.serotonin.bacnet4j.type.primitive.ObjectIdentifier;
 import com.serotonin.util.queue.ByteQueue;
 
 public class Recipient extends BaseType {
+    private static final long serialVersionUID = -2993858722446507060L;
+
     private final Choice choice;
-    
+
     private static List<Class<? extends Encodable>> classes;
     static {
         classes = new ArrayList<Class<? extends Encodable>>();
         classes.add(ObjectIdentifier.class);
         classes.add(Address.class);
     }
-    
+
     public Recipient(ObjectIdentifier device) {
         choice = new Choice(0, device);
     }
-    
+
     public Recipient(Address address) {
         choice = new Choice(1, address);
     }
-    
+
     public boolean isObjectIdentifier() {
         return choice.getContextId() == 0;
     }
-    
+
     public ObjectIdentifier getObjectIdentifier() {
-        return (ObjectIdentifier)choice.getDatum();
+        return (ObjectIdentifier) choice.getDatum();
     }
 
     public boolean isAddress() {
         return choice.getContextId() == 1;
     }
-    
+
     public Address getAddress() {
-        return (Address)choice.getDatum();
+        return (Address) choice.getDatum();
     }
 
     @Override
     public void write(ByteQueue queue) {
         write(queue, choice);
     }
-    
+
     public Recipient(ByteQueue queue) throws BACnetException {
         choice = new Choice(queue, classes);
     }

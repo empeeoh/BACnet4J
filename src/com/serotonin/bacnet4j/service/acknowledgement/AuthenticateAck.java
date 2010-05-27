@@ -27,10 +27,12 @@ import com.serotonin.bacnet4j.type.primitive.UnsignedInteger;
 import com.serotonin.util.queue.ByteQueue;
 
 public class AuthenticateAck extends AcknowledgementService {
+    private static final long serialVersionUID = 1433915425430939025L;
+
     public static final byte TYPE_ID = 24;
-    
+
     private final UnsignedInteger modifiedRandomNumber;
-    
+
     public AuthenticateAck(UnsignedInteger modifiedRandomNumber) {
         this.modifiedRandomNumber = modifiedRandomNumber;
     }
@@ -44,7 +46,7 @@ public class AuthenticateAck extends AcknowledgementService {
     public void write(ByteQueue queue) {
         write(queue, modifiedRandomNumber);
     }
-    
+
     AuthenticateAck(ByteQueue queue) throws BACnetException {
         modifiedRandomNumber = read(queue, UnsignedInteger.class);
     }

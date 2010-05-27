@@ -36,17 +36,19 @@ import com.serotonin.bacnet4j.type.primitive.UnsignedInteger;
 import com.serotonin.util.queue.ByteQueue;
 
 public class AcknowledgeAlarmRequest extends ConfirmedRequestService {
+    private static final long serialVersionUID = -2003086447797009243L;
+
     public static final byte TYPE_ID = 0;
-    
+
     private final UnsignedInteger acknowledgingProcessIdentifier;
     private final ObjectIdentifier eventObjectIdentifier;
     private final EventState eventStateAcknowledged;
     private final TimeStamp timeStamp;
     private final CharacterString acknowledgmentSource;
     private final TimeStamp timeOfAcknowledgment;
-    
-    public AcknowledgeAlarmRequest(UnsignedInteger acknowledgingProcessIdentifier, 
-            ObjectIdentifier eventObjectIdentifier, EventState eventStateAcknowledged, TimeStamp timeStamp, 
+
+    public AcknowledgeAlarmRequest(UnsignedInteger acknowledgingProcessIdentifier,
+            ObjectIdentifier eventObjectIdentifier, EventState eventStateAcknowledged, TimeStamp timeStamp,
             CharacterString acknowledgmentSource, TimeStamp timeOfAcknowledgment) {
         this.acknowledgingProcessIdentifier = acknowledgingProcessIdentifier;
         this.eventObjectIdentifier = eventObjectIdentifier;
@@ -60,10 +62,9 @@ public class AcknowledgeAlarmRequest extends ConfirmedRequestService {
     public byte getChoiceId() {
         return TYPE_ID;
     }
-    
+
     @Override
-    public AcknowledgementService handle(LocalDevice localDevice, Address from, Network network)
-            throws BACnetException {
+    public AcknowledgementService handle(LocalDevice localDevice, Address from, Network network) throws BACnetException {
         throw new NotImplementedException();
     }
 
@@ -76,7 +77,7 @@ public class AcknowledgeAlarmRequest extends ConfirmedRequestService {
         acknowledgmentSource.write(queue, 4);
         timeOfAcknowledgment.write(queue, 5);
     }
-    
+
     AcknowledgeAlarmRequest(ByteQueue queue) throws BACnetException {
         acknowledgingProcessIdentifier = read(queue, UnsignedInteger.class, 0);
         eventObjectIdentifier = read(queue, ObjectIdentifier.class, 1);
@@ -90,7 +91,8 @@ public class AcknowledgeAlarmRequest extends ConfirmedRequestService {
     public int hashCode() {
         final int PRIME = 31;
         int result = 1;
-        result = PRIME * result + ((acknowledgingProcessIdentifier == null) ? 0 : acknowledgingProcessIdentifier.hashCode());
+        result = PRIME * result
+                + ((acknowledgingProcessIdentifier == null) ? 0 : acknowledgingProcessIdentifier.hashCode());
         result = PRIME * result + ((acknowledgmentSource == null) ? 0 : acknowledgmentSource.hashCode());
         result = PRIME * result + ((eventObjectIdentifier == null) ? 0 : eventObjectIdentifier.hashCode());
         result = PRIME * result + ((eventStateAcknowledged == null) ? 0 : eventStateAcknowledged.hashCode());

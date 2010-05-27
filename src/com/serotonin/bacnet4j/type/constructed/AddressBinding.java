@@ -27,9 +27,10 @@ import com.serotonin.bacnet4j.type.primitive.ObjectIdentifier;
 import com.serotonin.util.queue.ByteQueue;
 
 public class AddressBinding extends BaseType {
+    private static final long serialVersionUID = -3619507415957976531L;
     private final ObjectIdentifier deviceObjectIdentifier;
     private final Address deviceAddress;
-    
+
     public AddressBinding(ObjectIdentifier deviceObjectIdentifier, Address deviceAddress) {
         this.deviceObjectIdentifier = deviceObjectIdentifier;
         this.deviceAddress = deviceAddress;
@@ -40,7 +41,7 @@ public class AddressBinding extends BaseType {
         write(queue, deviceObjectIdentifier);
         write(queue, deviceAddress);
     }
-    
+
     public AddressBinding(ByteQueue queue) throws BACnetException {
         deviceObjectIdentifier = read(queue, ObjectIdentifier.class);
         deviceAddress = read(queue, Address.class);

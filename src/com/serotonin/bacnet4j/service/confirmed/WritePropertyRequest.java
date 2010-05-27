@@ -40,15 +40,17 @@ import com.serotonin.bacnet4j.type.primitive.UnsignedInteger;
 import com.serotonin.util.queue.ByteQueue;
 
 public class WritePropertyRequest extends ConfirmedRequestService {
+    private static final long serialVersionUID = -6047767959151824679L;
+
     public static final byte TYPE_ID = 15;
-    
+
     private final ObjectIdentifier objectIdentifier;
     private final PropertyIdentifier propertyIdentifier;
     private final UnsignedInteger propertyArrayIndex;
     private final Encodable propertyValue;
     private final UnsignedInteger priority;
-    
-    public WritePropertyRequest(ObjectIdentifier objectIdentifier, PropertyIdentifier propertyIdentifier, 
+
+    public WritePropertyRequest(ObjectIdentifier objectIdentifier, PropertyIdentifier propertyIdentifier,
             UnsignedInteger propertyArrayIndex, Encodable propertyValue, UnsignedInteger priority) {
         this.objectIdentifier = objectIdentifier;
         this.propertyIdentifier = propertyIdentifier;
@@ -61,7 +63,7 @@ public class WritePropertyRequest extends ConfirmedRequestService {
     public byte getChoiceId() {
         return TYPE_ID;
     }
-    
+
     @Override
     public void write(ByteQueue queue) {
         write(queue, objectIdentifier, 0);
@@ -70,13 +72,13 @@ public class WritePropertyRequest extends ConfirmedRequestService {
         writeEncodable(queue, propertyValue, 3);
         writeOptional(queue, priority, 4);
     }
-    
+
     WritePropertyRequest(ByteQueue queue) throws BACnetException {
         objectIdentifier = read(queue, ObjectIdentifier.class, 0);
         propertyIdentifier = read(queue, PropertyIdentifier.class, 1);
         propertyArrayIndex = readOptional(queue, UnsignedInteger.class, 2);
-        propertyValue = readEncodable(queue, objectIdentifier.getObjectType(), propertyIdentifier, 
-                propertyArrayIndex, 3);
+        propertyValue = readEncodable(queue, objectIdentifier.getObjectType(), propertyIdentifier, propertyArrayIndex,
+                3);
         priority = readOptional(queue, UnsignedInteger.class, 4);
     }
 
@@ -86,7 +88,7 @@ public class WritePropertyRequest extends ConfirmedRequestService {
         BACnetObject obj = localDevice.getObject(objectIdentifier);
         if (obj == null)
             throw new BACnetErrorException(getChoiceId(), ErrorClass.object, ErrorCode.unknownObject);
-        
+
         PropertyValue pv = new PropertyValue(propertyIdentifier, propertyArrayIndex, propertyValue, priority);
         try {
             if (localDevice.getEventHandler().checkAllowPropertyWrite(obj, pv)) {
@@ -99,7 +101,7 @@ public class WritePropertyRequest extends ConfirmedRequestService {
         catch (BACnetServiceException e) {
             throw new BACnetErrorException(getChoiceId(), e);
         }
-        
+
         return null;
     }
 

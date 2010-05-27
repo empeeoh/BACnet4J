@@ -26,6 +26,7 @@ import com.serotonin.bacnet4j.exception.BACnetException;
 import com.serotonin.util.queue.ByteQueue;
 
 public class ActionList extends BaseType {
+    private static final long serialVersionUID = 2923869954790260717L;
     private final SequenceOf<ActionCommand> action;
 
     public ActionList(SequenceOf<ActionCommand> action) {
@@ -36,7 +37,7 @@ public class ActionList extends BaseType {
     public void write(ByteQueue queue) {
         write(queue, action, 0);
     }
-    
+
     public ActionList(ByteQueue queue) throws BACnetException {
         action = readSequenceOf(queue, ActionCommand.class, 0);
     }

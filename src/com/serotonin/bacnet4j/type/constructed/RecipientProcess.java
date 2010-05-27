@@ -27,9 +27,10 @@ import com.serotonin.bacnet4j.type.primitive.UnsignedInteger;
 import com.serotonin.util.queue.ByteQueue;
 
 public class RecipientProcess extends BaseType {
+    private static final long serialVersionUID = -3615223495651827907L;
     private final Recipient recipient;
     private final UnsignedInteger processIdentifier;
-    
+
     public RecipientProcess(Recipient recipient, UnsignedInteger processIdentifier) {
         this.recipient = recipient;
         this.processIdentifier = processIdentifier;
@@ -40,7 +41,7 @@ public class RecipientProcess extends BaseType {
         write(queue, recipient, 0);
         write(queue, processIdentifier, 1);
     }
-    
+
     public RecipientProcess(ByteQueue queue) throws BACnetException {
         recipient = read(queue, Recipient.class, 0);
         processIdentifier = read(queue, UnsignedInteger.class, 1);

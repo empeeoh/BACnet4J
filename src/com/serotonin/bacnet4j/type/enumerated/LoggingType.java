@@ -26,6 +26,7 @@ import com.serotonin.bacnet4j.type.primitive.Enumerated;
 import com.serotonin.util.queue.ByteQueue;
 
 public class LoggingType extends Enumerated {
+    private static final long serialVersionUID = 7142631539010266808L;
     public static final LoggingType polled = new LoggingType(0);
     public static final LoggingType cov = new LoggingType(1);
     public static final LoggingType triggered = new LoggingType(2);
@@ -33,7 +34,7 @@ public class LoggingType extends Enumerated {
     public LoggingType(int value) {
         super(value);
     }
-    
+
     public LoggingType(ByteQueue queue) {
         super(queue);
     }

@@ -46,18 +46,20 @@ import com.serotonin.bacnet4j.type.primitive.UnsignedInteger;
 import com.serotonin.util.queue.ByteQueue;
 
 public class CreateObjectRequest extends ConfirmedRequestService {
+    private static final long serialVersionUID = -610206284148696878L;
+
     public static final byte TYPE_ID = 10;
-    
+
     private static List<Class<? extends Encodable>> classes;
     static {
         classes = new ArrayList<Class<? extends Encodable>>();
         classes.add(ObjectType.class);
         classes.add(ObjectIdentifier.class);
     }
-    
+
     private final Choice objectSpecifier;
     private final SequenceOf<PropertyValue> listOfInitialValues;
-    
+
     public CreateObjectRequest(ObjectType objectType, SequenceOf<PropertyValue> listOfInitialValues) {
         objectSpecifier = new Choice(0, objectType);
         this.listOfInitialValues = listOfInitialValues;
@@ -72,39 +74,39 @@ public class CreateObjectRequest extends ConfirmedRequestService {
     public byte getChoiceId() {
         return TYPE_ID;
     }
-    
+
     @Override
     public AcknowledgementService handle(LocalDevice localDevice, Address from, Network network)
             throws BACnetErrorException {
         ObjectIdentifier id;
         if (objectSpecifier.getContextId() == 0) {
-            ObjectType type = (ObjectType)objectSpecifier.getDatum();
+            ObjectType type = (ObjectType) objectSpecifier.getDatum();
             id = localDevice.getNextInstanceObjectIdentifier(type);
         }
         else
-            id = (ObjectIdentifier)objectSpecifier.getDatum();
-        
+            id = (ObjectIdentifier) objectSpecifier.getDatum();
+
         BACnetObject obj = new BACnetObject(localDevice, id);
-        
+
         if (listOfInitialValues != null) {
-            for (int i=0; i<listOfInitialValues.getCount(); i++) {
-                PropertyValue pv = listOfInitialValues.get(i+1);
+            for (int i = 0; i < listOfInitialValues.getCount(); i++) {
+                PropertyValue pv = listOfInitialValues.get(i + 1);
                 try {
                     obj.setProperty(pv);
                 }
                 catch (BACnetServiceException e) {
-                    throw new BACnetErrorException(new CreateObjectError(getChoiceId(), e, new UnsignedInteger(i+1)));
+                    throw new BACnetErrorException(new CreateObjectError(getChoiceId(), e, new UnsignedInteger(i + 1)));
                 }
             }
         }
-        
+
         try {
             localDevice.addObject(obj);
         }
         catch (BACnetServiceException e) {
             throw new BACnetErrorException(new CreateObjectError(getChoiceId(), e, null));
         }
-        
+
         // Return a create object ack.
         return new CreateObjectAck(id);
     }
@@ -114,16 +116,16 @@ public class CreateObjectRequest extends ConfirmedRequestService {
         write(queue, objectSpecifier, 0);
         writeOptional(queue, listOfInitialValues, 1);
     }
-    
+
     CreateObjectRequest(ByteQueue queue) throws BACnetException {
         popStart(queue, 0);
         objectSpecifier = new Choice(queue, classes);
         popEnd(queue, 0);
-        
+
         if (objectSpecifier.getContextId() == 0)
-            ThreadLocalObjectType.set((ObjectType)objectSpecifier.getDatum());
+            ThreadLocalObjectType.set((ObjectType) objectSpecifier.getDatum());
         else
-            ThreadLocalObjectType.set(((ObjectIdentifier)objectSpecifier.getDatum()).getObjectType());
+            ThreadLocalObjectType.set(((ObjectIdentifier) objectSpecifier.getDatum()).getObjectType());
         listOfInitialValues = readOptionalSequenceOf(queue, PropertyValue.class, 1);
         ThreadLocalObjectType.remove();
     }

@@ -29,6 +29,8 @@ import com.serotonin.bacnet4j.type.primitive.UnsignedInteger;
 import com.serotonin.util.queue.ByteQueue;
 
 public class FloatingLimit extends EventParameter {
+    private static final long serialVersionUID = -3074551768740502706L;
+
     public static final byte TYPE_ID = 4;
 
     private final UnsignedInteger timeDelay;

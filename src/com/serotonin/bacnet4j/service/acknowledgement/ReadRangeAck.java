@@ -32,8 +32,10 @@ import com.serotonin.bacnet4j.type.primitive.UnsignedInteger;
 import com.serotonin.util.queue.ByteQueue;
 
 public class ReadRangeAck extends AcknowledgementService {
+    private static final long serialVersionUID = -8449473466967996803L;
+
     public static final byte TYPE_ID = 26;
-    
+
     private final ObjectIdentifier objectIdentifier;
     private final PropertyIdentifier propertyIdentifier;
     private final UnsignedInteger propertyArrayIndex;
@@ -41,9 +43,9 @@ public class ReadRangeAck extends AcknowledgementService {
     private final UnsignedInteger itemCount;
     private final SequenceOf<? extends Encodable> itemData;
     private final UnsignedInteger firstSequenceNumber;
-    
-    public ReadRangeAck(ObjectIdentifier objectIdentifier, PropertyIdentifier propertyIdentifier, 
-            UnsignedInteger propertyArrayIndex, ResultFlags resultFlags, UnsignedInteger itemCount, 
+
+    public ReadRangeAck(ObjectIdentifier objectIdentifier, PropertyIdentifier propertyIdentifier,
+            UnsignedInteger propertyArrayIndex, ResultFlags resultFlags, UnsignedInteger itemCount,
             SequenceOf<? extends Encodable> itemData, UnsignedInteger firstSequenceNumber) {
         this.objectIdentifier = objectIdentifier;
         this.propertyIdentifier = propertyIdentifier;
@@ -58,7 +60,7 @@ public class ReadRangeAck extends AcknowledgementService {
     public byte getChoiceId() {
         return TYPE_ID;
     }
-    
+
     @Override
     public void write(ByteQueue queue) {
         write(queue, objectIdentifier, 0);
@@ -69,7 +71,7 @@ public class ReadRangeAck extends AcknowledgementService {
         write(queue, itemData, 5);
         writeOptional(queue, firstSequenceNumber, 6);
     }
-    
+
     ReadRangeAck(ByteQueue queue) throws BACnetException {
         objectIdentifier = read(queue, ObjectIdentifier.class, 0);
         propertyIdentifier = read(queue, PropertyIdentifier.class, 1);

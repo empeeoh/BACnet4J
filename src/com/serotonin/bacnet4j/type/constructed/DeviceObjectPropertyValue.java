@@ -30,13 +30,14 @@ import com.serotonin.bacnet4j.type.primitive.UnsignedInteger;
 import com.serotonin.util.queue.ByteQueue;
 
 public class DeviceObjectPropertyValue extends BaseType {
+    private static final long serialVersionUID = 7014807902238765395L;
     private final ObjectIdentifier deviceIdentifier;
     private final ObjectIdentifier objectIdentifier;
     private final PropertyIdentifier propertyIdentifier;
     private final UnsignedInteger arrayIndex;
     private final Encodable value;
-    
-    public DeviceObjectPropertyValue(ObjectIdentifier deviceIdentifier, ObjectIdentifier objectIdentifier, 
+
+    public DeviceObjectPropertyValue(ObjectIdentifier deviceIdentifier, ObjectIdentifier objectIdentifier,
             PropertyIdentifier propertyIdentifier, UnsignedInteger arrayIndex, Encodable value) {
         this.deviceIdentifier = deviceIdentifier;
         this.objectIdentifier = objectIdentifier;
@@ -44,7 +45,7 @@ public class DeviceObjectPropertyValue extends BaseType {
         this.arrayIndex = arrayIndex;
         this.value = value;
     }
-    
+
     @Override
     public void write(ByteQueue queue) {
         write(queue, deviceIdentifier, 0);
@@ -53,7 +54,7 @@ public class DeviceObjectPropertyValue extends BaseType {
         writeOptional(queue, arrayIndex, 3);
         write(queue, value, 4);
     }
-    
+
     public DeviceObjectPropertyValue(ByteQueue queue) throws BACnetException {
         deviceIdentifier = read(queue, ObjectIdentifier.class, 0);
         objectIdentifier = read(queue, ObjectIdentifier.class, 1);

@@ -33,12 +33,14 @@ import com.serotonin.bacnet4j.type.primitive.ObjectIdentifier;
 import com.serotonin.util.queue.ByteQueue;
 
 public class IHaveRequest extends UnconfirmedRequestService {
+    private static final long serialVersionUID = 3369038797505147152L;
+
     public static final byte TYPE_ID = 1;
-    
+
     private final ObjectIdentifier deviceIdentifier;
     private final ObjectIdentifier objectIdentifier;
     private final CharacterString objectName;
-    
+
     public IHaveRequest(ObjectIdentifier deviceIdentifier, ObjectIdentifier objectIdentifier, CharacterString objectName) {
         super();
         this.deviceIdentifier = deviceIdentifier;
@@ -57,7 +59,7 @@ public class IHaveRequest extends UnconfirmedRequestService {
         RemoteObject o = new RemoteObject(objectIdentifier);
         o.setObjectName(objectName.toString());
         d.setObject(o);
-        
+
         localDevice.getEventHandler().fireIHaveReceived(d, o);
     }
 
@@ -67,7 +69,7 @@ public class IHaveRequest extends UnconfirmedRequestService {
         write(queue, objectIdentifier);
         write(queue, objectName);
     }
-    
+
     IHaveRequest(ByteQueue queue) throws BACnetException {
         deviceIdentifier = read(queue, ObjectIdentifier.class);
         objectIdentifier = read(queue, ObjectIdentifier.class);

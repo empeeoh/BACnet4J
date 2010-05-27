@@ -28,11 +28,13 @@ import com.serotonin.bacnet4j.type.primitive.BitString;
 import com.serotonin.util.queue.ByteQueue;
 
 public class ChangeOfBitString extends NotificationParameters {
+    private static final long serialVersionUID = -3901007413758533165L;
+
     public static final byte TYPE_ID = 0;
-    
+
     private final BitString referencedBitstring;
     private final StatusFlags statusFlags;
-    
+
     public ChangeOfBitString(BitString referencedBitstring, StatusFlags statusFlags) {
         this.referencedBitstring = referencedBitstring;
         this.statusFlags = statusFlags;
@@ -43,7 +45,7 @@ public class ChangeOfBitString extends NotificationParameters {
         write(queue, referencedBitstring, 0);
         write(queue, statusFlags, 1);
     }
-    
+
     public ChangeOfBitString(ByteQueue queue) throws BACnetException {
         referencedBitstring = read(queue, BitString.class, 0);
         statusFlags = read(queue, StatusFlags.class, 1);

@@ -28,19 +28,20 @@ import com.serotonin.bacnet4j.type.primitive.UnsignedInteger;
 import com.serotonin.util.queue.ByteQueue;
 
 public class AccumulatorRecord extends BaseType {
+    private static final long serialVersionUID = 6871737486792988550L;
     private final DateTime timestamp;
     private final UnsignedInteger presentValue;
     private final UnsignedInteger accumulatedValue;
     private final AccumulatorStatus accumulatorStatus;
 
-    public AccumulatorRecord(DateTime timestamp, UnsignedInteger presentValue, UnsignedInteger accumulatedValue, 
+    public AccumulatorRecord(DateTime timestamp, UnsignedInteger presentValue, UnsignedInteger accumulatedValue,
             AccumulatorStatus accumulatorStatus) {
         this.timestamp = timestamp;
         this.presentValue = presentValue;
         this.accumulatedValue = accumulatedValue;
         this.accumulatorStatus = accumulatorStatus;
     }
-    
+
     @Override
     public void write(ByteQueue queue) {
         write(queue, timestamp, 0);
@@ -48,7 +49,7 @@ public class AccumulatorRecord extends BaseType {
         write(queue, accumulatedValue, 2);
         write(queue, accumulatorStatus, 3);
     }
-    
+
     public AccumulatorRecord(ByteQueue queue) throws BACnetException {
         timestamp = read(queue, DateTime.class, 0);
         presentValue = read(queue, UnsignedInteger.class, 1);
@@ -57,6 +58,7 @@ public class AccumulatorRecord extends BaseType {
     }
 
     public static class AccumulatorStatus extends Enumerated {
+        private static final long serialVersionUID = -2613363966788524923L;
         public static final AccumulatorStatus normal = new AccumulatorStatus(0);
         public static final AccumulatorStatus starting = new AccumulatorStatus(1);
         public static final AccumulatorStatus recovered = new AccumulatorStatus(2);

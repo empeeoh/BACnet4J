@@ -27,9 +27,11 @@ import com.serotonin.bacnet4j.service.Service;
 import com.serotonin.util.queue.ByteQueue;
 
 abstract public class AcknowledgementService extends Service {
+    private static final long serialVersionUID = 3837098889443642001L;
+
     public static AcknowledgementService createAcknowledgementService(byte type, ByteQueue queue)
             throws BACnetException {
-        
+
         if (type == GetAlarmSummaryAck.TYPE_ID) // 3
             return new GetAlarmSummaryAck(queue);
         if (type == GetEnrollmentSummaryAck.TYPE_ID) // 4
@@ -58,7 +60,7 @@ abstract public class AcknowledgementService extends Service {
             return new ReadRangeAck(queue);
         if (type == GetEventInformationAck.TYPE_ID) // 29
             return new GetEventInformationAck(queue);
-        
-        throw new BACnetException("Unsupported service acknowledgement: "+ (type & 0xff));
+
+        throw new BACnetException("Unsupported service acknowledgement: " + (type & 0xff));
     }
 }

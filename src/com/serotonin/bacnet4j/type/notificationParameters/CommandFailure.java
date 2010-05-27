@@ -29,6 +29,8 @@ import com.serotonin.bacnet4j.type.constructed.StatusFlags;
 import com.serotonin.util.queue.ByteQueue;
 
 public class CommandFailure extends NotificationParameters {
+    private static final long serialVersionUID = 5727410398456093753L;
+
     public static final byte TYPE_ID = 3;
 
     private final Encodable commandValue;

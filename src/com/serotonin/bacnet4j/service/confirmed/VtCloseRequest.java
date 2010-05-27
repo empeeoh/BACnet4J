@@ -33,10 +33,12 @@ import com.serotonin.bacnet4j.type.primitive.UnsignedInteger;
 import com.serotonin.util.queue.ByteQueue;
 
 public class VtCloseRequest extends ConfirmedRequestService {
+    private static final long serialVersionUID = -7857063472279095665L;
+
     public static final byte TYPE_ID = 22;
-    
+
     private final SequenceOf<UnsignedInteger> listOfRemoteVTSessionIdentifiers;
-    
+
     public VtCloseRequest(SequenceOf<UnsignedInteger> listOfRemoteVTSessionIdentifiers) {
         this.listOfRemoteVTSessionIdentifiers = listOfRemoteVTSessionIdentifiers;
     }
@@ -50,14 +52,13 @@ public class VtCloseRequest extends ConfirmedRequestService {
     public void write(ByteQueue queue) {
         write(queue, listOfRemoteVTSessionIdentifiers);
     }
-    
+
     VtCloseRequest(ByteQueue queue) throws BACnetException {
         listOfRemoteVTSessionIdentifiers = readSequenceOf(queue, UnsignedInteger.class);
     }
 
     @Override
-    public AcknowledgementService handle(LocalDevice localDevice, Address from, Network network)
-            throws BACnetException {
+    public AcknowledgementService handle(LocalDevice localDevice, Address from, Network network) throws BACnetException {
         throw new NotImplementedException();
     }
 
@@ -65,7 +66,8 @@ public class VtCloseRequest extends ConfirmedRequestService {
     public int hashCode() {
         final int PRIME = 31;
         int result = 1;
-        result = PRIME * result + ((listOfRemoteVTSessionIdentifiers == null) ? 0 : listOfRemoteVTSessionIdentifiers.hashCode());
+        result = PRIME * result
+                + ((listOfRemoteVTSessionIdentifiers == null) ? 0 : listOfRemoteVTSessionIdentifiers.hashCode());
         return result;
     }
 

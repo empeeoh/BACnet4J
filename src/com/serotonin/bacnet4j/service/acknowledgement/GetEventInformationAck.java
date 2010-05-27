@@ -35,16 +35,18 @@ import com.serotonin.bacnet4j.type.primitive.UnsignedInteger;
 import com.serotonin.util.queue.ByteQueue;
 
 public class GetEventInformationAck extends AcknowledgementService {
+    private static final long serialVersionUID = -1017673519290270616L;
+
     public static final byte TYPE_ID = 29;
-    
+
     private final SequenceOf<EventSummary> listOfEventSummaries;
     private final Boolean moreEvents;
-    
+
     public GetEventInformationAck(SequenceOf<EventSummary> listOfEventSummaries, Boolean moreEvents) {
         this.listOfEventSummaries = listOfEventSummaries;
         this.moreEvents = moreEvents;
     }
-    
+
     @Override
     public byte getChoiceId() {
         return TYPE_ID;
@@ -55,7 +57,7 @@ public class GetEventInformationAck extends AcknowledgementService {
         write(queue, listOfEventSummaries, 0);
         write(queue, moreEvents, 1);
     }
-    
+
     GetEventInformationAck(ByteQueue queue) throws BACnetException {
         listOfEventSummaries = readSequenceOf(queue, EventSummary.class, 0);
         moreEvents = read(queue, Boolean.class, 1);
@@ -68,8 +70,9 @@ public class GetEventInformationAck extends AcknowledgementService {
     public Boolean getMoreEvents() {
         return moreEvents;
     }
-    
+
     public static class EventSummary extends BaseType {
+        private static final long serialVersionUID = -8125602915002238614L;
         private final ObjectIdentifier objectIdentifier;
         private final EventState eventState;
         private final EventTransitionBits acknowledgedTransitions;
@@ -81,10 +84,10 @@ public class GetEventInformationAck extends AcknowledgementService {
         private final UnsignedInteger eventPriorities1;
         private final UnsignedInteger eventPriorities2;
         private final UnsignedInteger eventPriorities3;
-        
-        public EventSummary(ObjectIdentifier objectIdentifier, EventState eventState, 
-                EventTransitionBits acknowledgedTransitions, TimeStamp eventTimeStamp1, TimeStamp eventTimeStamp2, 
-                TimeStamp eventTimeStamp3, NotifyType notifyType, EventTransitionBits eventEnable, 
+
+        public EventSummary(ObjectIdentifier objectIdentifier, EventState eventState,
+                EventTransitionBits acknowledgedTransitions, TimeStamp eventTimeStamp1, TimeStamp eventTimeStamp2,
+                TimeStamp eventTimeStamp3, NotifyType notifyType, EventTransitionBits eventEnable,
                 UnsignedInteger eventPriorities1, UnsignedInteger eventPriorities2, UnsignedInteger eventPriorities3) {
             this.objectIdentifier = objectIdentifier;
             this.eventState = eventState;
@@ -98,7 +101,7 @@ public class GetEventInformationAck extends AcknowledgementService {
             this.eventPriorities2 = eventPriorities2;
             this.eventPriorities3 = eventPriorities3;
         }
-        
+
         @Override
         public void write(ByteQueue queue) {
             objectIdentifier.write(queue, 0);
@@ -117,7 +120,7 @@ public class GetEventInformationAck extends AcknowledgementService {
             eventPriorities3.write(queue);
             writeContextTag(queue, 6, false);
         }
-        
+
         public EventSummary(ByteQueue queue) throws BACnetException {
             objectIdentifier = read(queue, ObjectIdentifier.class, 0);
             eventState = read(queue, EventState.class, 1);

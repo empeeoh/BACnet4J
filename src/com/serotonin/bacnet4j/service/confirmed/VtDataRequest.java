@@ -33,12 +33,14 @@ import com.serotonin.bacnet4j.type.primitive.UnsignedInteger;
 import com.serotonin.util.queue.ByteQueue;
 
 public class VtDataRequest extends ConfirmedRequestService {
+    private static final long serialVersionUID = 5285787585416136977L;
+
     public static final byte TYPE_ID = 23;
-    
+
     private final UnsignedInteger vtSessionIdentifier;
     private final OctetString vtNewData;
     private final UnsignedInteger vtDataFlag;
-    
+
     public VtDataRequest(UnsignedInteger vtSessionIdentifier, OctetString vtNewData, UnsignedInteger vtDataFlag) {
         this.vtSessionIdentifier = vtSessionIdentifier;
         this.vtNewData = vtNewData;
@@ -56,7 +58,7 @@ public class VtDataRequest extends ConfirmedRequestService {
         write(queue, vtNewData);
         write(queue, vtDataFlag);
     }
-    
+
     VtDataRequest(ByteQueue queue) throws BACnetException {
         vtSessionIdentifier = read(queue, UnsignedInteger.class);
         vtNewData = read(queue, OctetString.class);
@@ -64,8 +66,7 @@ public class VtDataRequest extends ConfirmedRequestService {
     }
 
     @Override
-    public AcknowledgementService handle(LocalDevice localDevice, Address from, Network network)
-            throws BACnetException {
+    public AcknowledgementService handle(LocalDevice localDevice, Address from, Network network) throws BACnetException {
         throw new NotImplementedException();
     }
 

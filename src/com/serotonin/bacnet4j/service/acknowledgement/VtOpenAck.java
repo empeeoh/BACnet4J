@@ -27,10 +27,12 @@ import com.serotonin.bacnet4j.type.primitive.UnsignedInteger;
 import com.serotonin.util.queue.ByteQueue;
 
 public class VtOpenAck extends AcknowledgementService {
+    private static final long serialVersionUID = 6959632953423207763L;
+
     public static final byte TYPE_ID = 21;
-    
+
     private final UnsignedInteger remoteVTSessionIdentifier;
-    
+
     public VtOpenAck(UnsignedInteger remoteVTSessionIdentifier) {
         this.remoteVTSessionIdentifier = remoteVTSessionIdentifier;
     }
@@ -44,7 +46,7 @@ public class VtOpenAck extends AcknowledgementService {
     public void write(ByteQueue queue) {
         write(queue, remoteVTSessionIdentifier);
     }
-    
+
     VtOpenAck(ByteQueue queue) throws BACnetException {
         remoteVTSessionIdentifier = read(queue, UnsignedInteger.class);
     }

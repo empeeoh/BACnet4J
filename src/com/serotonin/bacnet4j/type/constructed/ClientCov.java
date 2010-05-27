@@ -31,13 +31,14 @@ import com.serotonin.bacnet4j.type.primitive.Real;
 import com.serotonin.util.queue.ByteQueue;
 
 public class ClientCov extends BaseType {
+    private static final long serialVersionUID = 654453440700433527L;
     private Real realIncrement;
     private Null defaultIncrement;
-    
+
     public ClientCov(Real realIncrement) {
         this.realIncrement = realIncrement;
     }
-    
+
     public ClientCov(Null defaultIncrement) {
         this.defaultIncrement = defaultIncrement;
     }
@@ -49,7 +50,7 @@ public class ClientCov extends BaseType {
         else
             write(queue, defaultIncrement);
     }
-    
+
     public ClientCov(ByteQueue queue) throws BACnetException {
         int tag = (queue.peek(0) & 0xff) >> 4;
         if (tag == Null.TYPE_ID)

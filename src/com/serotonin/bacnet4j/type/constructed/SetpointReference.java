@@ -26,6 +26,7 @@ import com.serotonin.bacnet4j.exception.BACnetException;
 import com.serotonin.util.queue.ByteQueue;
 
 public class SetpointReference extends BaseType {
+    private static final long serialVersionUID = 6454996310502957318L;
     private final ObjectPropertyReference setpointReference;
 
     public SetpointReference(ObjectPropertyReference setpointReference) {
@@ -36,7 +37,7 @@ public class SetpointReference extends BaseType {
     public void write(ByteQueue queue) {
         writeOptional(queue, setpointReference, 0);
     }
-    
+
     public SetpointReference(ByteQueue queue) throws BACnetException {
         setpointReference = readOptional(queue, ObjectPropertyReference.class, 0);
     }
@@ -46,10 +47,10 @@ public class SetpointReference extends BaseType {
     }
 
     @Override
-    public String toString () {
-        return "SetpointReference(setpointReference="+ setpointReference +")";
+    public String toString() {
+        return "SetpointReference(setpointReference=" + setpointReference + ")";
     }
-    
+
     @Override
     public int hashCode() {
         final int PRIME = 31;

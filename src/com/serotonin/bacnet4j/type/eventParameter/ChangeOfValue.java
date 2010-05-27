@@ -34,6 +34,8 @@ import com.serotonin.bacnet4j.type.primitive.UnsignedInteger;
 import com.serotonin.util.queue.ByteQueue;
 
 public class ChangeOfValue extends EventParameter {
+    private static final long serialVersionUID = 2660470709377346618L;
+
     public static final byte TYPE_ID = 2;
 
     private static List<Class<? extends Encodable>> classes;

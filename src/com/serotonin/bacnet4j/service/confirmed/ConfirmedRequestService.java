@@ -34,7 +34,10 @@ import com.serotonin.bacnet4j.type.enumerated.ErrorCode;
 import com.serotonin.util.queue.ByteQueue;
 
 abstract public class ConfirmedRequestService extends Service {
-    public static ConfirmedRequestService createConfirmedRequestService(byte type, ByteQueue queue) throws BACnetException {
+    private static final long serialVersionUID = -7443765811741238314L;
+
+    public static ConfirmedRequestService createConfirmedRequestService(byte type, ByteQueue queue)
+            throws BACnetException {
         if (type == AcknowledgeAlarmRequest.TYPE_ID) // 0
             return new AcknowledgeAlarmRequest(queue);
         if (type == ConfirmedCovNotificationRequest.TYPE_ID) // 1
@@ -95,9 +98,10 @@ abstract public class ConfirmedRequestService extends Service {
             return new SubscribeCOVPropertyRequest(queue);
         if (type == GetEventInformation.TYPE_ID) // 29
             return new GetEventInformation(queue);
-        
+
         throw new BACnetErrorException(ErrorClass.device, ErrorCode.serviceRequestDenied);
     }
-    
-    abstract public AcknowledgementService handle(LocalDevice localDevice, Address from, Network network) throws BACnetException;
+
+    abstract public AcknowledgementService handle(LocalDevice localDevice, Address from, Network network)
+            throws BACnetException;
 }

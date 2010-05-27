@@ -31,6 +31,7 @@ import com.serotonin.bacnet4j.type.primitive.UnsignedInteger;
 import com.serotonin.util.queue.ByteQueue;
 
 public class ActionCommand extends BaseType {
+    private static final long serialVersionUID = 6627972998457216719L;
     private final ObjectIdentifier deviceIdentifier;
     private final ObjectIdentifier objectIdentifier;
     private final PropertyIdentifier propertyIdentifier;
@@ -40,9 +41,9 @@ public class ActionCommand extends BaseType {
     private final UnsignedInteger postDelay;
     private final Boolean quitOnFailure;
     private final Boolean writeSuccessful;
-    
-    public ActionCommand(ObjectIdentifier deviceIdentifier, ObjectIdentifier objectIdentifier, 
-            PropertyIdentifier propertyIdentifier, UnsignedInteger propertyArrayIndex, Encodable propertyValue, 
+
+    public ActionCommand(ObjectIdentifier deviceIdentifier, ObjectIdentifier objectIdentifier,
+            PropertyIdentifier propertyIdentifier, UnsignedInteger propertyArrayIndex, Encodable propertyValue,
             UnsignedInteger priority, UnsignedInteger postDelay, Boolean quitOnFailure, Boolean writeSuccessful) {
         this.deviceIdentifier = deviceIdentifier;
         this.objectIdentifier = objectIdentifier;
@@ -67,14 +68,14 @@ public class ActionCommand extends BaseType {
         write(queue, quitOnFailure, 7);
         write(queue, writeSuccessful, 8);
     }
-    
+
     public ActionCommand(ByteQueue queue) throws BACnetException {
         deviceIdentifier = readOptional(queue, ObjectIdentifier.class, 0);
         objectIdentifier = read(queue, ObjectIdentifier.class, 1);
         propertyIdentifier = read(queue, PropertyIdentifier.class, 2);
         propertyArrayIndex = readOptional(queue, UnsignedInteger.class, 3);
-        propertyValue = readEncodable(queue, objectIdentifier.getObjectType(), propertyIdentifier, 
-                propertyArrayIndex, 4);
+        propertyValue = readEncodable(queue, objectIdentifier.getObjectType(), propertyIdentifier, propertyArrayIndex,
+                4);
         priority = readOptional(queue, UnsignedInteger.class, 5);
         postDelay = readOptional(queue, UnsignedInteger.class, 6);
         quitOnFailure = read(queue, Boolean.class, 7);

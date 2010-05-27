@@ -30,6 +30,7 @@ import com.serotonin.bacnet4j.type.primitive.UnsignedInteger;
 import com.serotonin.util.queue.ByteQueue;
 
 public class Destination extends BaseType {
+    private static final long serialVersionUID = 5382539059135665624L;
     private final DaysOfWeek validDays;
     private final Time fromTime;
     private final Time toTime;
@@ -37,8 +38,8 @@ public class Destination extends BaseType {
     private final UnsignedInteger processIdentifier;
     private final Boolean issueConfirmedNotifications;
     private final EventTransitionBits transitions;
-    
-    public Destination(DaysOfWeek validDays, Time fromTime, Time toTime, Recipient recipient, 
+
+    public Destination(DaysOfWeek validDays, Time fromTime, Time toTime, Recipient recipient,
             UnsignedInteger processIdentifier, Boolean issueConfirmedNotifications, EventTransitionBits transitions) {
         this.validDays = validDays;
         this.fromTime = fromTime;
@@ -70,7 +71,7 @@ public class Destination extends BaseType {
         write(queue, issueConfirmedNotifications);
         write(queue, transitions);
     }
-    
+
     public Destination(ByteQueue queue) throws BACnetException {
         validDays = read(queue, DaysOfWeek.class);
         fromTime = read(queue, Time.class);
@@ -80,23 +81,23 @@ public class Destination extends BaseType {
         issueConfirmedNotifications = read(queue, Boolean.class);
         transitions = read(queue, EventTransitionBits.class);
     }
-    
+
     public boolean isSuitableForEvent(TimeStamp timeStamp, EventState toState) {
         // Only check date fields if the timestamp is not a sequence number.
         if (!timeStamp.isSequenceNumber()) {
             // Check if the timestamp day of week is in the valid days of week list.
             if (!validDays.contains(timeStamp.getDateTime().getDate().getDayOfWeek().getId()))
                 return false;
-            
+
             // Check if the timestamp is between the from and to times.
             if (timeStamp.getDateTime().getTime().before(fromTime) || timeStamp.getDateTime().getTime().after(toTime))
                 return false;
         }
-        
+
         // Check if the destination is interested in this new event state.
         return transitions.contains(toState);
     }
-    
+
     public DaysOfWeek getValidDays() {
         return validDays;
     }
