@@ -85,7 +85,6 @@ public class IpMessageControl extends Thread {
     RequestHandler requestHandler;
 
     // Runtime
-    private byte nextInvokeId;
     private DatagramSocket socket;
     final WaitingRoom waitingRoom = new WaitingRoom();
     private ExecutorService incomingExecutorService;
@@ -175,9 +174,9 @@ public class IpMessageControl extends Thread {
         }
     }
 
-    private byte getNextInvokeId() {
-        return nextInvokeId++;
-    }
+    // private byte getNextInvokeId() {
+    // return nextInvokeId++;
+    // }
 
     public AckAPDU send(String host, Network network, int maxAPDULengthAccepted, Segmentation segmentationSupported,
             ConfirmedRequestService serviceRequest) throws BACnetException {
@@ -204,7 +203,7 @@ public class IpMessageControl extends Thread {
     public AckAPDU send(InetSocketAddress addr, Network network, int maxAPDULengthAccepted,
             Segmentation segmentationSupported, ConfirmedRequestService serviceRequest) throws BACnetException {
         // Get an invoke id.
-        byte id = getNextInvokeId();
+        // byte id = getNextInvokeId();
 
         // Serialize the service request.
         ByteQueue serviceData = new ByteQueue();
@@ -221,7 +220,7 @@ public class IpMessageControl extends Thread {
             if (segmentsRequired > 128)
                 throw new BACnetException("Request too big to send to device; too many segments required");
 
-            Key key = waitingRoom.enter(addr, network, id, false);
+            Key key = waitingRoom.enterClient(addr, network);
             try {
                 return sendSegmentedRequest(key, maxAPDULengthAccepted, maxServiceData, serviceRequest.getChoiceId(),
                         serviceData);
@@ -232,9 +231,15 @@ public class IpMessageControl extends Thread {
         }
 
         // We can send the whole APDU in one shot.
-        ConfirmedRequest apdu = new ConfirmedRequest(false, false, true, MAX_SEGMENTS, APDU_LENGTH, id, (byte) 0, 0,
-                serviceRequest.getChoiceId(), serviceData);
-        return send(addr, network, id, timeout, apdu, false);
+        Key key = waitingRoom.enterClient(addr, network);
+        ConfirmedRequest apdu = new ConfirmedRequest(false, false, true, MAX_SEGMENTS, APDU_LENGTH, key.getInvokeId(),
+                (byte) 0, 0, serviceRequest.getChoiceId(), serviceData);
+        try {
+            return send(key, timeout, new APDU[] { apdu });
+        }
+        finally {
+            waitingRoom.leave(key);
+        }
     }
 
     void sendResponse(InetSocketAddress addr, Network network, ConfirmedRequest request, AcknowledgementService response)
@@ -259,7 +264,7 @@ public class IpMessageControl extends Thread {
             if (segmentsRequired > request.getMaxSegmentsAccepted() || segmentsRequired > 128)
                 throw new BACnetException("Response too big to send to device; too many segments required");
 
-            Key key = waitingRoom.enter(addr, network, request.getInvokeId(), true);
+            Key key = waitingRoom.enterServer(addr, network, request.getInvokeId());
             try {
                 sendSegmentedResponse(key, request.getMaxApduLengthAccepted().getMaxLength(), maxServiceData, response
                         .getChoiceId(), serviceData);
@@ -271,17 +276,6 @@ public class IpMessageControl extends Thread {
         else
             // We can send the whole APDU in one shot.
             sendImpl(new ComplexACK(false, false, request.getInvokeId(), 0, 0, response), false, addr, network);
-    }
-
-    private AckAPDU send(InetSocketAddress addr, Network network, byte id, int timeout, APDU apdu, boolean server)
-            throws BACnetException {
-        Key key = waitingRoom.enter(addr, network, id, server);
-        try {
-            return send(key, timeout, new APDU[] { apdu });
-        }
-        finally {
-            waitingRoom.leave(key);
-        }
     }
 
     private AckAPDU send(Key key, int timeout, APDU[] apdu) throws BACnetException {
@@ -533,7 +527,7 @@ public class IpMessageControl extends Thread {
                 else {
                     if (confAPDU.isSegmentedMessage()) {
                         // This is the initial part of a segmented message. Go and receive the subsequent parts.
-                        Key key = waitingRoom.enter(from, fromNetwork, invokeId, true);
+                        Key key = waitingRoom.enterServer(from, fromNetwork, invokeId);
                         try {
                             receiveSegmented(key, confAPDU);
                         }

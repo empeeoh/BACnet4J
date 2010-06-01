@@ -40,8 +40,6 @@ public class IpNetwork extends BACnetNetwork {
     private static final int DEFAULT_PORT = 0xbac0;
     private static final int MESSAGE_LENGTH = 1476;
 
-    private byte nextInvokeId = 0;
-
     private int port = DEFAULT_PORT;
 
     // Runtime fields.
@@ -53,10 +51,6 @@ public class IpNetwork extends BACnetNetwork {
 
     public IpNetwork(int port) {
         this.port = port;
-    }
-
-    protected byte getNextInvokeId() {
-        return nextInvokeId++;
     }
 
     public void init() throws BACnetException {

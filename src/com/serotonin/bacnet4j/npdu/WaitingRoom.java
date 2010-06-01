@@ -39,35 +39,43 @@ import com.serotonin.bacnet4j.exception.SegmentedMessageAbortedException;
 
 public class WaitingRoom {
     private final HashMap<Key, Member> waitHere = new HashMap<Key, Member>();
+    private byte nextInvokeId;
 
-    // public AckAPDU waitForAck(InetSocketAddress peer, byte id, boolean server, long timeout,
-    // boolean throwTimeout) throws BACnetException {
-    // return (AckAPDU)waitForAPDU(peer, id, server, timeout, throwTimeout);
-    // }
-    //    
-    // public ConfirmedRequest waitForRequest(InetSocketAddress peer, byte id, boolean server, long timeout,
-    // boolean throwTimeout) throws BACnetException {
-    // return (ConfirmedRequest)waitForAPDU(peer, id, server, timeout, throwTimeout);
-    // }
-    //    
-    // public APDU waitForAPDU(InetSocketAddress peer, byte id, boolean server, long timeout,
-    // boolean throwTimeout) throws BACnetException {
-    // Key key = enter(peer, id, !server);
-    // try {
-    // return getAPDU(key, timeout, throwTimeout);
-    // }
-    // finally {
-    // leave(key);
-    // }
-    // }
-
-    public Key enter(InetSocketAddress peer, Network network, byte id, boolean server) {
+    synchronized public Key enterClient(InetSocketAddress peer, Network network) {
         Member member = new Member();
-        Key key = new Key(peer, network, id, !server);
+        Key key;
+
+        // Loop until we find a key that is available.
+        int attempts = 256;
+        while (true) {
+            // We set the server value in the key to true so that it matches with the message from the server.
+            key = new Key(peer, network, nextInvokeId++, true);
+
+            synchronized (waitHere) {
+                if (waitHere.get(key) != null) {
+                    // Key collision. Try again unless we've tried too many times.
+                    if (--attempts > 0)
+                        continue;
+                    throw new BACnetRuntimeException("Cannot enter a client into the waiting room. key=" + key);
+                }
+
+                // Found a good id. Use it and exit.
+                waitHere.put(key, member);
+                break;
+            }
+        }
+
+        return key;
+    }
+
+    public Key enterServer(InetSocketAddress peer, Network network, byte id) {
+        // We set the server value in the key to false so that it matches with the message from the client.
+        Key key = new Key(peer, network, id, false);
+        Member member = new Member();
 
         synchronized (waitHere) {
             if (waitHere.get(key) != null)
-                throw new BACnetRuntimeException("Waiting room too crowded. key=" + key);
+                throw new BACnetRuntimeException("Cannot enter a server into the waiting room. key=" + key);
             waitHere.put(key, member);
         }
 
