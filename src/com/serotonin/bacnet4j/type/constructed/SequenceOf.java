@@ -96,10 +96,11 @@ public class SequenceOf<E extends Encodable> extends BaseType implements Iterabl
     public void remove(int indexBase1) {
         int index = indexBase1 - 1;
         if (index < values.size())
-            values.set(index, null);
+            values.remove(index);
+        // values.set(index, null);
         // Trim null values at the end.
-        while (!values.isEmpty() && values.get(values.size() - 1) == null)
-            values.remove(values.size() - 1);
+        // while (!values.isEmpty() && values.get(values.size() - 1) == null)
+        // values.remove(values.size() - 1);
     }
 
     public void remove(E value) {
