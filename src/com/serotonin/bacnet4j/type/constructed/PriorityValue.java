@@ -154,4 +154,58 @@ public class PriorityValue extends BaseType {
                         "Unsupported primitive id: " + tag);
         }
     }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((binaryValue == null) ? 0 : binaryValue.hashCode());
+        result = prime * result + ((constructedValue == null) ? 0 : constructedValue.hashCode());
+        result = prime * result + ((integerValue == null) ? 0 : integerValue.hashCode());
+        result = prime * result + ((nullValue == null) ? 0 : nullValue.hashCode());
+        result = prime * result + ((realValue == null) ? 0 : realValue.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        PriorityValue other = (PriorityValue) obj;
+        if (binaryValue == null) {
+            if (other.binaryValue != null)
+                return false;
+        }
+        else if (!binaryValue.equals(other.binaryValue))
+            return false;
+        if (constructedValue == null) {
+            if (other.constructedValue != null)
+                return false;
+        }
+        else if (!constructedValue.equals(other.constructedValue))
+            return false;
+        if (integerValue == null) {
+            if (other.integerValue != null)
+                return false;
+        }
+        else if (!integerValue.equals(other.integerValue))
+            return false;
+        if (nullValue == null) {
+            if (other.nullValue != null)
+                return false;
+        }
+        else if (!nullValue.equals(other.nullValue))
+            return false;
+        if (realValue == null) {
+            if (other.realValue != null)
+                return false;
+        }
+        else if (!realValue.equals(other.realValue))
+            return false;
+        return true;
+    }
 }
