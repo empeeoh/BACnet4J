@@ -489,9 +489,16 @@ public class IpMessageControl extends Thread {
                 throw new MessageValidationAssertionException("Length field does not match data: given=" + length
                         + ", expected=" + (queue.size() + 4));
 
-            if (function == 0x4)
-                // A forward. Ignore the next 6 bytes.
-                queue.pop(6);
+            if (function == 0x4) {
+                // A forward. Use the addr/port as the from address.
+                byte[] addr = new byte[4];
+                queue.pop(addr);
+                fromAddr = InetAddress.getByAddress(addr);
+                fromPort = queue.popU2B();
+
+                // // A forward. Ignore the next 6 bytes.
+                // queue.pop(6);
+            }
 
             // Network layer protocol control information. See 6.2.2
             NPCI npci = new NPCI(queue);
