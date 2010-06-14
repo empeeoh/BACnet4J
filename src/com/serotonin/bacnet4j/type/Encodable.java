@@ -302,12 +302,18 @@ abstract public class Encodable implements Serializable {
             return amb.convertTo(Null.class);
         }
 
-        if (propertyArrayIndex != null && !def.isSequence())
-            throw new BACnetErrorException(ErrorClass.property, ErrorCode.propertyIsNotAList);
-        if (propertyArrayIndex == null && def.isSequence())
-            return readSequenceOf(queue, def.getClazz(), contextId);
-        if (propertyArrayIndex == null && SequenceOf.class.isAssignableFrom(def.getClazz()))
-            return readSequenceType(queue, def.getClazz(), contextId);
+        if (propertyArrayIndex != null) {
+            if (!def.isSequence() && !SequenceOf.class.isAssignableFrom(def.getClazz()))
+                throw new BACnetErrorException(ErrorClass.property, ErrorCode.propertyIsNotAList);
+            if (SequenceOf.class.isAssignableFrom(def.getClazz()))
+                return readWrapped(queue, def.getInnerType(), contextId);
+        }
+        else {
+            if (def.isSequence())
+                return readSequenceOf(queue, def.getClazz(), contextId);
+            if (SequenceOf.class.isAssignableFrom(def.getClazz()))
+                return readSequenceType(queue, def.getClazz(), contextId);
+        }
 
         return readWrapped(queue, def.getClazz(), contextId);
     }

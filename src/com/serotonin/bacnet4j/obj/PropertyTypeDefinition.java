@@ -23,6 +23,8 @@
 package com.serotonin.bacnet4j.obj;
 
 import com.serotonin.bacnet4j.type.Encodable;
+import com.serotonin.bacnet4j.type.constructed.PriorityArray;
+import com.serotonin.bacnet4j.type.constructed.PriorityValue;
 import com.serotonin.bacnet4j.type.enumerated.ObjectType;
 import com.serotonin.bacnet4j.type.enumerated.PropertyIdentifier;
 
@@ -31,10 +33,10 @@ public class PropertyTypeDefinition {
     private final PropertyIdentifier propertyIdentifier;
     private final Class<? extends Encodable> clazz;
     private final boolean sequence;
-    private boolean required;
+    private final boolean required;
     private final Encodable defaultValue;
-    
-    PropertyTypeDefinition(ObjectType objectType, PropertyIdentifier propertyIdentifier, 
+
+    PropertyTypeDefinition(ObjectType objectType, PropertyIdentifier propertyIdentifier,
             Class<? extends Encodable> clazz, boolean sequence, boolean required, Encodable defaultValue) {
         this.objectType = objectType;
         this.propertyIdentifier = propertyIdentifier;
@@ -70,5 +72,11 @@ public class PropertyTypeDefinition {
 
     public Encodable getDefaultValue() {
         return defaultValue;
+    }
+
+    public Class<? extends Encodable> getInnerType() {
+        if (clazz == PriorityArray.class)
+            return PriorityValue.class;
+        return null;
     }
 }
