@@ -247,6 +247,10 @@ public class PropertyIdentifier extends Enumerated {
     public static final PropertyIdentifier lockStatus = new PropertyIdentifier(233);
     public static final PropertyIdentifier maskedAlarmValues = new PropertyIdentifier(234);
     public static final PropertyIdentifier securedStatus = new PropertyIdentifier(235);
+    public static final PropertyIdentifier backupAndRestoreState = new PropertyIdentifier(338);
+    public static final PropertyIdentifier backupPreparationTime = new PropertyIdentifier(339);
+    public static final PropertyIdentifier restoreCompletionTime = new PropertyIdentifier(340);
+    public static final PropertyIdentifier restorePreparationTime = new PropertyIdentifier(341);
 
     public PropertyIdentifier(int value) {
         super(value);
@@ -699,6 +703,14 @@ public class PropertyIdentifier extends Enumerated {
             return "Masked Alarm Values";
         if (type == securedStatus.intValue())
             return "Secured Status";
+        if (type == backupAndRestoreState.intValue())
+            return "Backup And Restore State";
+        if (type == backupPreparationTime.intValue())
+            return "Backup Preparation Time";
+        if (type == restoreCompletionTime.intValue())
+            return "Restore Completion Time";
+        if (type == restorePreparationTime.intValue())
+            return "Restore Preparation Time";
         return "Unknown: " + type;
     }
 }

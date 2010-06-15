@@ -27,6 +27,7 @@ import java.util.List;
 
 import com.serotonin.bacnet4j.exception.BACnetException;
 import com.serotonin.bacnet4j.type.Encodable;
+import com.serotonin.bacnet4j.type.enumerated.BackupState;
 import com.serotonin.bacnet4j.type.enumerated.BinaryPV;
 import com.serotonin.bacnet4j.type.enumerated.DeviceStatus;
 import com.serotonin.bacnet4j.type.enumerated.DoorAlarmState;
@@ -50,22 +51,43 @@ public class PropertyStates extends BaseType {
     private static List<Class<? extends Encodable>> classes;
     static {
         classes = new ArrayList<Class<? extends Encodable>>();
-        classes.add(Boolean.class);
-        classes.add(BinaryPV.class);
-        classes.add(EventType.class);
-        classes.add(Polarity.class);
-        classes.add(ProgramRequest.class);
-        classes.add(ProgramState.class);
-        classes.add(ProgramError.class);
-        classes.add(Reliability.class);
-        classes.add(EventState.class);
-        classes.add(DeviceStatus.class);
-        classes.add(EngineeringUnits.class);
-        classes.add(UnsignedInteger.class);
-        classes.add(LifeSafetyMode.class);
-        classes.add(LifeSafetyState.class);
-        classes.add(RestartReason.class);
-        classes.add(DoorAlarmState.class);
+        classes.add(Boolean.class); // 0
+        classes.add(BinaryPV.class); // 1
+        classes.add(EventType.class); // 2
+        classes.add(Polarity.class); // 3
+        classes.add(ProgramRequest.class); // 4;
+        classes.add(ProgramState.class); // 5
+        classes.add(ProgramError.class); // 6
+        classes.add(Reliability.class); // 7
+        classes.add(EventState.class); // 8
+        classes.add(DeviceStatus.class); // 9
+        classes.add(EngineeringUnits.class); // 10
+        classes.add(UnsignedInteger.class); // 11
+        classes.add(LifeSafetyMode.class); // 12
+        classes.add(LifeSafetyState.class); // 13
+        classes.add(RestartReason.class); // 14
+        classes.add(DoorAlarmState.class); // 15
+        classes.add(Encodable.class); // 16
+        classes.add(Encodable.class); // 17
+        classes.add(Encodable.class); // 18
+        classes.add(Encodable.class); // 19
+        classes.add(Encodable.class); // 20
+        classes.add(Encodable.class); // 21
+        classes.add(Encodable.class); // 22
+        classes.add(Encodable.class); // 23
+        classes.add(Encodable.class); // 24
+        classes.add(Encodable.class); // 25
+        classes.add(Encodable.class); // 26
+        classes.add(Encodable.class); // 27
+        classes.add(Encodable.class); // 28
+        classes.add(Encodable.class); // 29
+        classes.add(Encodable.class); // 30
+        classes.add(Encodable.class); // 31
+        classes.add(Encodable.class); // 32
+        classes.add(Encodable.class); // 33
+        classes.add(Encodable.class); // 34
+        classes.add(Encodable.class); // 35
+        classes.add(BackupState.class); // 36
     }
 
     public interface Types {
@@ -85,6 +107,7 @@ public class PropertyStates extends BaseType {
         int LIFE_SAFETY_STATE = 13;
         int RESTART_REASON = 14;
         int DOOR_ALARM_STATE = 15;
+        int BACKUP_STATE = 36;
     }
 
     private final Choice state;

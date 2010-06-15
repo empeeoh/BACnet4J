@@ -106,6 +106,7 @@ public class ErrorCode extends Enumerated {
     public static final ErrorCode noPropertySpecified = new ErrorCode(77);
     public static final ErrorCode notConfiguredForTriggeredLogging = new ErrorCode(78);
     public static final ErrorCode communicationDisabled = new ErrorCode(83);
+    public static final ErrorCode unknownFileSize = new ErrorCode(122);
 
     public ErrorCode(int value) {
         super(value);
@@ -276,6 +277,8 @@ public class ErrorCode extends Enumerated {
             return "Not Configured For Triggered Logging";
         if (type == communicationDisabled.intValue())
             return "Communication Disabled";
+        if (type == unknownFileSize.intValue())
+            return "Unknown File Size";
         return "Unknown: " + type;
     }
 }

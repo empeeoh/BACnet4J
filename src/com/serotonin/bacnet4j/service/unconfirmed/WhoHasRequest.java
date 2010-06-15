@@ -97,7 +97,8 @@ public class WhoHasRequest extends UnconfirmedRequestService {
             // Return the result in an i have message.
             IHaveRequest response = new IHaveRequest(localDevice.getConfiguration().getId(), result.getId(), result
                     .getRawObjectName());
-            localDevice.sendUnconfirmed(from, network, response);
+            // localDevice.sendUnconfirmed(from, network, response);
+            localDevice.sendBroadcast(from.getPort(), network, response);
         }
     }
 

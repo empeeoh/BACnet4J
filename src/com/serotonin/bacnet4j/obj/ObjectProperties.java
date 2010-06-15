@@ -65,6 +65,7 @@ import com.serotonin.bacnet4j.type.constructed.StatusFlags;
 import com.serotonin.bacnet4j.type.constructed.TimeStamp;
 import com.serotonin.bacnet4j.type.constructed.VtSession;
 import com.serotonin.bacnet4j.type.enumerated.Action;
+import com.serotonin.bacnet4j.type.enumerated.BackupState;
 import com.serotonin.bacnet4j.type.enumerated.BinaryPV;
 import com.serotonin.bacnet4j.type.enumerated.DeviceStatus;
 import com.serotonin.bacnet4j.type.enumerated.DoorAlarmState;
@@ -595,9 +596,13 @@ public class ObjectProperties {
         add(ObjectType.device, PropertyIdentifier.deviceAddressBinding, AddressBinding.class, true, true,
                 new SequenceOf<AddressBinding>());
         add(ObjectType.device, PropertyIdentifier.databaseRevision, UnsignedInteger.class, false, true, null);
-        add(ObjectType.device, PropertyIdentifier.configurationFiles, ObjectIdentifier.class, true, true, null);
-        add(ObjectType.device, PropertyIdentifier.lastRestoreTime, TimeStamp.class, false, true, null);
-        add(ObjectType.device, PropertyIdentifier.backupFailureTimeout, Unsigned16.class, false, true, null);
+        add(ObjectType.device, PropertyIdentifier.configurationFiles, ObjectIdentifier.class, true, false, null);
+        add(ObjectType.device, PropertyIdentifier.lastRestoreTime, TimeStamp.class, false, false, null);
+        add(ObjectType.device, PropertyIdentifier.backupFailureTimeout, Unsigned16.class, false, false, null);
+        add(ObjectType.device, PropertyIdentifier.backupPreparationTime, Unsigned16.class, false, false, null);
+        add(ObjectType.device, PropertyIdentifier.restorePreparationTime, Unsigned16.class, false, false, null);
+        add(ObjectType.device, PropertyIdentifier.restoreCompletionTime, Unsigned16.class, false, false, null);
+        add(ObjectType.device, PropertyIdentifier.backupAndRestoreState, BackupState.class, false, true, null);
         add(ObjectType.device, PropertyIdentifier.activeCovSubscriptions, CovSubscription.class, true, true,
                 new SequenceOf<CovSubscription>());
         add(ObjectType.device, PropertyIdentifier.maxSegmentsAccepted, UnsignedInteger.class, false, true, null);
