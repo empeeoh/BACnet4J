@@ -96,7 +96,11 @@ public class Address extends BaseType {
     }
 
     public String toIpString() {
-        return IpAddressUtils.toIpString(getIpBytes()) + ":" + getPort();
+        return IpAddressUtils.toIpString(getIpBytes());
+    }
+
+    public String toIpPortString() {
+        return toIpString() + ":" + getPort();
     }
 
     private byte[] getIpBytes() {
