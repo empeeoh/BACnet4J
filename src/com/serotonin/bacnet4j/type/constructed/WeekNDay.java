@@ -55,10 +55,9 @@ public class WeekNDay extends OctetString {
                 return days29to31;
             case 6:
                 return last7Days;
-            case (byte) 255:
+            default:
                 return any;
             }
-            throw new IllegalArgumentException(Byte.toString(b));
         }
 
         private WeekOfMonth(int value) {
