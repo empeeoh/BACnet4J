@@ -30,8 +30,8 @@ abstract public class APDU {
     public static APDU createAPDU(ByteQueue queue) throws BACnetException {
         // Get the first byte. The 4 high-order bits will tell us the type of PDU this is.
         byte type = queue.peek(0);
-        type = (byte)((type & 0xff) >> 4);
-        
+        type = (byte) ((type & 0xff) >> 4);
+
         if (type == ConfirmedRequest.TYPE_ID)
             return new ConfirmedRequest(queue);
         if (type == UnconfirmedRequest.TYPE_ID)
@@ -50,13 +50,14 @@ abstract public class APDU {
             return new Abort(queue);
         throw new IllegalPduTypeException(Byte.toString(type));
     }
-    
+
     abstract public byte getPduType();
+
     abstract public void write(ByteQueue queue);
-    
+
     protected int getShiftedTypeId(byte typeId) {
         return typeId << 4;
     }
-    
+
     abstract public boolean expectsReply();
 }
