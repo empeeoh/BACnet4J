@@ -24,7 +24,7 @@ package com.serotonin.bacnet4j.type.constructed;
 
 import com.serotonin.bacnet4j.exception.BACnetException;
 import com.serotonin.bacnet4j.type.Encodable;
-import com.serotonin.bacnet4j.type.ThreadLocalObjectType;
+import com.serotonin.bacnet4j.type.ThreadLocalObjectTypeStack;
 import com.serotonin.bacnet4j.type.enumerated.PropertyIdentifier;
 import com.serotonin.bacnet4j.type.primitive.UnsignedInteger;
 import com.serotonin.util.queue.ByteQueue;
@@ -79,7 +79,7 @@ public class PropertyValue extends BaseType {
     public PropertyValue(ByteQueue queue) throws BACnetException {
         propertyIdentifier = read(queue, PropertyIdentifier.class, 0);
         propertyArrayIndex = readOptional(queue, UnsignedInteger.class, 1);
-        value = readEncodable(queue, ThreadLocalObjectType.get(), propertyIdentifier, propertyArrayIndex, 2);
+        value = readEncodable(queue, ThreadLocalObjectTypeStack.get(), propertyIdentifier, propertyArrayIndex, 2);
         priority = readOptional(queue, UnsignedInteger.class, 3);
     }
 

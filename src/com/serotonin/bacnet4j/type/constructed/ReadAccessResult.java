@@ -24,7 +24,7 @@ package com.serotonin.bacnet4j.type.constructed;
 
 import com.serotonin.bacnet4j.exception.BACnetException;
 import com.serotonin.bacnet4j.type.Encodable;
-import com.serotonin.bacnet4j.type.ThreadLocalObjectType;
+import com.serotonin.bacnet4j.type.ThreadLocalObjectTypeStack;
 import com.serotonin.bacnet4j.type.enumerated.PropertyIdentifier;
 import com.serotonin.bacnet4j.type.primitive.ObjectIdentifier;
 import com.serotonin.bacnet4j.type.primitive.UnsignedInteger;
@@ -61,9 +61,13 @@ public class ReadAccessResult extends BaseType {
 
     public ReadAccessResult(ByteQueue queue) throws BACnetException {
         objectIdentifier = read(queue, ObjectIdentifier.class, 0);
-        ThreadLocalObjectType.set(objectIdentifier.getObjectType());
-        listOfResults = readOptionalSequenceOf(queue, Result.class, 1);
-        ThreadLocalObjectType.remove();
+        try {
+            ThreadLocalObjectTypeStack.set(objectIdentifier.getObjectType());
+            listOfResults = readOptionalSequenceOf(queue, Result.class, 1);
+        }
+        finally {
+            ThreadLocalObjectTypeStack.remove();
+        }
     }
 
     public static class Result extends BaseType {
@@ -121,7 +125,7 @@ public class ReadAccessResult extends BaseType {
             propertyArrayIndex = readOptional(queue, UnsignedInteger.class, 3);
             int contextId = peekTagNumber(queue);
             if (contextId == 4)
-                readResult = new Choice(4, readEncodable(queue, ThreadLocalObjectType.get(), propertyIdentifier,
+                readResult = new Choice(4, readEncodable(queue, ThreadLocalObjectTypeStack.get(), propertyIdentifier,
                         propertyArrayIndex, 4));
             else
                 readResult = new Choice(5, read(queue, BACnetError.class, 5));

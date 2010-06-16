@@ -25,7 +25,7 @@ package com.serotonin.bacnet4j.service.unconfirmed;
 import com.serotonin.bacnet4j.LocalDevice;
 import com.serotonin.bacnet4j.Network;
 import com.serotonin.bacnet4j.exception.BACnetException;
-import com.serotonin.bacnet4j.type.ThreadLocalObjectType;
+import com.serotonin.bacnet4j.type.ThreadLocalObjectTypeStack;
 import com.serotonin.bacnet4j.type.constructed.Address;
 import com.serotonin.bacnet4j.type.constructed.PropertyValue;
 import com.serotonin.bacnet4j.type.constructed.SequenceOf;
@@ -80,9 +80,13 @@ public class UnconfirmedCovNotificationRequest extends UnconfirmedRequestService
         initiatingDeviceIdentifier = read(queue, ObjectIdentifier.class, 1);
         monitoredObjectIdentifier = read(queue, ObjectIdentifier.class, 2);
         timeRemaining = read(queue, UnsignedInteger.class, 3);
-        ThreadLocalObjectType.set(monitoredObjectIdentifier.getObjectType());
-        listOfValues = readSequenceOf(queue, PropertyValue.class, 4);
-        ThreadLocalObjectType.remove();
+        try {
+            ThreadLocalObjectTypeStack.set(monitoredObjectIdentifier.getObjectType());
+            listOfValues = readSequenceOf(queue, PropertyValue.class, 4);
+        }
+        finally {
+            ThreadLocalObjectTypeStack.remove();
+        }
     }
 
     @Override

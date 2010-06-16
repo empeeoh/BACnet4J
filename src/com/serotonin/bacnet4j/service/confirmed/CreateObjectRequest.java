@@ -34,7 +34,7 @@ import com.serotonin.bacnet4j.obj.BACnetObject;
 import com.serotonin.bacnet4j.service.acknowledgement.AcknowledgementService;
 import com.serotonin.bacnet4j.service.acknowledgement.CreateObjectAck;
 import com.serotonin.bacnet4j.type.Encodable;
-import com.serotonin.bacnet4j.type.ThreadLocalObjectType;
+import com.serotonin.bacnet4j.type.ThreadLocalObjectTypeStack;
 import com.serotonin.bacnet4j.type.constructed.Address;
 import com.serotonin.bacnet4j.type.constructed.Choice;
 import com.serotonin.bacnet4j.type.constructed.PropertyValue;
@@ -122,12 +122,16 @@ public class CreateObjectRequest extends ConfirmedRequestService {
         objectSpecifier = new Choice(queue, classes);
         popEnd(queue, 0);
 
-        if (objectSpecifier.getContextId() == 0)
-            ThreadLocalObjectType.set((ObjectType) objectSpecifier.getDatum());
-        else
-            ThreadLocalObjectType.set(((ObjectIdentifier) objectSpecifier.getDatum()).getObjectType());
-        listOfInitialValues = readOptionalSequenceOf(queue, PropertyValue.class, 1);
-        ThreadLocalObjectType.remove();
+        try {
+            if (objectSpecifier.getContextId() == 0)
+                ThreadLocalObjectTypeStack.set((ObjectType) objectSpecifier.getDatum());
+            else
+                ThreadLocalObjectTypeStack.set(((ObjectIdentifier) objectSpecifier.getDatum()).getObjectType());
+            listOfInitialValues = readOptionalSequenceOf(queue, PropertyValue.class, 1);
+        }
+        finally {
+            ThreadLocalObjectTypeStack.remove();
+        }
     }
 
     @Override

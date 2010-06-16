@@ -23,7 +23,7 @@
 package com.serotonin.bacnet4j.type.constructed;
 
 import com.serotonin.bacnet4j.exception.BACnetException;
-import com.serotonin.bacnet4j.type.ThreadLocalObjectType;
+import com.serotonin.bacnet4j.type.ThreadLocalObjectTypeStack;
 import com.serotonin.bacnet4j.type.primitive.ObjectIdentifier;
 import com.serotonin.util.queue.ByteQueue;
 
@@ -45,9 +45,13 @@ public class WriteAccessSpecification extends BaseType {
 
     public WriteAccessSpecification(ByteQueue queue) throws BACnetException {
         objectIdentifier = read(queue, ObjectIdentifier.class, 0);
-        ThreadLocalObjectType.set(objectIdentifier.getObjectType());
-        listOfProperties = readSequenceOf(queue, PropertyValue.class, 1);
-        ThreadLocalObjectType.remove();
+        try {
+            ThreadLocalObjectTypeStack.set(objectIdentifier.getObjectType());
+            listOfProperties = readSequenceOf(queue, PropertyValue.class, 1);
+        }
+        finally {
+            ThreadLocalObjectTypeStack.remove();
+        }
     }
 
     public SequenceOf<PropertyValue> getListOfProperties() {
