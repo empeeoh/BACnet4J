@@ -22,18 +22,15 @@
  */
 package com.serotonin.bacnet4j.test;
 
-import java.net.InetAddress;
 import java.net.InetSocketAddress;
-import java.net.NetworkInterface;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Enumeration;
 import java.util.List;
 
 import com.serotonin.bacnet4j.LocalDevice;
 import com.serotonin.bacnet4j.RemoteDevice;
 import com.serotonin.bacnet4j.service.acknowledgement.AcknowledgementService;
 import com.serotonin.bacnet4j.service.acknowledgement.CreateObjectAck;
+import com.serotonin.bacnet4j.service.acknowledgement.ReadPropertyAck;
 import com.serotonin.bacnet4j.service.confirmed.ConfirmedRequestService;
 import com.serotonin.bacnet4j.service.confirmed.CreateObjectRequest;
 import com.serotonin.bacnet4j.service.confirmed.DeleteObjectRequest;
@@ -50,6 +47,7 @@ import com.serotonin.bacnet4j.service.unconfirmed.WhoIsRequest;
 import com.serotonin.bacnet4j.type.constructed.Address;
 import com.serotonin.bacnet4j.type.constructed.Destination;
 import com.serotonin.bacnet4j.type.constructed.EventTransitionBits;
+import com.serotonin.bacnet4j.type.constructed.PriorityArray;
 import com.serotonin.bacnet4j.type.constructed.PropertyReference;
 import com.serotonin.bacnet4j.type.constructed.PropertyValue;
 import com.serotonin.bacnet4j.type.constructed.ReadAccessSpecification;
@@ -68,33 +66,44 @@ import com.serotonin.bacnet4j.type.primitive.UnsignedInteger;
 
 public class Test {
     public static void main(String[] args) throws Exception {
-        Enumeration<NetworkInterface> netInter = NetworkInterface.getNetworkInterfaces();
-        int n = 0;
+        LocalDevice localDevice = null;
+        RemoteDevice remoteDevice = null;
 
-        while (netInter.hasMoreElements()) {
-            NetworkInterface ni = netInter.nextElement();
-
-            System.out.println("NetworkInterface " + n++ + ": " + ni.getDisplayName());
-
-            for (InetAddress iaddress : Collections.list(ni.getInetAddresses())) {
-                System.out.println("CanonicalHostName: " + iaddress.getCanonicalHostName());
-
-                System.out.println("IP: " + iaddress.getHostAddress());
-
-                System.out.println("Loopback? " + iaddress.isLoopbackAddress());
-                System.out.println("SiteLocal? " + iaddress.isSiteLocalAddress());
-                System.out.println();
-
-                // if (!iaddress.isLoopbackAddress() && iaddress.isSiteLocalAddress()) {
-                // System.out.println(iaddress.getAddress());
-                // return;
-                // // return iaddress.getAddress();
-                // }
-            }
-        }
-
-        System.out.println(InetAddress.getLocalHost().getAddress());
+        ReadPropertyRequest req = new ReadPropertyRequest(new ObjectIdentifier(ObjectType.analogOutput, 1234),
+                PropertyIdentifier.priorityArray);
+        ReadPropertyAck ack = (ReadPropertyAck) localDevice.send(remoteDevice, req);
+        PriorityArray priorityArray = (PriorityArray) ack.getValue();
+        int priority = priorityArray.get(16).getIntegerValue().intValue();
     }
+
+    // public static void main(String[] args) throws Exception {
+    // Enumeration<NetworkInterface> netInter = NetworkInterface.getNetworkInterfaces();
+    // int n = 0;
+    //
+    // while (netInter.hasMoreElements()) {
+    // NetworkInterface ni = netInter.nextElement();
+    //
+    // System.out.println("NetworkInterface " + n++ + ": " + ni.getDisplayName());
+    //
+    // for (InetAddress iaddress : Collections.list(ni.getInetAddresses())) {
+    // System.out.println("CanonicalHostName: " + iaddress.getCanonicalHostName());
+    //
+    // System.out.println("IP: " + iaddress.getHostAddress());
+    //
+    // System.out.println("Loopback? " + iaddress.isLoopbackAddress());
+    // System.out.println("SiteLocal? " + iaddress.isSiteLocalAddress());
+    // System.out.println();
+    //
+    // // if (!iaddress.isLoopbackAddress() && iaddress.isSiteLocalAddress()) {
+    // // System.out.println(iaddress.getAddress());
+    // // return;
+    // // // return iaddress.getAddress();
+    // // }
+    // }
+    // }
+    //
+    // System.out.println(InetAddress.getLocalHost().getAddress());
+    // }
 
     // public static void main(String[] args) throws Exception {
     // LocalDevice localDevice = new LocalDevice(1, "255.255.255.255", "localhost");
