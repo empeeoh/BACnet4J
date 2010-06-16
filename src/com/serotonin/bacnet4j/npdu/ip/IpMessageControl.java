@@ -443,6 +443,12 @@ public class IpMessageControl extends Thread {
         ime.runImpl();
     }
 
+    public APDU createApdu(byte[] message) throws Exception {
+        IncomingMessageExecutor ime = new IncomingMessageExecutor();
+        ime.queue = new ByteQueue(message);
+        return ime.parseApdu();
+    }
+
     class IncomingMessageExecutor implements Runnable {
         ByteQueue originalQueue;
         ByteQueue queue;
@@ -474,50 +480,10 @@ public class IpMessageControl extends Thread {
         }
 
         void runImpl() throws Exception {
-            // Initial parsing of IP message.
-            // BACnet/IP
-            if (queue.pop() != (byte) 0x81)
-                throw new MessageValidationAssertionException("Protocol id is not BACnet/IP (0x81)");
-
-            byte function = queue.pop();
-            if (function != 0xa && function != 0xb && function != 0x4)
-                throw new MessageValidationAssertionException(
-                        "Function is not unicast, broadcast, or forward (0xa, 0xb, or 0x4)");
-
-            int length = BACnetUtils.popShort(queue);
-            if (length != queue.size() + 4)
-                throw new MessageValidationAssertionException("Length field does not match data: given=" + length
-                        + ", expected=" + (queue.size() + 4));
-
-            if (function == 0x4) {
-                // A forward. Use the addr/port as the from address.
-                byte[] addr = new byte[4];
-                queue.pop(addr);
-                fromAddr = InetAddress.getByAddress(addr);
-                fromPort = queue.popU2B();
-
-                // // A forward. Ignore the next 6 bytes.
-                // queue.pop(6);
-            }
-
-            // Network layer protocol control information. See 6.2.2
-            NPCI npci = new NPCI(queue);
-            if (npci.getVersion() != 1)
-                throw new MessageValidationAssertionException("Invalid protocol version: " + npci.getVersion());
-            if (npci.isNetworkMessage())
-                return; // throw new MessageValidationAssertionException("Network messages are not supported");
-
-            if (npci.hasSourceInfo())
-                fromNetwork = new Network(npci.getSourceNetwork(), npci.getSourceAddress());
-
             // Create the APDU.
-            APDU apdu;
-            try {
-                apdu = APDU.createAPDU(queue);
-            }
-            catch (Exception e) {
-                throw new BACnetException("Error while creating APDU: ", e);
-            }
+            APDU apdu = parseApdu();
+            if (apdu == null)
+                return;
 
             // if (apdu.expectsReply() != npci.isExpectingReply())
             // throw new MessageValidationAssertionException("Inconsistent message: APDU expectsReply="+
@@ -576,10 +542,56 @@ public class IpMessageControl extends Thread {
                 AckAPDU ack = (AckAPDU) apdu;
 
                 // Used for testing only. This is required to test the parsing of service data in an ack.
-                // ((ComplexACK) ack).parseServiceData();
+                ((ComplexACK) ack).parseServiceData();
 
                 waitingRoom.notifyMember(new InetSocketAddress(fromAddr, fromPort), fromNetwork, ack
                         .getOriginalInvokeId(), ack.isServer(), ack);
+            }
+        }
+
+        APDU parseApdu() throws Exception {
+            // Initial parsing of IP message.
+            // BACnet/IP
+            if (queue.pop() != (byte) 0x81)
+                throw new MessageValidationAssertionException("Protocol id is not BACnet/IP (0x81)");
+
+            byte function = queue.pop();
+            if (function != 0xa && function != 0xb && function != 0x4)
+                throw new MessageValidationAssertionException(
+                        "Function is not unicast, broadcast, or forward (0xa, 0xb, or 0x4)");
+
+            int length = BACnetUtils.popShort(queue);
+            if (length != queue.size() + 4)
+                throw new MessageValidationAssertionException("Length field does not match data: given=" + length
+                        + ", expected=" + (queue.size() + 4));
+
+            if (function == 0x4) {
+                // A forward. Use the addr/port as the from address.
+                byte[] addr = new byte[4];
+                queue.pop(addr);
+                fromAddr = InetAddress.getByAddress(addr);
+                fromPort = queue.popU2B();
+
+                // // A forward. Ignore the next 6 bytes.
+                // queue.pop(6);
+            }
+
+            // Network layer protocol control information. See 6.2.2
+            NPCI npci = new NPCI(queue);
+            if (npci.getVersion() != 1)
+                throw new MessageValidationAssertionException("Invalid protocol version: " + npci.getVersion());
+            if (npci.isNetworkMessage())
+                return null; // throw new MessageValidationAssertionException("Network messages are not supported");
+
+            if (npci.hasSourceInfo())
+                fromNetwork = new Network(npci.getSourceNetwork(), npci.getSourceAddress());
+
+            // Create the APDU.
+            try {
+                return APDU.createAPDU(queue);
+            }
+            catch (Exception e) {
+                throw new BACnetException("Error while creating APDU: ", e);
             }
         }
     }
