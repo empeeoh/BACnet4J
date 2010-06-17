@@ -1,39 +1,39 @@
 package com.serotonin.bacnet4j.type;
 
-import java.util.ArrayDeque;
-import java.util.Deque;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.serotonin.bacnet4j.type.enumerated.ObjectType;
 
 public class ThreadLocalObjectTypeStack {
-    private static ThreadLocal<Deque<ObjectType>> objType = new ThreadLocal<Deque<ObjectType>>();
+    private static ThreadLocal<List<ObjectType>> objType = new ThreadLocal<List<ObjectType>>();
 
     public static void set(ObjectType objectType) {
-        Deque<ObjectType> deque = objType.get();
+        List<ObjectType> stack = objType.get();
 
-        if (deque == null) {
-            deque = new ArrayDeque<ObjectType>();
-            objType.set(deque);
+        if (stack == null) {
+            stack = new ArrayList<ObjectType>();
+            objType.set(stack);
         }
 
-        deque.push(objectType);
+        stack.add(objectType);
     }
 
     public static ObjectType get() {
-        Deque<ObjectType> deque = objType.get();
-        if (deque == null)
+        List<ObjectType> stack = objType.get();
+        if (stack == null)
             return null;
-        return deque.peek();
+        return stack.get(stack.size() - 1);
     }
 
     public static void remove() {
-        Deque<ObjectType> deque = objType.get();
-        if (deque == null)
+        List<ObjectType> stack = objType.get();
+        if (stack == null)
             return;
 
-        deque.pop();
-
-        if (deque.isEmpty())
+        if (stack.size() <= 1)
             objType.remove();
+        else
+            stack.remove(stack.size() - 1);
     }
 }
