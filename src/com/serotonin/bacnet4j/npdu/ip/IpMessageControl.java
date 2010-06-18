@@ -542,7 +542,7 @@ public class IpMessageControl extends Thread {
                 AckAPDU ack = (AckAPDU) apdu;
 
                 // Used for testing only. This is required to test the parsing of service data in an ack.
-                ((ComplexACK) ack).parseServiceData();
+                // ((ComplexACK) ack).parseServiceData();
 
                 waitingRoom.notifyMember(new InetSocketAddress(fromAddr, fromPort), fromNetwork, ack
                         .getOriginalInvokeId(), ack.isServer(), ack);
