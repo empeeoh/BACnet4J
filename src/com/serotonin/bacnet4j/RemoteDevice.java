@@ -88,6 +88,10 @@ public class RemoteDevice implements Serializable {
         return new ArrayList<RemoteObject>(objects.values());
     }
 
+    public void clearObjects() {
+        objects.clear();
+    }
+
     public Address getAddress() {
         return address;
     }
