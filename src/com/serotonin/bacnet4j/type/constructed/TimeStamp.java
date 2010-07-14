@@ -65,6 +65,14 @@ public class TimeStamp extends BaseType {
         choice = new Choice(queue, classes);
     }
 
+    public boolean isTime() {
+        return choice.getContextId() == 0;
+    }
+
+    public Time getTime() {
+        return (Time) choice.getDatum();
+    }
+
     public boolean isSequenceNumber() {
         return choice.getContextId() == 1;
     }
