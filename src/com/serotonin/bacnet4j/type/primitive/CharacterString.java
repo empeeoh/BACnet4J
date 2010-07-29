@@ -43,7 +43,7 @@ public class CharacterString extends Primitive {
         byte ISO_8859_1 = 5;
     }
 
-    private byte encoding;
+    private final byte encoding;
     private final String value;
 
     public CharacterString(String value) {
@@ -53,7 +53,7 @@ public class CharacterString extends Primitive {
 
     public CharacterString(byte encoding, String value) {
         try {
-            validateEncoding(encoding);
+            validateEncoding();
         }
         catch (BACnetErrorException e) {
             // This is an API constructor, so it doesn't need to throw checked exceptions. Convert to runtime.
@@ -77,8 +77,8 @@ public class CharacterString extends Primitive {
     public CharacterString(ByteQueue queue) throws BACnetErrorException {
         int length = (int) readTag(queue);
 
-        byte encoding = queue.pop();
-        validateEncoding(encoding);
+        encoding = queue.pop();
+        validateEncoding();
 
         byte[] bytes = new byte[length - 1];
         queue.pop(bytes);
@@ -134,7 +134,7 @@ public class CharacterString extends Primitive {
         return null;
     }
 
-    private void validateEncoding(byte encoding) throws BACnetErrorException {
+    private void validateEncoding() throws BACnetErrorException {
         if (encoding != Encodings.ANSI_X3_4 && encoding != Encodings.ISO_8859_1)
             throw new BACnetErrorException(ErrorClass.property, ErrorCode.characterSetNotSupported, Byte
                     .toString(encoding));
