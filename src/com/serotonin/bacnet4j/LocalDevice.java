@@ -126,6 +126,7 @@ public class LocalDevice implements RequestHandler {
     private BACnetObject configuration;
     private final List<BACnetObject> localObjects = new CopyOnWriteArrayList<BACnetObject>();
     private final List<RemoteDevice> remoteDevices = new CopyOnWriteArrayList<RemoteDevice>();
+    private boolean initialized;
 
     /**
      * The local password of the device. Used in the ReinitializeDeviceRequest service.
@@ -207,14 +208,20 @@ public class LocalDevice implements RequestHandler {
         }
     }
 
-    public void initialize() throws IOException {
+    public synchronized void initialize() throws IOException {
         eventHandler.initialize();
         messageControl.initialize();
+        initialized = true;
     }
 
-    public void terminate() {
+    public synchronized void terminate() {
         messageControl.terminate();
         eventHandler.terminate();
+        initialized = false;
+    }
+
+    public boolean isInitialized() {
+        return initialized;
     }
 
     public BACnetObject getConfiguration() {
