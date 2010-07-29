@@ -1,4 +1,5 @@
 package com.serotonin.bacnet4j.test;
+
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 
@@ -15,17 +16,18 @@ import com.serotonin.bacnet4j.type.primitive.ObjectIdentifier;
 
 public class Test2 {
     public static void main(String[] args) throws Exception {
-        LocalDevice localDevice = new LocalDevice(1968, "10.174.1.255");
+        LocalDevice localDevice = new LocalDevice(1968, "93.93.233.191");
         localDevice.getEventHandler().addListener(new Listener());
+        localDevice.setPort(47809);
         localDevice.initialize();
 
         // Read
         // ReadPropertyRequest read = new ReadPropertyRequest(new ObjectIdentifier(ObjectType.analogInput, 243),
         // PropertyIdentifier.presentValue);
-        getObjectList(localDevice, "10.174.1.118", 0xBAC0, 52);
-        getObjectList(localDevice, "10.174.1.128", 0xBAC0, 57);
-        getObjectList(localDevice, "10.174.1.132", 0xBAC0, 59);
-        getObjectList(localDevice, "10.174.1.137", 0xBAC0, 63);
+        getObjectList(localDevice, "93.93.233.191", 0xBAC0, 5667);
+        // getObjectList(localDevice, "10.174.1.128", 0xBAC0, 57);
+        // getObjectList(localDevice, "10.174.1.132", 0xBAC0, 59);
+        // getObjectList(localDevice, "10.174.1.137", 0xBAC0, 63);
 
         localDevice.terminate();
     }

@@ -12,9 +12,12 @@ import java.util.GregorianCalendar;
 import com.serotonin.bacnet4j.service.Service;
 import com.serotonin.bacnet4j.service.acknowledgement.AcknowledgementService;
 import com.serotonin.bacnet4j.service.acknowledgement.ReadPropertyAck;
+import com.serotonin.bacnet4j.service.unconfirmed.UnconfirmedRequestService;
+import com.serotonin.bacnet4j.service.unconfirmed.UnconfirmedTextMessageRequest;
 import com.serotonin.bacnet4j.type.Encodable;
 import com.serotonin.bacnet4j.type.constructed.BACnetError;
 import com.serotonin.bacnet4j.type.constructed.DateTime;
+import com.serotonin.bacnet4j.type.constructed.DeviceObjectPropertyReference;
 import com.serotonin.bacnet4j.type.constructed.PriorityArray;
 import com.serotonin.bacnet4j.type.constructed.PriorityValue;
 import com.serotonin.bacnet4j.type.constructed.SequenceOf;
@@ -24,6 +27,7 @@ import com.serotonin.bacnet4j.type.constructed.TimeStamp;
 import com.serotonin.bacnet4j.type.constructed.TimeValue;
 import com.serotonin.bacnet4j.type.enumerated.ErrorClass;
 import com.serotonin.bacnet4j.type.enumerated.ErrorCode;
+import com.serotonin.bacnet4j.type.enumerated.MessagePriority;
 import com.serotonin.bacnet4j.type.enumerated.ObjectType;
 import com.serotonin.bacnet4j.type.enumerated.PropertyIdentifier;
 import com.serotonin.bacnet4j.type.error.BaseError;
@@ -36,10 +40,8 @@ import com.serotonin.bacnet4j.type.notificationParameters.CommandFailure;
 import com.serotonin.bacnet4j.type.notificationParameters.FloatingLimit;
 import com.serotonin.bacnet4j.type.notificationParameters.NotificationParameters;
 import com.serotonin.bacnet4j.type.primitive.BitString;
-import com.serotonin.bacnet4j.type.primitive.Boolean;
 import com.serotonin.bacnet4j.type.primitive.CharacterString;
 import com.serotonin.bacnet4j.type.primitive.Date;
-import com.serotonin.bacnet4j.type.primitive.Double;
 import com.serotonin.bacnet4j.type.primitive.Enumerated;
 import com.serotonin.bacnet4j.type.primitive.Null;
 import com.serotonin.bacnet4j.type.primitive.ObjectIdentifier;
@@ -73,9 +75,12 @@ public class SerializationTests {
             deserialized = NotificationParameters.createNotificationParameters(queue);
         else if (EventParameter.class.isAssignableFrom(encodable.getClass()))
             deserialized = EventParameter.createEventParameter(queue);
-        else if (Service.class.isAssignableFrom(encodable.getClass()))
+        else if (AcknowledgementService.class.isAssignableFrom(encodable.getClass()))
             deserialized = AcknowledgementService.createAcknowledgementService(((Service) encodable).getChoiceId(),
                     queue);
+        else if (UnconfirmedRequestService.class.isAssignableFrom(encodable.getClass()))
+            deserialized = UnconfirmedRequestService.createUnconfirmedRequestService(((Service) encodable)
+                    .getChoiceId(), queue);
         else {
             Constructor<? extends Encodable> c = encodable.getClass().getConstructor(ByteQueue.class);
             deserialized = c.newInstance(queue);
@@ -86,12 +91,25 @@ public class SerializationTests {
     }
 
     private static final Encodable[] encodables = {
+            new ReadPropertyAck(
+                    new ObjectIdentifier(ObjectType.eventEnrollment, 123),
+                    PropertyIdentifier.eventParameters,
+                    null,
+                    new com.serotonin.bacnet4j.type.eventParameter.FloatingLimit(
+                            new UnsignedInteger(234),
+                            new DeviceObjectPropertyReference(new ObjectIdentifier(ObjectType.analogValue, 345),
+                                    PropertyIdentifier.presentValue, null, new ObjectIdentifier(ObjectType.device, 456)),
+                            new Real(567), new Real(678), new Real(789))), //
+
+            new UnconfirmedTextMessageRequest(new ObjectIdentifier(ObjectType.device, 123), MessagePriority.urgent,
+                    new CharacterString(CharacterString.Encodings.ISO_8859_1, "This is the message")), //
+
             // Primitives
             new BitString(new boolean[] { true, false, true, false, true }), //
-            new Boolean(true), //
+            new com.serotonin.bacnet4j.type.primitive.Boolean(true), //
             new CharacterString("My test character string"), //
             new Date(new GregorianCalendar(2008, Calendar.MARCH, 22)), //
-            new Double(123.456), //
+            new com.serotonin.bacnet4j.type.primitive.Double(123.456), //
             new Enumerated(4), //
             new Null(), //
             new ObjectIdentifier(ObjectType.averaging, 2), //

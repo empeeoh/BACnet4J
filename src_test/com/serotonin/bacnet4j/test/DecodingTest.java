@@ -1,10 +1,13 @@
 package com.serotonin.bacnet4j.test;
 
 import com.serotonin.bacnet4j.npdu.ip.IpMessageControl;
+import com.serotonin.bacnet4j.service.unconfirmed.UnconfirmedRequestService;
+import com.serotonin.util.queue.ByteQueue;
 
 public class DecodingTest {
     public static void main(String[] args) throws Exception {
-        String s = "[81,b,0,14,1,0,10,0,c4,2,0,8,98,22,1,e0,91,0,21,8]";
+        String s = "81,a,0,d,1,0,50,9d,9,91,1,91,1f";
+        // String s = "[81,b,0,14,1,0,10,0,c4,2,0,8,98,22,1,e0,91,0,21,8]";
         // String input = "[81,4,0,23,c0,a8,1,5a,ba,c0,1,8,27,28,6,0,40,ae,0,73,8f,10,0,c4,2,0,9,60,22,1,e0,91,0,21,8]";
         // String input = "[81,4,0,1e,c0,a8,1,5a,ba,c0,1,8,4e,38,1,3,10,0,c4,2,0,9,63,22,1,e0,91,0,21,8]";
         // String input = "[81,4,0,1e,c0,a8,1,5a,ba,c0,1,8,4e,36,1,1,10,0,c4,2,0,8,99,22,1,e0,91,0,21,8]";
@@ -83,6 +86,12 @@ public class DecodingTest {
         // String s = "810a0015010030080c0c004003e8195729083e003f";
 
         new IpMessageControl().testDecoding(toBytes(s));
+    }
+
+    static void test2() throws Exception {
+        String s = "[c,2,0,0,7b,29,1,3d,14,3,54,68,69,73,20,69,73,20,74,68,65,20,6d,65,73,73,61,67,65]";
+        byte[] b = toBytes(s);
+        UnconfirmedRequestService.createUnconfirmedRequestService((byte) 5, new ByteQueue(b));
     }
 
     // public static void main(String[] args) throws Exception {
