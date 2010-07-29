@@ -22,20 +22,20 @@
  */
 package com.serotonin.bacnet4j;
 
-import com.serotonin.io.messaging.DefaultExceptionListener;
-import com.serotonin.io.messaging.MessagingConnectionListener;
+import com.serotonin.messaging.DefaultMessagingExceptionHandler;
+import com.serotonin.messaging.MessagingExceptionHandler;
 
 abstract public class BACnetNetwork {
-    private MessagingConnectionListener exceptionListener = new DefaultExceptionListener();
+    private MessagingExceptionHandler exceptionListener = new DefaultMessagingExceptionHandler();
 
-    public void setExceptionListener(MessagingConnectionListener exceptionListener) {
+    public void setExceptionListener(MessagingExceptionHandler exceptionListener) {
         if (exceptionListener == null)
-            this.exceptionListener = new DefaultExceptionListener();
+            this.exceptionListener = new DefaultMessagingExceptionHandler();
         else
             this.exceptionListener = exceptionListener;
     }
-    
-    public MessagingConnectionListener getExceptionListener() {
+
+    public MessagingExceptionHandler getExceptionListener() {
         return exceptionListener;
     }
 }
