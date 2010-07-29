@@ -29,39 +29,49 @@ import com.serotonin.bacnet4j.type.error.BaseError;
 
 public class BACnetErrorException extends BACnetException {
     private static final long serialVersionUID = -1;
-    
+
     private final BaseError error;
-    
+
     public BACnetErrorException(byte choice, ErrorClass errorClass, ErrorCode errorCode) {
-        super(errorClass.toString() +": "+ errorCode.toString());
+        super(getBaseMessage(errorClass, errorCode, null));
         error = new BaseError(choice, new BACnetError(errorClass, errorCode));
     }
-    
+
     public BACnetErrorException(byte choice, BACnetServiceException e) {
         super(e);
         error = new BaseError(choice, new BACnetError(e.getErrorClass(), e.getErrorCode()));
     }
-    
+
     public BACnetErrorException(ErrorClass errorClass, ErrorCode errorCode) {
-        super(errorClass.toString() +": "+ errorCode.toString());
-        error = new BaseError((byte)127, new BACnetError(errorClass, errorCode));
+        super(getBaseMessage(errorClass, errorCode, null));
+        error = new BaseError((byte) 127, new BACnetError(errorClass, errorCode));
     }
-    
+
     public BACnetErrorException(BACnetServiceException e) {
         super(e.getMessage());
-        error = new BaseError((byte)127, new BACnetError(e.getErrorClass(), e.getErrorCode()));
+        error = new BaseError((byte) 127, new BACnetError(e.getErrorClass(), e.getErrorCode()));
     }
-    
+
     public BACnetErrorException(ErrorClass errorClass, ErrorCode errorCode, String message) {
-        super(message);
-        error = new BaseError((byte)127, new BACnetError(errorClass, errorCode));
+        super(getBaseMessage(errorClass, errorCode, message));
+        error = new BaseError((byte) 127, new BACnetError(errorClass, errorCode));
     }
-    
+
     public BACnetErrorException(BaseError error) {
         this.error = error;
     }
 
     public BaseError getError() {
         return error;
+    }
+
+    private static String getBaseMessage(ErrorClass errorClass, ErrorCode errorCode, String message) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(errorClass.toString());
+        sb.append(": ");
+        sb.append(errorCode.toString());
+        if (message != null)
+            sb.append(" '").append(message).append("'");
+        return sb.toString();
     }
 }

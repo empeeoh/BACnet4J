@@ -1,6 +1,7 @@
 package com.serotonin.bacnet4j.type;
 
 import java.io.Serializable;
+import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import java.util.Map;
 
@@ -168,10 +169,19 @@ abstract public class Encodable implements Serializable {
         try {
             return clazz.getConstructor(new Class[] { ByteQueue.class }).newInstance(new Object[] { queue });
         }
-        catch (Exception e) {
+        catch (NoSuchMethodException e) {
             // Check if this is an EventParameter
             if (clazz == EventParameter.class)
                 return (T) EventParameter.createEventParameter(queue);
+            throw new BACnetException(e);
+        }
+        catch (InvocationTargetException e) {
+            // Check if there is a wrapped BACnet exception
+            if (e.getCause() instanceof BACnetException)
+                throw (BACnetException) e.getCause();
+            throw new BACnetException(e);
+        }
+        catch (Exception e) {
             throw new BACnetException(e);
         }
     }
