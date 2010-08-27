@@ -5,6 +5,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import java.util.Map;
 
+import com.serotonin.bacnet4j.LocalDevice;
 import com.serotonin.bacnet4j.base.BACnetUtils;
 import com.serotonin.bacnet4j.exception.BACnetErrorException;
 import com.serotonin.bacnet4j.exception.BACnetException;
@@ -349,15 +350,15 @@ abstract public class Encodable implements Serializable {
             throws BACnetException {
         if (readStart(queue) != contextId)
             return null;
+
         VendorServiceKey key = new VendorServiceKey(vendorId, serviceNumber);
         SequenceDefinition def = resolutions.get(key);
-        if (def == null)
-            throw new BACnetErrorException(ErrorClass.device, ErrorCode.operationalProblem,
-                    "No sequence definition found for vendorId=" + vendorId + ", serviceNumber" + serviceNumber);
-        popStart(queue, contextId);
-        Sequence result = new Sequence(def, queue);
-        popEnd(queue, contextId);
-        return result;
+        if (def == null) {
+            LocalDevice.getExceptionListener().unimplementedVendorService(vendorId, serviceNumber, queue);
+            return null;
+        }
+
+        return new Sequence(def, queue, contextId);
     }
 
     private static <T extends Encodable> T readWrapped(ByteQueue queue, Class<T> clazz, int contextId)

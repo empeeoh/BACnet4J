@@ -27,7 +27,11 @@ import com.serotonin.bacnet4j.type.primitive.UnsignedInteger;
 public class VendorServiceKey {
     private final UnsignedInteger vendorId;
     private final UnsignedInteger serviceNumber;
-    
+
+    public VendorServiceKey(int vendorId, int serviceNumber) {
+        this(new UnsignedInteger(vendorId), new UnsignedInteger(serviceNumber));
+    }
+
     public VendorServiceKey(UnsignedInteger vendorId, UnsignedInteger serviceNumber) {
         this.vendorId = vendorId;
         this.serviceNumber = serviceNumber;

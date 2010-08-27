@@ -62,6 +62,18 @@ public class Sequence extends BaseType {
         }
     }
 
+    public Sequence(SequenceDefinition definition, ByteQueue queue, int contextId) throws BACnetException {
+        this(definition, popStart0(queue, contextId));
+        Encodable.popEnd(queue, contextId);
+    }
+
+    // The constructor call must be the first statement in the constructor (a nuisance of a rule), so this static 
+    // method is required as a workaround. Ugly, but it works.
+    private static ByteQueue popStart0(ByteQueue queue, int contextId) throws BACnetException {
+        Encodable.popStart(queue, contextId);
+        return queue;
+    }
+
     public Sequence(SequenceDefinition definition, ByteQueue queue) throws BACnetException {
         this.definition = definition;
         values = new HashMap<String, Encodable>();

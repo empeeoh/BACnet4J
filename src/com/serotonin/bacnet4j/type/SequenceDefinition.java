@@ -1,12 +1,19 @@
 package com.serotonin.bacnet4j.type;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 public class SequenceDefinition implements Serializable {
     private static final long serialVersionUID = 6464244006575549887L;
 
     private final List<ElementSpecification> elements;
+
+    public SequenceDefinition(ElementSpecification... specs) {
+        elements = new ArrayList<SequenceDefinition.ElementSpecification>();
+        for (ElementSpecification spec : specs)
+            elements.add(spec);
+    }
 
     public SequenceDefinition(List<ElementSpecification> elements) {
         this.elements = elements;

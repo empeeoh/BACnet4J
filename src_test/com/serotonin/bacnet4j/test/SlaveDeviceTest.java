@@ -47,32 +47,32 @@ public class SlaveDeviceTest {
         // Segmentation.noSegmentation);
 
         // Set up a few objects.
-        BACnetObject ai0 = new BACnetObject(localDevice, localDevice
-                .getNextInstanceObjectIdentifier(ObjectType.analogInput));
+        BACnetObject ai0 = new BACnetObject(localDevice,
+                localDevice.getNextInstanceObjectIdentifier(ObjectType.analogInput));
         ai0.setProperty(PropertyIdentifier.units, EngineeringUnits.centimeters);
         localDevice.addObject(ai0);
 
-        BACnetObject ai1 = new BACnetObject(localDevice, localDevice
-                .getNextInstanceObjectIdentifier(ObjectType.analogInput));
+        BACnetObject ai1 = new BACnetObject(localDevice,
+                localDevice.getNextInstanceObjectIdentifier(ObjectType.analogInput));
         ai0.setProperty(PropertyIdentifier.units, EngineeringUnits.percentObscurationPerFoot);
         localDevice.addObject(ai1);
 
-        BACnetObject bi0 = new BACnetObject(localDevice, localDevice
-                .getNextInstanceObjectIdentifier(ObjectType.binaryInput));
+        BACnetObject bi0 = new BACnetObject(localDevice,
+                localDevice.getNextInstanceObjectIdentifier(ObjectType.binaryInput));
         localDevice.addObject(bi0);
         bi0.setProperty(PropertyIdentifier.objectName, new CharacterString("Off and on"));
         bi0.setProperty(PropertyIdentifier.inactiveText, new CharacterString("Off"));
         bi0.setProperty(PropertyIdentifier.activeText, new CharacterString("On"));
 
-        BACnetObject bi1 = new BACnetObject(localDevice, localDevice
-                .getNextInstanceObjectIdentifier(ObjectType.binaryInput));
+        BACnetObject bi1 = new BACnetObject(localDevice,
+                localDevice.getNextInstanceObjectIdentifier(ObjectType.binaryInput));
         localDevice.addObject(bi1);
         bi1.setProperty(PropertyIdentifier.objectName, new CharacterString("Good and bad"));
         bi1.setProperty(PropertyIdentifier.inactiveText, new CharacterString("Bad"));
         bi1.setProperty(PropertyIdentifier.activeText, new CharacterString("Good"));
 
-        BACnetObject mso0 = new BACnetObject(localDevice, localDevice
-                .getNextInstanceObjectIdentifier(ObjectType.multiStateOutput));
+        BACnetObject mso0 = new BACnetObject(localDevice,
+                localDevice.getNextInstanceObjectIdentifier(ObjectType.multiStateOutput));
         mso0.setProperty(PropertyIdentifier.objectName, new CharacterString("Vegetable"));
         mso0.setProperty(PropertyIdentifier.numberOfStates, new UnsignedInteger(4));
         mso0.setProperty(PropertyIdentifier.stateText, 1, new CharacterString("Tomato"));
@@ -82,14 +82,15 @@ public class SlaveDeviceTest {
         mso0.setProperty(PropertyIdentifier.presentValue, new UnsignedInteger(1));
         localDevice.addObject(mso0);
 
-        BACnetObject ao0 = new BACnetObject(localDevice, localDevice
-                .getNextInstanceObjectIdentifier(ObjectType.analogOutput));
+        BACnetObject ao0 = new BACnetObject(localDevice,
+                localDevice.getNextInstanceObjectIdentifier(ObjectType.analogOutput));
         ao0.setProperty(PropertyIdentifier.objectName, new CharacterString("Settable analog"));
         localDevice.addObject(ao0);
 
-        BACnetObject av0 = new BACnetObject(localDevice, localDevice
-                .getNextInstanceObjectIdentifier(ObjectType.analogValue));
+        BACnetObject av0 = new BACnetObject(localDevice,
+                localDevice.getNextInstanceObjectIdentifier(ObjectType.analogValue));
         av0.setProperty(PropertyIdentifier.objectName, new CharacterString("Command Priority Test"));
+        av0.setProperty(PropertyIdentifier.relinquishDefault, new Real(3.1415F));
         localDevice.addObject(av0);
 
         FileObject file0 = new FileObject(localDevice, localDevice.getNextInstanceObjectIdentifier(ObjectType.file),
@@ -98,8 +99,8 @@ public class SlaveDeviceTest {
         file0.setProperty(PropertyIdentifier.archive, new Boolean(false));
         localDevice.addObject(file0);
 
-        BACnetObject bv1 = new BACnetObject(localDevice, localDevice
-                .getNextInstanceObjectIdentifier(ObjectType.binaryValue));
+        BACnetObject bv1 = new BACnetObject(localDevice,
+                localDevice.getNextInstanceObjectIdentifier(ObjectType.binaryValue));
         bv1.setProperty(PropertyIdentifier.objectName, new CharacterString("A binary value"));
         bv1.setProperty(PropertyIdentifier.inactiveText, new CharacterString("Down"));
         bv1.setProperty(PropertyIdentifier.activeText, new CharacterString("Up"));

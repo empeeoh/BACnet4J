@@ -266,8 +266,8 @@ public class IpMessageControl extends Thread {
 
             Key key = waitingRoom.enterServer(addr, network, request.getInvokeId());
             try {
-                sendSegmentedResponse(key, request.getMaxApduLengthAccepted().getMaxLength(), maxServiceData, response
-                        .getChoiceId(), serviceData);
+                sendSegmentedResponse(key, request.getMaxApduLengthAccepted().getMaxLength(), maxServiceData,
+                        response.getChoiceId(), serviceData);
             }
             finally {
                 waitingRoom.leave(key);
@@ -437,10 +437,10 @@ public class IpMessageControl extends Thread {
         }
     }
 
-    public void testDecoding(byte[] message) throws Exception {
+    public void testDecoding(byte[] message) {
         IncomingMessageExecutor ime = new IncomingMessageExecutor();
         ime.queue = new ByteQueue(message);
-        ime.runImpl();
+        ime.run();
     }
 
     public APDU createApdu(byte[] message) throws Exception {
@@ -479,7 +479,7 @@ public class IpMessageControl extends Thread {
             }
         }
 
-        void runImpl() throws Exception {
+        private void runImpl() throws Exception {
             // Create the APDU.
             APDU apdu = parseApdu();
             if (apdu == null)
@@ -544,8 +544,8 @@ public class IpMessageControl extends Thread {
                 // Used for testing only. This is required to test the parsing of service data in an ack.
                 // ((ComplexACK) ack).parseServiceData();
 
-                waitingRoom.notifyMember(new InetSocketAddress(fromAddr, fromPort), fromNetwork, ack
-                        .getOriginalInvokeId(), ack.isServer(), ack);
+                waitingRoom.notifyMember(new InetSocketAddress(fromAddr, fromPort), fromNetwork,
+                        ack.getOriginalInvokeId(), ack.isServer(), ack);
             }
         }
 
@@ -589,6 +589,10 @@ public class IpMessageControl extends Thread {
             // Create the APDU.
             try {
                 return APDU.createAPDU(queue);
+            }
+            catch (BACnetException e) {
+                // If it's already a BACnetException, don't bother wrapping it.
+                throw e;
             }
             catch (Exception e) {
                 throw new BACnetException("Error while creating APDU: ", e);
@@ -740,8 +744,8 @@ public class IpMessageControl extends Thread {
             // Do we need to send an ack?
             if (!segment.isMoreFollows() || segmentWindow.isLastSegment(lastSeq)) {
                 // Return an acknowledgement
-                sendImpl(new SegmentACK(false, server, id, lastSeq, window, segment.isMoreFollows()), false, peer, key
-                        .getNetwork());
+                sendImpl(new SegmentACK(false, server, id, lastSeq, window, segment.isMoreFollows()), false, peer,
+                        key.getNetwork());
                 segmentWindow.clear(lastSeq + 1);
             }
 
