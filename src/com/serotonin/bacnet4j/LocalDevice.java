@@ -1,24 +1,22 @@
 /*
  * ============================================================================
- * GNU Lesser General Public License
+ * GNU General Public License
  * ============================================================================
  *
- * Copyright (C) 2006-2009 Serotonin Software Technologies Inc. http://serotoninsoftware.com
+ * Copyright (C) 2006-2011 Serotonin Software Technologies Inc. http://serotoninsoftware.com
  * @author Matthew Lohbihler
  * 
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  * 
- * This library is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
- * 
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307, USA.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.serotonin.bacnet4j;
 
@@ -74,11 +72,11 @@ import com.serotonin.bacnet4j.type.constructed.ObjectPropertyReference;
 import com.serotonin.bacnet4j.type.constructed.ObjectTypesSupported;
 import com.serotonin.bacnet4j.type.constructed.PropertyReference;
 import com.serotonin.bacnet4j.type.constructed.ReadAccessResult;
+import com.serotonin.bacnet4j.type.constructed.ReadAccessResult.Result;
 import com.serotonin.bacnet4j.type.constructed.ReadAccessSpecification;
 import com.serotonin.bacnet4j.type.constructed.SequenceOf;
 import com.serotonin.bacnet4j.type.constructed.ServicesSupported;
 import com.serotonin.bacnet4j.type.constructed.TimeStamp;
-import com.serotonin.bacnet4j.type.constructed.ReadAccessResult.Result;
 import com.serotonin.bacnet4j.type.enumerated.AbortReason;
 import com.serotonin.bacnet4j.type.enumerated.DeviceStatus;
 import com.serotonin.bacnet4j.type.enumerated.ErrorClass;
@@ -580,8 +578,8 @@ public class LocalDevice implements RequestHandler {
         UnsignedInteger priority = null;
         try {
             recipientList = (SequenceOf<Destination>) nc.getPropertyRequired(PropertyIdentifier.recipientList);
-            ackRequired = new Boolean(((EventTransitionBits) nc.getPropertyRequired(PropertyIdentifier.ackRequired))
-                    .contains(toState));
+            ackRequired = new Boolean(
+                    ((EventTransitionBits) nc.getPropertyRequired(PropertyIdentifier.ackRequired)).contains(toState));
 
             // Determine which priority value to use based upon the toState.
             SequenceOf<UnsignedInteger> priorities = (SequenceOf<UnsignedInteger>) nc
@@ -613,10 +611,10 @@ public class LocalDevice implements RequestHandler {
                                 .getInstanceNumber());
 
                     if (remoteDevice != null) {
-                        ConfirmedEventNotificationRequest req = new ConfirmedEventNotificationRequest(destination
-                                .getProcessIdentifier(), configuration.getId(), eventObjectIdentifier, timeStamp,
-                                new UnsignedInteger(notificationClassId), priority, eventType, messageText, notifyType,
-                                ackRequired, fromState, toState, eventValues);
+                        ConfirmedEventNotificationRequest req = new ConfirmedEventNotificationRequest(
+                                destination.getProcessIdentifier(), configuration.getId(), eventObjectIdentifier,
+                                timeStamp, new UnsignedInteger(notificationClassId), priority, eventType, messageText,
+                                notifyType, ackRequired, fromState, toState, eventValues);
 
                         try {
                             send(remoteDevice, req);
@@ -638,10 +636,10 @@ public class LocalDevice implements RequestHandler {
                     }
 
                     if (address != null) {
-                        UnconfirmedEventNotificationRequest req = new UnconfirmedEventNotificationRequest(destination
-                                .getProcessIdentifier(), configuration.getId(), eventObjectIdentifier, timeStamp,
-                                new UnsignedInteger(notificationClassId), priority, eventType, messageText, notifyType,
-                                ackRequired, fromState, toState, eventValues);
+                        UnconfirmedEventNotificationRequest req = new UnconfirmedEventNotificationRequest(
+                                destination.getProcessIdentifier(), configuration.getId(), eventObjectIdentifier,
+                                timeStamp, new UnsignedInteger(notificationClassId), priority, eventType, messageText,
+                                notifyType, ackRequired, fromState, toState, eventValues);
                         try {
                             sendUnconfirmed(address, null, req);
                         }
@@ -716,10 +714,10 @@ public class LocalDevice implements RequestHandler {
 
     public IAmRequest getIAm() {
         try {
-            return new IAmRequest(configuration.getId(), (UnsignedInteger) configuration
-                    .getProperty(PropertyIdentifier.maxApduLengthAccepted), (Segmentation) configuration
-                    .getProperty(PropertyIdentifier.segmentationSupported), (Unsigned16) configuration
-                    .getProperty(PropertyIdentifier.vendorIdentifier));
+            return new IAmRequest(configuration.getId(),
+                    (UnsignedInteger) configuration.getProperty(PropertyIdentifier.maxApduLengthAccepted),
+                    (Segmentation) configuration.getProperty(PropertyIdentifier.segmentationSupported),
+                    (Unsigned16) configuration.getProperty(PropertyIdentifier.vendorIdentifier));
         }
         catch (BACnetServiceException e) {
             // Should never happen, so just wrap in a RuntimeException
@@ -892,12 +890,12 @@ public class LocalDevice implements RequestHandler {
                     request = new ReadPropertyRequest(oid, ref.getPropertyIdentifier(), ref.getPropertyArrayIndex());
                     try {
                         ack = (ReadPropertyAck) send(d, request);
-                        propertyValues.add(oid, ack.getPropertyIdentifier(), ack.getPropertyArrayIndex(), ack
-                                .getValue());
+                        propertyValues.add(oid, ack.getPropertyIdentifier(), ack.getPropertyArrayIndex(),
+                                ack.getValue());
                     }
                     catch (ErrorAPDUException e) {
-                        propertyValues.add(oid, ref.getPropertyIdentifier(), ref.getPropertyArrayIndex(), e
-                                .getBACnetError());
+                        propertyValues.add(oid, ref.getPropertyIdentifier(), ref.getPropertyArrayIndex(),
+                                e.getBACnetError());
                     }
                 }
             }

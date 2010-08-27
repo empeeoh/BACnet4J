@@ -1,24 +1,22 @@
 /*
  * ============================================================================
- * GNU Lesser General Public License
+ * GNU General Public License
  * ============================================================================
  *
- * Copyright (C) 2006-2009 Serotonin Software Technologies Inc. http://serotoninsoftware.com
+ * Copyright (C) 2006-2011 Serotonin Software Technologies Inc. http://serotoninsoftware.com
  * @author Matthew Lohbihler
  * 
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  * 
- * This library is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
- * 
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307, USA.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.serotonin.bacnet4j.apdu;
 
@@ -34,23 +32,23 @@ public class Abort extends AckAPDU {
     public static final byte TYPE_ID = 7;
 
     /**
-     * This parameter shall be TRUE when the Abort PDU is sent by a server. This parameter shall be FALSE when the 
-     * Abort PDU is sent by a client.
+     * This parameter shall be TRUE when the Abort PDU is sent by a server. This parameter shall be FALSE when the Abort
+     * PDU is sent by a client.
      */
     private final boolean server;
-    
+
     /**
-     * This parameter, of type BACnetAbortReason, contains the reason the transaction with the indicated invoke ID is 
+     * This parameter, of type BACnetAbortReason, contains the reason the transaction with the indicated invoke ID is
      * being aborted.
      */
     private final int abortReason;
-    
+
     public Abort(boolean server, byte originalInvokeId, int abortReason) {
         this.server = server;
         this.originalInvokeId = originalInvokeId;
         this.abortReason = abortReason;
     }
-    
+
     @Override
     public byte getPduType() {
         return TYPE_ID;
@@ -72,7 +70,7 @@ public class Abort extends AckAPDU {
         queue.push(originalInvokeId);
         queue.push(abortReason);
     }
-    
+
     Abort(ByteQueue queue) {
         server = (queue.popU1B() & 1) == 1;
         originalInvokeId = queue.pop();
@@ -88,7 +86,7 @@ public class Abort extends AckAPDU {
         result = PRIME * result + (server ? 1231 : 1237);
         return result;
     }
-    
+
     @Override
     public boolean equals(Object obj) {
         if (this == obj)
@@ -106,11 +104,11 @@ public class Abort extends AckAPDU {
             return false;
         return true;
     }
-    
+
     @Override
     public String toString() {
-        return "Abort(server="+ server +", originalInvokeId="+ originalInvokeId +", abortReason="+
-                new AbortReason(abortReason) +")";
+        return "Abort(server=" + server + ", originalInvokeId=" + originalInvokeId + ", abortReason="
+                + new AbortReason(abortReason) + ")";
     }
 
     @Override

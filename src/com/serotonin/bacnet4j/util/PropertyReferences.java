@@ -1,24 +1,22 @@
 /*
  * ============================================================================
- * GNU Lesser General Public License
+ * GNU General Public License
  * ============================================================================
  *
- * Copyright (C) 2006-2009 Serotonin Software Technologies Inc. http://serotoninsoftware.com
+ * Copyright (C) 2006-2011 Serotonin Software Technologies Inc. http://serotoninsoftware.com
  * @author Matthew Lohbihler
  * 
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  * 
- * This library is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
- * 
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307, USA.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.serotonin.bacnet4j.util;
 
@@ -32,9 +30,8 @@ import com.serotonin.bacnet4j.type.enumerated.PropertyIdentifier;
 import com.serotonin.bacnet4j.type.primitive.ObjectIdentifier;
 
 public class PropertyReferences {
-    private final Map<ObjectIdentifier, List<PropertyReference>> properties = 
-            new HashMap<ObjectIdentifier, List<PropertyReference>>();
-    
+    private final Map<ObjectIdentifier, List<PropertyReference>> properties = new HashMap<ObjectIdentifier, List<PropertyReference>>();
+
     public void add(ObjectIdentifier oid, PropertyReference ref) {
         List<PropertyReference> refs = properties.get(oid);
         if (refs == null) {
@@ -43,7 +40,7 @@ public class PropertyReferences {
         }
         refs.add(ref);
     }
-    
+
     public void add(ObjectIdentifier oid, PropertyIdentifier pid) {
         add(oid, new PropertyReference(pid));
     }
@@ -51,10 +48,10 @@ public class PropertyReferences {
     public Map<ObjectIdentifier, List<PropertyReference>> getProperties() {
         return properties;
     }
-    
+
     public List<PropertyReferences> getPropertiesPartitioned(int maxPartitionSize) {
         List<PropertyReferences> partitions = new ArrayList<PropertyReferences>();
-        
+
         if (size() <= maxPartitionSize)
             partitions.add(this);
         else {
@@ -71,10 +68,10 @@ public class PropertyReferences {
                 }
             }
         }
-        
+
         return partitions;
     }
-    
+
     public int size() {
         int size = 0;
         for (ObjectIdentifier oid : properties.keySet())

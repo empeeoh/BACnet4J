@@ -1,51 +1,47 @@
 /*
  * ============================================================================
- * GNU Lesser General Public License
+ * GNU General Public License
  * ============================================================================
  *
- * Copyright (C) 2006-2009 Serotonin Software Technologies Inc. http://serotoninsoftware.com
+ * Copyright (C) 2006-2011 Serotonin Software Technologies Inc. http://serotoninsoftware.com
  * @author Matthew Lohbihler
  * 
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  * 
- * This library is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
- * 
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307, USA.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.serotonin.bacnet4j.enums;
 
 public enum MaxApduLength {
-    UP_TO_50   (0, 50), // MinimumMessageSize
-    UP_TO_128  (1, 128),
-    UP_TO_206  (2, 206), // Fits in a LonTalk frame
-    UP_TO_480  (3, 480), // Fits in an ARCNET frame
-    UP_TO_1024 (4, 1024),
-    UP_TO_1476 (5, 1476); // Fits in an ISO 8802-3 frame
-   
+    UP_TO_50(0, 50), // MinimumMessageSize
+    UP_TO_128(1, 128), UP_TO_206(2, 206), // Fits in a LonTalk frame
+    UP_TO_480(3, 480), // Fits in an ARCNET frame
+    UP_TO_1024(4, 1024), UP_TO_1476(5, 1476); // Fits in an ISO 8802-3 frame
+
     private byte id;
     private int maxLength;
-    
+
     MaxApduLength(int id, int maxLength) {
-        this.id = (byte)id;
+        this.id = (byte) id;
         this.maxLength = maxLength;
     }
-    
+
     public byte getId() {
         return id;
     }
-    
+
     public int getMaxLength() {
         return maxLength;
     }
-    
+
     public static MaxApduLength valueOf(byte id) {
         if (id == UP_TO_50.id)
             return UP_TO_50;
@@ -59,7 +55,7 @@ public enum MaxApduLength {
             return UP_TO_1024;
         if (id == UP_TO_1476.id)
             return UP_TO_1476;
-            
-        throw new IllegalArgumentException("Unknown id: "+ id);
+
+        throw new IllegalArgumentException("Unknown id: " + id);
     }
 }
