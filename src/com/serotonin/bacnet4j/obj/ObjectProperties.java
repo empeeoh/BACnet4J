@@ -241,7 +241,7 @@ public class ObjectProperties {
         add(ObjectType.accessDoor, PropertyIdentifier.statusFlags, StatusFlags.class, false, true, new StatusFlags(
                 false, false, false, true));
         add(ObjectType.accessDoor, PropertyIdentifier.eventState, EventState.class, false, true, EventState.normal);
-        add(ObjectType.accessDoor, PropertyIdentifier.reliability, Reliability.class, false, false, null);
+        add(ObjectType.accessDoor, PropertyIdentifier.reliability, Reliability.class, false, true, null);
         add(ObjectType.accessDoor, PropertyIdentifier.outOfService, Boolean.class, false, true, new Boolean(true));
         add(ObjectType.accessDoor, PropertyIdentifier.priorityArray, PriorityArray.class, false, true,
                 new PriorityArray());
