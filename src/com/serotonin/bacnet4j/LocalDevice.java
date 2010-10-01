@@ -151,13 +151,18 @@ public class LocalDevice implements RequestHandler {
         messageControl.setRequestHandler(this);
 
         try {
-            configuration = new BACnetObject(this, new ObjectIdentifier(ObjectType.device, deviceId));
+            ObjectIdentifier deviceIdentifier = new ObjectIdentifier(ObjectType.device, deviceId);
+
+            configuration = new BACnetObject(this, deviceIdentifier);
             configuration.setProperty(PropertyIdentifier.maxApduLengthAccepted, new UnsignedInteger(1476));
             configuration.setProperty(PropertyIdentifier.vendorIdentifier, new Unsigned16(VENDOR_ID));
             configuration.setProperty(PropertyIdentifier.vendorName, new CharacterString(
                     "Serotonin Software Technologies, Inc."));
             configuration.setProperty(PropertyIdentifier.segmentationSupported, Segmentation.segmentedBoth);
-            configuration.setProperty(PropertyIdentifier.objectList, new SequenceOf<ObjectIdentifier>());
+
+            SequenceOf<ObjectIdentifier> objectList = new SequenceOf<ObjectIdentifier>();
+            objectList.add(deviceIdentifier);
+            configuration.setProperty(PropertyIdentifier.objectList, objectList);
 
             // Set up the supported services indicators. Remove lines as services get implemented.
             ServicesSupported servicesSupported = new ServicesSupported();
