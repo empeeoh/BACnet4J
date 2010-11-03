@@ -48,6 +48,7 @@ import com.serotonin.bacnet4j.exception.BACnetRuntimeException;
 import com.serotonin.bacnet4j.exception.BACnetServiceException;
 import com.serotonin.bacnet4j.exception.ErrorAPDUException;
 import com.serotonin.bacnet4j.exception.NotImplementedException;
+import com.serotonin.bacnet4j.exception.PropertyValueException;
 import com.serotonin.bacnet4j.exception.RejectAPDUException;
 import com.serotonin.bacnet4j.npdu.RequestHandler;
 import com.serotonin.bacnet4j.npdu.ip.IpMessageControl;
@@ -523,8 +524,12 @@ public class LocalDevice implements RequestHandler {
     }
 
     public RemoteDevice getRemoteDevice(Address peer) {
+        return getRemoteDevice(peer, null);
+    }
+
+    public RemoteDevice getRemoteDevice(Address peer, Network network) {
         for (RemoteDevice d : remoteDevices) {
-            if (d.getAddress().equals(peer))
+            if (d.getAddress().equals(peer) && ObjectUtils.isEqual(d.getNetwork(), network))
                 return d;
         }
         return null;
@@ -871,42 +876,56 @@ public class LocalDevice implements RequestHandler {
 
                 ReadPropertyMultipleRequest request = new ReadPropertyMultipleRequest(
                         new SequenceOf<ReadAccessSpecification>(specs));
-                ReadPropertyMultipleAck ack = (ReadPropertyMultipleAck) send(d, request);
 
-                List<ReadAccessResult> results = ack.getListOfReadAccessResults().getValues();
-                ObjectIdentifier oid;
-                for (ReadAccessResult objectResult : results) {
-                    oid = objectResult.getObjectIdentifier();
-                    for (Result result : objectResult.getListOfResults().getValues())
-                        propertyValues.add(oid, result.getPropertyIdentifier(), result.getPropertyArrayIndex(), result
-                                .getReadResult().getDatum());
+                ReadPropertyMultipleAck ack;
+                try {
+                    ack = (ReadPropertyMultipleAck) send(d, request);
+
+                    List<ReadAccessResult> results = ack.getListOfReadAccessResults().getValues();
+                    ObjectIdentifier oid;
+                    for (ReadAccessResult objectResult : results) {
+                        oid = objectResult.getObjectIdentifier();
+                        for (Result result : objectResult.getListOfResults().getValues())
+                            propertyValues.add(oid, result.getPropertyIdentifier(), result.getPropertyArrayIndex(),
+                                    result.getReadResult().getDatum());
+                    }
+                }
+                catch (AbortAPDUException e) {
+                    if (e.getApdu().getAbortReason() == AbortReason.bufferOverflow.intValue()
+                            || e.getApdu().getAbortReason() == AbortReason.segmentationNotSupported.intValue())
+                        sendOneAtATime(d, partition, propertyValues);
+                    else
+                        throw e;
                 }
             }
         }
-        else {
+        else
             // If it doesn't support read property multiple, send them one at a time.
-            List<PropertyReference> refList;
-            ReadPropertyRequest request;
-            ReadPropertyAck ack;
-            properties = refs.getProperties();
-            for (ObjectIdentifier oid : properties.keySet()) {
-                refList = properties.get(oid);
-                for (PropertyReference ref : refList) {
-                    request = new ReadPropertyRequest(oid, ref.getPropertyIdentifier(), ref.getPropertyArrayIndex());
-                    try {
-                        ack = (ReadPropertyAck) send(d, request);
-                        propertyValues.add(oid, ack.getPropertyIdentifier(), ack.getPropertyArrayIndex(),
-                                ack.getValue());
-                    }
-                    catch (ErrorAPDUException e) {
-                        propertyValues.add(oid, ref.getPropertyIdentifier(), ref.getPropertyArrayIndex(),
-                                e.getBACnetError());
-                    }
-                }
-            }
-        }
+            sendOneAtATime(d, refs, propertyValues);
 
         return propertyValues;
+    }
+
+    private void sendOneAtATime(RemoteDevice d, PropertyReferences refs, PropertyValues propertyValues)
+            throws BACnetException {
+        List<PropertyReference> refList;
+        ReadPropertyRequest request;
+        ReadPropertyAck ack;
+        Map<ObjectIdentifier, List<PropertyReference>> properties = refs.getProperties();
+        for (ObjectIdentifier oid : properties.keySet()) {
+            refList = properties.get(oid);
+            for (PropertyReference ref : refList) {
+                request = new ReadPropertyRequest(oid, ref.getPropertyIdentifier(), ref.getPropertyArrayIndex());
+                try {
+                    ack = (ReadPropertyAck) send(d, request);
+                    propertyValues.add(oid, ack.getPropertyIdentifier(), ack.getPropertyArrayIndex(), ack.getValue());
+                }
+                catch (ErrorAPDUException e) {
+                    propertyValues.add(oid, ref.getPropertyIdentifier(), ref.getPropertyArrayIndex(),
+                            e.getBACnetError());
+                }
+            }
+        }
     }
 
     public PropertyValues readPresentValues(RemoteDevice d) throws BACnetException {
@@ -940,4 +959,29 @@ public class LocalDevice implements RequestHandler {
         setProperty(d, oid, PropertyIdentifier.presentValue, value);
     }
 
+    //
+    // Manual device discovery
+    public RemoteDevice findRemoteDevice(Address address, Network network, int deviceId) throws BACnetException,
+            PropertyValueException {
+        ObjectIdentifier deviceOid = new ObjectIdentifier(ObjectType.device, deviceId);
+        ReadPropertyRequest req = new ReadPropertyRequest(deviceOid, PropertyIdentifier.maxApduLengthAccepted);
+        ReadPropertyAck ack = (ReadPropertyAck) send(address, network, 1476, Segmentation.noSegmentation, req);
+
+        // If we got this far, then we got a response. Now get the other required properties.
+        RemoteDevice d = new RemoteDevice(deviceOid.getInstanceNumber(), address, network);
+        d.setMaxAPDULengthAccepted(((UnsignedInteger) ack.getValue()).intValue());
+        d.setSegmentationSupported(Segmentation.noSegmentation);
+
+        PropertyReferences refs = new PropertyReferences();
+        refs.add(deviceOid, PropertyIdentifier.segmentationSupported);
+        refs.add(deviceOid, PropertyIdentifier.vendorIdentifier);
+        PropertyValues values = readProperties(d, refs);
+
+        d.setSegmentationSupported((Segmentation) values.get(deviceOid, PropertyIdentifier.segmentationSupported));
+        d.setVendorId(((Unsigned16) values.get(deviceOid, PropertyIdentifier.vendorIdentifier)).intValue());
+
+        addRemoteDevice(d);
+
+        return d;
+    }
 }
