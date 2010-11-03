@@ -625,7 +625,7 @@ public class EngineeringUnits extends Enumerated {
         if (type == revolutionsPerMinute.intValue())
             return "revolutions per minute";
         if (type == squareMetersPerNewton.intValue())
-            return "square meters perNewton";
+            return "square meters per Newton";
         if (type == wattsPerMeterPerDegreeKelvin.intValue())
             return "watts per meter per degree kelvin";
         if (type == wattsPerSquareMeterDegreeKelvin.intValue())

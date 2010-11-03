@@ -187,7 +187,7 @@ public class BACnetObject implements Serializable {
         ObjectProperties.validateValue(id.getObjectType(), pid, value);
         setPropertyImpl(pid, value);
 
-        // If the reinquish default was set, make sure the present value gets updated as necessary.
+        // If the relinquish default was set, make sure the present value gets updated as necessary.
         if (pid.equals(PropertyIdentifier.relinquishDefault))
             setCommandableImpl((PriorityArray) getProperty(PropertyIdentifier.priorityArray));
     }
