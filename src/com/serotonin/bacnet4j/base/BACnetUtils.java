@@ -82,4 +82,22 @@ public class BACnetUtils {
             bdata[i] = ((data[i / 8] >> (7 - (i % 8))) & 0x1) == 1;
         return bdata;
     }
+
+    public static byte[] dottedStringToBytes(String s) throws NumberFormatException {
+        String[] parts = s.split("\\.");
+        byte[] b = new byte[parts.length];
+        for (int i = 0; i < b.length; i++)
+            b[i] = (byte) Integer.parseInt(parts[i]);
+        return b;
+    }
+
+    public static String bytesToDottedString(byte[] b) {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < b.length; i++) {
+            if (i > 0)
+                sb.append('.');
+            sb.append(0xff & b[i]);
+        }
+        return sb.toString();
+    }
 }

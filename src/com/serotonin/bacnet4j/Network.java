@@ -23,6 +23,7 @@ package com.serotonin.bacnet4j;
 import java.io.Serializable;
 import java.util.Arrays;
 
+import com.serotonin.bacnet4j.base.BACnetUtils;
 import com.serotonin.util.ArrayUtils;
 
 /**
@@ -32,6 +33,11 @@ public class Network implements Serializable {
     private static final long serialVersionUID = -8228723394333966565L;
     private final int networkNumber;
     private final byte[] networkAddress;
+
+    public Network(int networkNumber, String networkAddress) {
+        this.networkNumber = networkNumber;
+        this.networkAddress = BACnetUtils.dottedStringToBytes(networkAddress);
+    }
 
     public Network(int networkNumber, byte[] networkAddress) {
         this.networkNumber = networkNumber;
@@ -44,6 +50,10 @@ public class Network implements Serializable {
 
     public byte[] getNetworkAddress() {
         return networkAddress;
+    }
+
+    public String getNetworkAddressDottedString() {
+        return BACnetUtils.bytesToDottedString(networkAddress);
     }
 
     @Override
