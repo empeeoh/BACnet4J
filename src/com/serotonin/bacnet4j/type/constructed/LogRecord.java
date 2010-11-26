@@ -166,8 +166,8 @@ public class LogRecord extends BaseType {
         return (BACnetError) choice.getDatum();
     }
 
-    public BaseType getBaseType() {
-        return (BaseType) choice.getDatum();
+    public Encodable getEncodable() {
+        return choice.getDatum();
     }
 
     public int getChoiceType() {
