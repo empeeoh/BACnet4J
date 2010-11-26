@@ -106,7 +106,7 @@ public class LogRecord extends BaseType {
         choice = new Choice(8, datum);
     }
 
-    public LogRecord(DateTime timestamp, BaseType datum, StatusFlags statusFlags) {
+    public LogRecord(DateTime timestamp, Encodable datum, StatusFlags statusFlags) {
         this(timestamp, statusFlags);
         choice = new Choice(10, datum);
     }
