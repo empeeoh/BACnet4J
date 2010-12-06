@@ -35,14 +35,14 @@ import com.serotonin.bacnet4j.service.confirmed.ConfirmedRequestService;
 import com.serotonin.bacnet4j.service.confirmed.CreateObjectRequest;
 import com.serotonin.bacnet4j.service.confirmed.DeleteObjectRequest;
 import com.serotonin.bacnet4j.service.confirmed.ReadPropertyConditionalRequest;
+import com.serotonin.bacnet4j.service.confirmed.ReadPropertyConditionalRequest.ObjectSelectionCriteria;
+import com.serotonin.bacnet4j.service.confirmed.ReadPropertyConditionalRequest.ObjectSelectionCriteria.SelectionCriteria;
+import com.serotonin.bacnet4j.service.confirmed.ReadPropertyConditionalRequest.ObjectSelectionCriteria.SelectionCriteria.RelationSpecifier;
+import com.serotonin.bacnet4j.service.confirmed.ReadPropertyConditionalRequest.ObjectSelectionCriteria.SelectionLogic;
 import com.serotonin.bacnet4j.service.confirmed.ReadPropertyMultipleRequest;
 import com.serotonin.bacnet4j.service.confirmed.ReadPropertyRequest;
 import com.serotonin.bacnet4j.service.confirmed.WritePropertyMultipleRequest;
 import com.serotonin.bacnet4j.service.confirmed.WritePropertyRequest;
-import com.serotonin.bacnet4j.service.confirmed.ReadPropertyConditionalRequest.ObjectSelectionCriteria;
-import com.serotonin.bacnet4j.service.confirmed.ReadPropertyConditionalRequest.ObjectSelectionCriteria.SelectionCriteria;
-import com.serotonin.bacnet4j.service.confirmed.ReadPropertyConditionalRequest.ObjectSelectionCriteria.SelectionLogic;
-import com.serotonin.bacnet4j.service.confirmed.ReadPropertyConditionalRequest.ObjectSelectionCriteria.SelectionCriteria.RelationSpecifier;
 import com.serotonin.bacnet4j.service.unconfirmed.WhoIsRequest;
 import com.serotonin.bacnet4j.type.constructed.Address;
 import com.serotonin.bacnet4j.type.constructed.Destination;
@@ -257,8 +257,7 @@ public class Test {
 
         // Read conditional
         List<SelectionCriteria> criteria = new ArrayList<SelectionCriteria>();
-        criteria
-                .add(new SelectionCriteria(PropertyIdentifier.presentValue, null, RelationSpecifier.equal, new Real(0)));
+        criteria.add(new SelectionCriteria(PropertyIdentifier.presentValue, null, RelationSpecifier.equal, new Real(0)));
         criteria.add(new SelectionCriteria(PropertyIdentifier.presentValue, null, RelationSpecifier.notEqual, new Real(
                 0)));
         ObjectSelectionCriteria osc = new ObjectSelectionCriteria(SelectionLogic.or, new SequenceOf<SelectionCriteria>(
@@ -284,7 +283,7 @@ public class Test {
         ObjectIdentifier nc1 = new ObjectIdentifier(ObjectType.notificationClass, 4194001);
         ObjectIdentifier nc2 = new ObjectIdentifier(ObjectType.notificationClass, 4194002);
 
-        Recipient recipient = new Recipient(d.getAddress());
+        Recipient recipient = new Recipient(d.getAddress(d.getDefaultLocalInetAddress()));
         Destination dest = new Destination(recipient, new UnsignedInteger(0), new Boolean(false),
                 new EventTransitionBits(true, true, true));
         // System.out.println(send(d, rd, new AddListElementRequest(nc0, PropertyIdentifier.recipientList, new
