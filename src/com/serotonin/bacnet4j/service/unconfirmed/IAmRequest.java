@@ -20,6 +20,8 @@
  */
 package com.serotonin.bacnet4j.service.unconfirmed;
 
+import java.util.logging.Logger;
+
 import com.serotonin.bacnet4j.LocalDevice;
 import com.serotonin.bacnet4j.Network;
 import com.serotonin.bacnet4j.RemoteDevice;
@@ -32,6 +34,7 @@ import com.serotonin.util.queue.ByteQueue;
 
 public class IAmRequest extends UnconfirmedRequestService {
     private static final long serialVersionUID = -5896735458454994754L;
+    private static final Logger LOGGER = Logger.getLogger(IAmRequest.class.getName());
 
     public static final byte TYPE_ID = 0;
 
@@ -56,11 +59,20 @@ public class IAmRequest extends UnconfirmedRequestService {
     @Override
     public void handle(LocalDevice localDevice, Address from, Network network) {
         // Make sure we're not hearing from ourselves.
-        if (iAmDeviceIdentifier.getInstanceNumber() == localDevice.getConfiguration().getInstanceId())
-            return;
+        int myDoi = localDevice.getConfiguration().getInstanceId();
+        int remoteDoi = iAmDeviceIdentifier.getInstanceNumber();
+        if (remoteDoi == myDoi) {
+            // Get my bacnet address and compare the addresses
+            for (Address addr : localDevice.getAllLocalAddresses()) {
+                if (addr.equals(from))
+                    // This is a local address, so ignore.
+                    return;
+                LOGGER.warning("Another instance with my device instance ID found!");
+            }
+        }
 
         // Register the device in the list of known devices.
-        RemoteDevice d = localDevice.getRemoteDeviceCreate(iAmDeviceIdentifier.getInstanceNumber(), from, network);
+        RemoteDevice d = localDevice.getRemoteDeviceCreate(remoteDoi, from, network);
         d.setMaxAPDULengthAccepted(maxAPDULengthAccepted.intValue());
         d.setSegmentationSupported(segmentationSupported);
         d.setVendorId(vendorId.intValue());

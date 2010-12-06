@@ -237,6 +237,7 @@ public class LocalDevice implements RequestHandler {
     }
 
     //
+    //
     // Controller configuration.
     //
     public void setBroadcastAddress(String broadcastAddress) {
@@ -314,9 +315,8 @@ public class LocalDevice implements RequestHandler {
     }
 
     //
-    // /
-    // / Local object management
-    // /
+    //
+    // Local object management
     //
     public BACnetObject getObjectRequired(ObjectIdentifier id) throws BACnetServiceException {
         BACnetObject o = getObject(id);
@@ -411,9 +411,8 @@ public class LocalDevice implements RequestHandler {
     }
 
     //
-    // /
-    // / Message sending
-    // /
+    //
+    // Message sending
     //
     public AcknowledgementService send(RemoteDevice d, ConfirmedRequestService serviceRequest) throws BACnetException {
         return send(d.getAddress(), d.getNetwork(), d.getMaxAPDULengthAccepted(), d.getSegmentationSupported(),
@@ -486,9 +485,8 @@ public class LocalDevice implements RequestHandler {
     }
 
     //
-    // /
-    // / Remote device management
-    // /
+    //
+    // Remote device management
     //
     public RemoteDevice getRemoteDevice(int instanceId, Address address, Network network) throws BACnetException {
         RemoteDevice d = getRemoteDeviceImpl(instanceId, address, network);
@@ -552,9 +550,8 @@ public class LocalDevice implements RequestHandler {
     }
 
     //
-    // /
-    // / Intrinsic events
-    // /
+    //
+    // Intrinsic events
     //
     @SuppressWarnings("unchecked")
     public List<BACnetException> sendIntrinsicEvent(ObjectIdentifier eventObjectIdentifier, TimeStamp timeStamp,
@@ -665,9 +662,8 @@ public class LocalDevice implements RequestHandler {
     }
 
     //
-    // /
-    // / Request Handler
-    // /
+    //
+    // Request Handler
     //
     public AcknowledgementService handleConfirmedRequest(Address from, Network network, byte invokeId,
             ConfirmedRequestService serviceRequest) throws BACnetException {
@@ -697,13 +693,12 @@ public class LocalDevice implements RequestHandler {
     }
 
     //
-    // /
-    // / Convenience methods
-    // /
     //
-    public Address getAddress() {
+    // Convenience methods
+    //
+    public Address getAddress(InetAddress inetAddress) {
         try {
-            return new Address(getLocalIPAddress(), messageControl.getPort());
+            return new Address(inetAddress.getAddress(), messageControl.getPort());
         }
         catch (Exception e) {
             // Should never happen, so just wrap in a RuntimeException
@@ -711,15 +706,33 @@ public class LocalDevice implements RequestHandler {
         }
     }
 
-    private byte[] getLocalIPAddress() throws UnknownHostException, SocketException {
+    public InetAddress getDefaultLocalInetAddress() throws UnknownHostException, SocketException {
         for (NetworkInterface iface : Collections.list(NetworkInterface.getNetworkInterfaces())) {
             for (InetAddress addr : Collections.list(iface.getInetAddresses())) {
                 if (!addr.isLoopbackAddress() && addr.isSiteLocalAddress())
-                    return addr.getAddress();
+                    return addr;
             }
         }
 
-        return InetAddress.getLocalHost().getAddress();
+        return InetAddress.getLocalHost();
+    }
+
+    public Address[] getAllLocalAddresses() {
+        try {
+            ArrayList<Address> result = new ArrayList<Address>();
+            for (NetworkInterface iface : Collections.list(NetworkInterface.getNetworkInterfaces())) {
+                for (InetAddress addr : Collections.list(iface.getInetAddresses())) {
+                    if (!addr.isLoopbackAddress() && addr.isSiteLocalAddress())
+                        result.add(getAddress(addr));
+                }
+            }
+
+            return result.toArray(new Address[result.size()]);
+        }
+        catch (Exception e) {
+            // Should never happen, so just wrap in a RuntimeException
+            throw new RuntimeException(e);
+        }
     }
 
     public IAmRequest getIAm() {
