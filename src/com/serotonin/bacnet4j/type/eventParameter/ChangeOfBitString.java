@@ -59,6 +59,18 @@ public class ChangeOfBitString extends EventParameter {
         return TYPE_ID;
     }
 
+    public UnsignedInteger getTimeDelay() {
+        return timeDelay;
+    }
+
+    public BitString getBitMask() {
+        return bitMask;
+    }
+
+    public SequenceOf<BitString> getListOfBitstringValues() {
+        return listOfBitstringValues;
+    }
+
     @Override
     public int hashCode() {
         final int PRIME = 31;

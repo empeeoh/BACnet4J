@@ -58,6 +58,18 @@ public class UnsignedRange extends NotificationParameters {
         return TYPE_ID;
     }
 
+    public UnsignedInteger getExceedingValue() {
+        return exceedingValue;
+    }
+
+    public StatusFlags getStatusFlags() {
+        return statusFlags;
+    }
+
+    public UnsignedInteger getExceedingLimit() {
+        return exceedingLimit;
+    }
+
     @Override
     public int hashCode() {
         final int PRIME = 31;

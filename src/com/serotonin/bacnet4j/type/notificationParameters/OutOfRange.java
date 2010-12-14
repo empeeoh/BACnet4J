@@ -62,6 +62,22 @@ public class OutOfRange extends NotificationParameters {
         return TYPE_ID;
     }
 
+    public Real getExceedingValue() {
+        return exceedingValue;
+    }
+
+    public StatusFlags getStatusFlags() {
+        return statusFlags;
+    }
+
+    public Real getDeadband() {
+        return deadband;
+    }
+
+    public Real getExceedingLimit() {
+        return exceedingLimit;
+    }
+
     @Override
     public int hashCode() {
         final int PRIME = 31;

@@ -54,6 +54,14 @@ public class ChangeOfState extends NotificationParameters {
         return TYPE_ID;
     }
 
+    public PropertyStates getNewState() {
+        return newState;
+    }
+
+    public StatusFlags getStatusFlags() {
+        return statusFlags;
+    }
+
     @Override
     public int hashCode() {
         final int PRIME = 31;

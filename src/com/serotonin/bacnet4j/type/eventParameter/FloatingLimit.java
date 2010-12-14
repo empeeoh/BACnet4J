@@ -68,6 +68,26 @@ public class FloatingLimit extends EventParameter {
         return TYPE_ID;
     }
 
+    public UnsignedInteger getTimeDelay() {
+        return timeDelay;
+    }
+
+    public DeviceObjectPropertyReference getSetpointReference() {
+        return setpointReference;
+    }
+
+    public Real getLowDiffLimit() {
+        return lowDiffLimit;
+    }
+
+    public Real getHighDiffLimit() {
+        return highDiffLimit;
+    }
+
+    public Real getDeadband() {
+        return deadband;
+    }
+
     @Override
     public int hashCode() {
         final int PRIME = 31;

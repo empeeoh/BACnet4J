@@ -54,6 +54,14 @@ public class ChangeOfBitString extends NotificationParameters {
         return TYPE_ID;
     }
 
+    public BitString getReferencedBitstring() {
+        return referencedBitstring;
+    }
+
+    public StatusFlags getStatusFlags() {
+        return statusFlags;
+    }
+
     @Override
     public int hashCode() {
         final int PRIME = 31;

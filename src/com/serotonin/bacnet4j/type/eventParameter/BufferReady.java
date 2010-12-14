@@ -53,6 +53,14 @@ public class BufferReady extends EventParameter {
         return TYPE_ID;
     }
 
+    public UnsignedInteger getNotificationThreshold() {
+        return notificationThreshold;
+    }
+
+    public UnsignedInteger getPreviousNotificationCount() {
+        return previousNotificationCount;
+    }
+
     @Override
     public int hashCode() {
         final int PRIME = 31;

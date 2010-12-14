@@ -59,6 +59,18 @@ public class BufferReady extends NotificationParameters {
         return TYPE_ID;
     }
 
+    public DeviceObjectPropertyReference getBufferProperty() {
+        return bufferProperty;
+    }
+
+    public UnsignedInteger getPreviousNotification() {
+        return previousNotification;
+    }
+
+    public UnsignedInteger getCurrentNotification() {
+        return currentNotification;
+    }
+
     @Override
     public int hashCode() {
         final int PRIME = 31;

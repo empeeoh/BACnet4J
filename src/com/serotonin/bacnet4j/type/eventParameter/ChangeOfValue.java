@@ -72,6 +72,14 @@ public class ChangeOfValue extends EventParameter {
         return TYPE_ID;
     }
 
+    public UnsignedInteger getTimeDelay() {
+        return timeDelay;
+    }
+
+    public Choice getNewValue() {
+        return newValue;
+    }
+
     @Override
     public int hashCode() {
         final int prime = 31;

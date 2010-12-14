@@ -55,6 +55,14 @@ public class ChangeOfState extends EventParameter {
         return TYPE_ID;
     }
 
+    public UnsignedInteger getTimeDelay() {
+        return timeDelay;
+    }
+
+    public SequenceOf<PropertyStates> getListOfValues() {
+        return listOfValues;
+    }
+
     @Override
     public int hashCode() {
         final int PRIME = 31;

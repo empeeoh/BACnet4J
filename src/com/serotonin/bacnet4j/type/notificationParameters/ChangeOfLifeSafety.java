@@ -65,6 +65,22 @@ public class ChangeOfLifeSafety extends NotificationParameters {
         return TYPE_ID;
     }
 
+    public LifeSafetyState getNewState() {
+        return newState;
+    }
+
+    public LifeSafetyMode getNewMode() {
+        return newMode;
+    }
+
+    public StatusFlags getStatusFlags() {
+        return statusFlags;
+    }
+
+    public LifeSafetyOperation getOperationExpected() {
+        return operationExpected;
+    }
+
     @Override
     public int hashCode() {
         final int PRIME = 31;

@@ -54,6 +54,14 @@ public class CommandFailure extends EventParameter {
         return TYPE_ID;
     }
 
+    public UnsignedInteger getTimeDelay() {
+        return timeDelay;
+    }
+
+    public DeviceObjectPropertyReference getFeedbackPropertyReference() {
+        return feedbackPropertyReference;
+    }
+
     @Override
     public int hashCode() {
         final int PRIME = 31;

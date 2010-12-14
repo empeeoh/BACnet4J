@@ -66,6 +66,18 @@ public class Extended extends NotificationParameters {
         return TYPE_ID;
     }
 
+    public UnsignedInteger getVendorId() {
+        return vendorId;
+    }
+
+    public UnsignedInteger getExtendedEventType() {
+        return extendedEventType;
+    }
+
+    public SequenceOf<Parameter> getParameters() {
+        return parameters;
+    }
+
     public static class Parameter extends BaseType {
         private static final long serialVersionUID = 9016759459458667665L;
         private Primitive primitive;

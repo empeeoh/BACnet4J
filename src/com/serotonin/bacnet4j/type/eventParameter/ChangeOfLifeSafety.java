@@ -65,6 +65,22 @@ public class ChangeOfLifeSafety extends EventParameter {
         return TYPE_ID;
     }
 
+    public UnsignedInteger getTimeDelay() {
+        return timeDelay;
+    }
+
+    public SequenceOf<LifeSafetyState> getListOfLifeSafetyAlarmValues() {
+        return listOfLifeSafetyAlarmValues;
+    }
+
+    public SequenceOf<LifeSafetyState> getListOfAlarmValues() {
+        return listOfAlarmValues;
+    }
+
+    public DeviceObjectPropertyReference getModePropertyReference() {
+        return modePropertyReference;
+    }
+
     @Override
     public int hashCode() {
         final int PRIME = 31;

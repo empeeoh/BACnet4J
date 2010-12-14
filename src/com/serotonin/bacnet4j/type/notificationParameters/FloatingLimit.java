@@ -62,6 +62,22 @@ public class FloatingLimit extends NotificationParameters {
         return TYPE_ID;
     }
 
+    public Real getReferenceValue() {
+        return referenceValue;
+    }
+
+    public StatusFlags getStatusFlags() {
+        return statusFlags;
+    }
+
+    public Real getSetpointValue() {
+        return setpointValue;
+    }
+
+    public Real getErrorLimit() {
+        return errorLimit;
+    }
+
     @Override
     public int hashCode() {
         final int PRIME = 31;

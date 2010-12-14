@@ -57,6 +57,18 @@ public class UnsignedRange extends EventParameter {
         return TYPE_ID;
     }
 
+    public UnsignedInteger getTimeDelay() {
+        return timeDelay;
+    }
+
+    public UnsignedInteger getLowLimit() {
+        return lowLimit;
+    }
+
+    public UnsignedInteger getHighLimit() {
+        return highLimit;
+    }
+
     @Override
     public int hashCode() {
         final int PRIME = 31;

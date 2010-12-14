@@ -59,6 +59,18 @@ public class CommandFailure extends NotificationParameters {
         return TYPE_ID;
     }
 
+    public Encodable getCommandValue() {
+        return commandValue;
+    }
+
+    public StatusFlags getStatusFlags() {
+        return statusFlags;
+    }
+
+    public Encodable getFeedbackValue() {
+        return feedbackValue;
+    }
+
     @Override
     public int hashCode() {
         final int PRIME = 31;

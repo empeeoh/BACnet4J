@@ -62,6 +62,22 @@ public class OutOfRange extends EventParameter {
         return TYPE_ID;
     }
 
+    public UnsignedInteger getTimeDelay() {
+        return timeDelay;
+    }
+
+    public Real getLowLimit() {
+        return lowLimit;
+    }
+
+    public Real getHighLimit() {
+        return highLimit;
+    }
+
+    public Real getDeadband() {
+        return deadband;
+    }
+
     @Override
     public int hashCode() {
         final int PRIME = 31;

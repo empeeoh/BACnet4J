@@ -50,6 +50,10 @@ public class ComplexEventType extends NotificationParameters {
         return TYPE_ID;
     }
 
+    public SequenceOf<PropertyValue> getValues() {
+        return values;
+    }
+
     @Override
     public int hashCode() {
         final int PRIME = 31;
