@@ -212,8 +212,8 @@ public class BACnetObject implements Serializable {
             throw new BACnetServiceException(ErrorClass.property, ErrorCode.writeAccessDenied);
         if (pid.intValue() == PropertyIdentifier.priorityArray.intValue())
             throw new BACnetServiceException(ErrorClass.property, ErrorCode.writeAccessDenied);
-        if (pid.intValue() == PropertyIdentifier.relinquishDefault.intValue())
-            throw new BACnetServiceException(ErrorClass.property, ErrorCode.writeAccessDenied);
+        //        if (pid.intValue() == PropertyIdentifier.relinquishDefault.intValue())
+        //            throw new BACnetServiceException(ErrorClass.property, ErrorCode.writeAccessDenied);
 
         if (ObjectProperties.isCommandable((ObjectType) getProperty(PropertyIdentifier.objectType), pid))
             setCommandable(value.getValue(), value.getPriority());
