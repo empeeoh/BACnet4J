@@ -31,6 +31,8 @@ public class ProgramError extends Enumerated {
     public static final ProgramError program = new ProgramError(3);
     public static final ProgramError other = new ProgramError(4);
 
+    public static final ProgramError[] ALL = { normal, loadFailed, internal, program, other, };
+
     public ProgramError(int value) {
         super(value);
     }

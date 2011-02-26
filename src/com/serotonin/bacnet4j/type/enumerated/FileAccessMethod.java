@@ -28,6 +28,8 @@ public class FileAccessMethod extends Enumerated {
     public static final FileAccessMethod recordAccess = new FileAccessMethod(0);
     public static final FileAccessMethod streamAccess = new FileAccessMethod(1);
 
+    public static final FileAccessMethod[] ALL = { recordAccess, streamAccess, };
+
     public FileAccessMethod(int value) {
         super(value);
     }

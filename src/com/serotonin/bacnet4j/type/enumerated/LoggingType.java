@@ -29,6 +29,8 @@ public class LoggingType extends Enumerated {
     public static final LoggingType cov = new LoggingType(1);
     public static final LoggingType triggered = new LoggingType(2);
 
+    public static final LoggingType[] ALL = { polled, cov, triggered, };
+
     public LoggingType(int value) {
         super(value);
     }

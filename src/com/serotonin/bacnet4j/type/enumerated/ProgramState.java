@@ -32,6 +32,8 @@ public class ProgramState extends Enumerated {
     public static final ProgramState halted = new ProgramState(4);
     public static final ProgramState unloading = new ProgramState(5);
 
+    public static final ProgramState[] ALL = { idle, loading, running, waiting, halted, unloading, };
+
     public ProgramState(int value) {
         super(value);
     }

@@ -239,6 +239,38 @@ public class EngineeringUnits extends Enumerated {
     public static final EngineeringUnits wattsPerMeterPerDegreeKelvin = new EngineeringUnits(189);
     public static final EngineeringUnits wattsPerSquareMeterDegreeKelvin = new EngineeringUnits(141);
 
+    public static final EngineeringUnits[] ALL = { squareMeters, squareFeet, milliamperes, amperes, ohms, volts,
+            kilovolts, megavolts, voltAmperes, kilovoltAmperes, megavoltAmperes, voltAmperesReactive,
+            kilovoltAmperesReactive, megavoltAmperesReactive, degreesPhase, powerFactor, joules, kilojoules, wattHours,
+            kilowattHours, btus, therms, tonHours, joulesPerKilogramDryAir, btusPerPoundDryAir, cyclesPerHour,
+            cyclesPerMinute, hertz, gramsOfWaterPerKilogramDryAir, percentRelativeHumidity, millimeters, meters,
+            inches, feet, wattsPerSquareFoot, wattsPerSquareMeter, lumens, luxes, footCandles, kilograms, poundsMass,
+            tons, kilogramsPerSecond, kilogramsPerMinute, kilogramsPerHour, poundsMassPerMinute, poundsMassPerHour,
+            watts, kilowatts, megawatts, btusPerHour, horsepower, tonsRefrigeration, pascals, kilopascals, bars,
+            poundsForcePerSquareInch, centimetersOfWater, inchesOfWater, millimetersOfMercury, centimetersOfMercury,
+            inchesOfMercury, degreesCelsius, degreesKelvin, degreesFahrenheit, degreeDaysCelsius, degreeDaysFahrenheit,
+            years, months, weeks, days, hours, minutes, seconds, metersPerSecond, kilometersPerHour, feetPerSecond,
+            feetPerMinute, milesPerHour, cubicFeet, cubicMeters, imperialGallons, liters, usGallons,
+            cubicFeetPerMinute, cubicMetersPerSecond, imperialGallonsPerMinute, litersPerSecond, litersPerMinute,
+            usGallonsPerMinute, degreesAngular, degreesCelsiusPerHour, degreesCelsiusPerMinute,
+            degreesFahrenheitPerHour, degreesFahrenheitPerMinute, noUnits, partsPerMillion, partsPerBillion, percent,
+            percentPerSecond, perMinute, perSecond, psiPerDegreeFahrenheit, radians, revolutionsPerMinute, currency1,
+            currency2, currency3, currency4, currency5, currency6, currency7, currency8, currency9, currency10,
+            squareInches, squareCentimeters, btusPerPound, centimeters, poundsMassPerSecond, deltaDegreesFahrenheit,
+            deltaDegreesKelvin, kilohms, megohms, millivolts, kilojoulesPerKilogram, megajoules, joulesPerDegreeKelvin,
+            joulesPerKilogramDegreeKelvin, kilohertz, megahertz, perHour, milliwatts, hectopascals, millibars,
+            cubicMetersPerHour, litersPerHour, kilowattHoursPerSquareMeter, kilowattHoursPerSquareFoot,
+            megajoulesPerSquareMeter, megajoulesPerSquareFoot, wattsPerSquareMeterDegreeKelvin, cubicFeetPerSecond,
+            percentObscurationPerFoot, percentObscurationPerMeter, milliohms, megawattHours, kiloBtus, megaBtus,
+            kilojoulesPerKilogramDryAir, megajoulesPerKilogramDryAir, kilojoulesPerDegreeKelvin,
+            megajoulesPerDegreeKelvin, newton, gramsPerSecond, gramsPerMinute, tonsPerHour, kiloBtusPerHour,
+            hundredthsSeconds, milliseconds, newtonMeters, millimetersPerSecond, millimetersPerMinute, metersPerMinute,
+            metersPerHour, cubicMetersPerMinute, metersPerSecondPerSecond, amperesPerMeter, amperesPerSquareMeter,
+            ampereSquareMeters, farads, henrys, ohmMeters, siemens, siemensPerMeter, teslas, voltsPerDegreeKelvin,
+            voltsPerMeter, webers, candelas, candelasPerSquareMeter, degreesKelvinPerHour, degreesKelvinPerMinute,
+            jouleSeconds, radiansPerSecond, squareMetersPerNewton, kilogramsPerCubicMeter, newtonSeconds,
+            newtonsPerMeter, wattsPerMeterPerDegreeKelvin, };
+
     public EngineeringUnits(int value) {
         super(value);
     }

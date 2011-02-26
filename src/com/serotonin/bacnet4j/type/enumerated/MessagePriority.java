@@ -28,6 +28,8 @@ public class MessagePriority extends Enumerated {
     public static final MessagePriority normal = new MessagePriority(0);
     public static final MessagePriority urgent = new MessagePriority(1);
 
+    public static final MessagePriority[] ALL = { normal, urgent, };
+
     public MessagePriority(int value) {
         super(value);
     }

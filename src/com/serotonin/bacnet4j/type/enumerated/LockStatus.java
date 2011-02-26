@@ -33,6 +33,8 @@ public class LockStatus extends Enumerated {
     public static final LockStatus fault = new LockStatus(2);
     public static final LockStatus unknown = new LockStatus(3);
 
+    public static final LockStatus[] ALL = { locked, unlocked, fault, unknown, };
+
     public LockStatus(int value) {
         super(value);
     }

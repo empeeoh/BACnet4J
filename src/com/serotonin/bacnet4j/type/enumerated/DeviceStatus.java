@@ -32,6 +32,9 @@ public class DeviceStatus extends Enumerated {
     public static final DeviceStatus nonOperational = new DeviceStatus(4);
     public static final DeviceStatus backupInProgress = new DeviceStatus(5);
 
+    public static final DeviceStatus[] ALL = { operational, operationalReadOnly, downloadRequired, downloadInProgress,
+            nonOperational, backupInProgress, };
+
     public DeviceStatus(int value) {
         super(value);
     }

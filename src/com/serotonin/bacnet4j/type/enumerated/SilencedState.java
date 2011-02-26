@@ -30,6 +30,8 @@ public class SilencedState extends Enumerated {
     public static final SilencedState visibleSilenced = new SilencedState(2);
     public static final SilencedState allSilenced = new SilencedState(3);
 
+    public static final SilencedState[] ALL = { unsilenced, audibleSilenced, visibleSilenced, allSilenced, };
+
     public SilencedState(int value) {
         super(value);
     }

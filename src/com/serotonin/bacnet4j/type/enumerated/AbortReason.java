@@ -31,6 +31,9 @@ public class AbortReason extends Enumerated {
     public static final AbortReason preemptedByHigherPriorityTask = new AbortReason(3);
     public static final AbortReason segmentationNotSupported = new AbortReason(4);
 
+    public static final AbortReason[] ALL = { other, bufferOverflow, invalidApduInThisState,
+            preemptedByHigherPriorityTask, segmentationNotSupported, };
+
     public AbortReason(int value) {
         super(value);
     }

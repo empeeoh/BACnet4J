@@ -28,6 +28,8 @@ public class BinaryPV extends Enumerated {
     public static final BinaryPV inactive = new BinaryPV(0);
     public static final BinaryPV active = new BinaryPV(1);
 
+    public static final BinaryPV[] ALL = { inactive, active, };
+
     public BinaryPV(int value) {
         super(value);
     }

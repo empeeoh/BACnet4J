@@ -32,6 +32,8 @@ public class DoorSecuredStatus extends Enumerated {
     public static final DoorSecuredStatus unsecured = new DoorSecuredStatus(1);
     public static final DoorSecuredStatus unknown = new DoorSecuredStatus(2);
 
+    public static final DoorSecuredStatus[] ALL = { secured, unsecured, unknown, };
+
     public DoorSecuredStatus(int value) {
         super(value);
     }

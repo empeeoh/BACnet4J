@@ -33,6 +33,9 @@ public class BackupState extends Enumerated {
     public static final BackupState backupFailure = new BackupState(5);
     public static final BackupState restoreFailure = new BackupState(6);
 
+    public static final BackupState[] ALL = { idle, preparingForBackup, preparingForRestore, performingABackup,
+            performingARestore, backupFailure, restoreFailure, };
+
     public BackupState(int value) {
         super(value);
     }

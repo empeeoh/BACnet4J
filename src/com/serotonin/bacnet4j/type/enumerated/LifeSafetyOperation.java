@@ -36,6 +36,9 @@ public class LifeSafetyOperation extends Enumerated {
     public static final LifeSafetyOperation unsilenceAudible = new LifeSafetyOperation(8);
     public static final LifeSafetyOperation unsilenceVisual = new LifeSafetyOperation(9);
 
+    public static final LifeSafetyOperation[] ALL = { none, silence, silenceAudible, silenceVisual, reset, resetAlarm,
+            resetFault, unsilence, unsilenceAudible, unsilenceVisual, };
+
     public LifeSafetyOperation(int value) {
         super(value);
     }

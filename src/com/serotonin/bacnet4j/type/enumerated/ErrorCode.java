@@ -106,6 +106,26 @@ public class ErrorCode extends Enumerated {
     public static final ErrorCode communicationDisabled = new ErrorCode(83);
     public static final ErrorCode unknownFileSize = new ErrorCode(122);
 
+    public static final ErrorCode[] ALL = { other, authenticationFailed, configurationInProgress, deviceBusy,
+            dynamicCreationNotSupported, fileAccessDenied, incompatibleSecurityLevels, inconsistentParameters,
+            inconsistentSelectionCriterion, invalidDataType, invalidFileAccessMethod, invalidFileStartPosition,
+            invalidOperatorName, invalidParameterDataType, invalidTimeStamp, keyGenerationError,
+            missingRequiredParameter, noObjectsOfSpecifiedType, noSpaceForObject, noSpaceToAddListElement,
+            noSpaceToWriteProperty, noVtSessionsAvailable, propertyIsNotAList, objectDeletionNotPermitted,
+            objectIdentifierAlreadyExists, operationalProblem, passwordFailure, readAccessDenied, securityNotSupported,
+            serviceRequestDenied, timeout, unknownObject, unknownProperty, unknownVtClass, unknownVtSession,
+            unsupportedObjectType, valueOutOfRange, vtSessionAlreadyClosed, vtSessionTerminationFailure,
+            writeAccessDenied, characterSetNotSupported, invalidArrayIndex, covSubscriptionFailed, notCovProperty,
+            optionalFunctionalityNotSupported, invalidConfigurationData, datatypeNotSupported, duplicateName,
+            duplicateObjectId, propertyIsNotAnArray, abortBufferOverflow, abortInvalidApduInThisState,
+            abortPreemptedByHigherPriorityTask, abortSegmentationNotSupported, abortProprietary, abortOther,
+            invalidTag, networkDown, rejectBufferOverflow, rejectInconsistentParameters,
+            rejectInvalidParameterDataType, rejectInvalidTag, rejectMissingRequiredParameter,
+            rejectParameterOutOfRange, rejectTooManyArguments, rejectUndefinedEnumeration, rejectUnrecognizedService,
+            rejectProprietary, rejectOther, unknownDevice, unknownRoute, valueNotInitialized, invalidEventState,
+            noAlarmConfigured, logBufferFull, loggedValuePurged, noPropertySpecified, notConfiguredForTriggeredLogging,
+            communicationDisabled, unknownFileSize, };
+
     public ErrorCode(int value) {
         super(value);
     }

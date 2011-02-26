@@ -28,6 +28,8 @@ public class Polarity extends Enumerated {
     public static final Polarity normal = new Polarity(0);
     public static final Polarity reverse = new Polarity(1);
 
+    public static final Polarity[] ALL = { normal, reverse, };
+
     public Polarity(int value) {
         super(value);
     }

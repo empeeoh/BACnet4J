@@ -34,6 +34,9 @@ public class RestartReason extends Enumerated {
     public static final RestartReason softwareWatchdog = new RestartReason(6);
     public static final RestartReason suspended = new RestartReason(7);
 
+    public static final RestartReason[] ALL = { unknown, coldstart, warmstart, detectedPowerLost, detectedPoweredOff,
+            hardwareWatchdog, softwareWatchdog, suspended, };
+
     public RestartReason(int value) {
         super(value);
     }

@@ -41,6 +41,9 @@ public class NodeType extends Enumerated {
     public static final NodeType functional = new NodeType(10);
     public static final NodeType other = new NodeType(11);
 
+    public static final NodeType[] ALL = { unknown, system, network, device, organizational, area, equipment, point,
+            collection, property, functional, other, };
+
     public NodeType(int value) {
         super(value);
     }

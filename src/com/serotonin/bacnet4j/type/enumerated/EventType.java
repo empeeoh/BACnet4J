@@ -46,6 +46,9 @@ public class EventType extends Enumerated {
     public static final EventType bufferReady = new EventType(BufferReady.TYPE_ID);
     public static final EventType unsignedRange = new EventType(UnsignedRange.TYPE_ID);
 
+    public static final EventType[] ALL = { changeOfBitstring, changeOfState, changeOfValue, commandFailure,
+            floatingLimit, outOfRange, changeOfLifeSafety, extended, bufferReady, unsignedRange, };
+
     public EventType(int value) {
         super(value);
     }

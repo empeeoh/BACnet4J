@@ -36,6 +36,10 @@ public class RejectReason extends Enumerated {
     public static final RejectReason undefinedEnumeration = new RejectReason(8);
     public static final RejectReason unrecognizedService = new RejectReason(9);
 
+    public static final RejectReason[] ALL = { other, bufferOverflow, inconsistentParameters, invalidParameterDataType,
+            invalidTag, missingRequiredParameter, parameterOutOfRange, tooManyArguments, undefinedEnumeration,
+            unrecognizedService, };
+
     public RejectReason(int value) {
         super(value);
     }

@@ -50,6 +50,10 @@ public class LifeSafetyState extends Enumerated {
     public static final LifeSafetyState supervisory = new LifeSafetyState(22);
     public static final LifeSafetyState testSupervisory = new LifeSafetyState(23);
 
+    public static final LifeSafetyState[] ALL = { quiet, preAlarm, alarm, fault, faultPreAlarm, faultAlarm, notReady,
+            active, tamper, testAlarm, testActive, testFault, testFaultAlarm, holdup, duress, tamperAlarm, abnormal,
+            emergencyPower, delayed, blocked, localAlarm, generalAlarm, supervisory, testSupervisory, };
+
     public LifeSafetyState(int value) {
         super(value);
     }

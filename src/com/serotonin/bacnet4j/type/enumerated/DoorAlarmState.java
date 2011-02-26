@@ -38,6 +38,9 @@ public class DoorAlarmState extends Enumerated {
     public static final DoorAlarmState freeAccess = new DoorAlarmState(7);
     public static final DoorAlarmState egressOpen = new DoorAlarmState(8);
 
+    public static final DoorAlarmState[] ALL = { normal, alarm, doorOpenTooLong, forcedOpen, tamper, doorFault,
+            lockDown, freeAccess, egressOpen, };
+
     public DoorAlarmState(int value) {
         super(value);
     }

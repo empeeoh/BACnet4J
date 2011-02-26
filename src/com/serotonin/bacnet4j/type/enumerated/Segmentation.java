@@ -30,6 +30,8 @@ public class Segmentation extends Enumerated {
     public static final Segmentation segmentedReceive = new Segmentation(2);
     public static final Segmentation noSegmentation = new Segmentation(3);
 
+    public static final Segmentation[] ALL = { segmentedBoth, segmentedTransmit, segmentedReceive, noSegmentation, };
+
     public Segmentation(int value) {
         super(value);
     }

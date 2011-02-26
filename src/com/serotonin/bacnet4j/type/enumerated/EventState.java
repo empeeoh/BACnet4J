@@ -32,6 +32,8 @@ public class EventState extends Enumerated {
     public static final EventState lowLimit = new EventState(4);
     public static final EventState lifeSafetyAlarm = new EventState(5);
 
+    public static final EventState[] ALL = { normal, fault, offnormal, highLimit, lowLimit, lifeSafetyAlarm, };
+
     public EventState(int value) {
         super(value);
     }

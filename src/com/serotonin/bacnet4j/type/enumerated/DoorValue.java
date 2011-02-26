@@ -33,6 +33,8 @@ public class DoorValue extends Enumerated {
     public static final DoorValue pulseUnlock = new DoorValue(2);
     public static final DoorValue extendedPulseUnlock = new DoorValue(3);
 
+    public static final DoorValue[] ALL = { lock, unlock, pulseUnlock, extendedPulseUnlock, };
+
     public DoorValue(int value) {
         super(value);
     }

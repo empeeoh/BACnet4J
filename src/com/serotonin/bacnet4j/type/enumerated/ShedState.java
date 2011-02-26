@@ -33,6 +33,8 @@ public class ShedState extends Enumerated {
     public static final ShedState shedCompliant = new ShedState(2);
     public static final ShedState shedNonCompliant = new ShedState(3);
 
+    public static final ShedState[] ALL = { shedInactive, shedRequestPending, shedCompliant, shedNonCompliant, };
+
     public ShedState(int value) {
         super(value);
     }

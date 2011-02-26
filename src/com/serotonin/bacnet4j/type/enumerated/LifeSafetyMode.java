@@ -41,6 +41,9 @@ public class LifeSafetyMode extends Enumerated {
     public static final LifeSafetyMode automaticReleaseDisabled = new LifeSafetyMode(13);
     public static final LifeSafetyMode defaultMode = new LifeSafetyMode(14);
 
+    public static final LifeSafetyMode[] ALL = { off, on, test, manned, unmanned, armed, disarmed, prearmed, slow,
+            fast, disconnected, enabled, disabled, automaticReleaseDisabled, defaultMode, };
+
     public LifeSafetyMode(int value) {
         super(value);
     }

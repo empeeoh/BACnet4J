@@ -28,6 +28,8 @@ public class Action extends Enumerated {
     public static final Action direct = new Action(0);
     public static final Action reverse = new Action(1);
 
+    public static final Action[] ALL = { direct, reverse, };
+
     public Action(int value) {
         super(value);
     }

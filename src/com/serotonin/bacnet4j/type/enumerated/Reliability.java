@@ -38,6 +38,9 @@ public class Reliability extends Enumerated {
     public static final Reliability configurationError = new Reliability(10);
     public static final Reliability communicationFailure = new Reliability(12);
 
+    public static final Reliability[] ALL = { noFaultDetected, noSensor, overRange, underRange, openLoop, shortedLoop,
+            noOutput, unreliableOther, processError, multiStateFault, configurationError, communicationFailure, };
+
     public Reliability(int value) {
         super(value);
     }

@@ -34,6 +34,9 @@ public class ErrorClass extends Enumerated {
     public static final ErrorClass vt = new ErrorClass(6);
     public static final ErrorClass communication = new ErrorClass(7);
 
+    public static final ErrorClass[] ALL = { device, object, property, resources, security, services, vt,
+            communication, };
+
     public ErrorClass(int value) {
         super(value);
     }

@@ -30,6 +30,8 @@ public class Maintenance extends Enumerated {
     public static final Maintenance needServiceOperational = new Maintenance(2);
     public static final Maintenance needServiceInoperative = new Maintenance(3);
 
+    public static final Maintenance[] ALL = { none, periodicTest, needServiceOperational, needServiceInoperative, };
+
     public Maintenance(int value) {
         super(value);
     }

@@ -33,6 +33,9 @@ public class VtClass extends Enumerated {
     public static final VtClass hp_700_94 = new VtClass(5);
     public static final VtClass ibm_3130 = new VtClass(6);
 
+    public static final VtClass[] ALL = { defaultTerminal, ansi_x3_64, dec_vt52, dec_vt100, dec_vt220, hp_700_94,
+            ibm_3130, };
+
     public VtClass(int value) {
         super(value);
     }

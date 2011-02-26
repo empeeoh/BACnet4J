@@ -56,6 +56,12 @@ public class ObjectType extends Enumerated {
     public static final ObjectType structuredView = new ObjectType(29);
     public static final ObjectType accessDoor = new ObjectType(30);
 
+    public static final ObjectType[] ALL = { analogInput, analogOutput, analogValue, binaryInput, binaryOutput,
+            binaryValue, calendar, command, device, eventEnrollment, file, group, loop, multiStateInput,
+            multiStateOutput, notificationClass, program, schedule, averaging, multiStateValue, trendLog,
+            lifeSafetyPoint, lifeSafetyZone, accumulator, pulseConverter, eventLog, trendLogMultiple, loadControl,
+            structuredView, accessDoor, };
+
     public ObjectType(int value) {
         super(value);
     }

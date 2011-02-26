@@ -250,6 +250,45 @@ public class PropertyIdentifier extends Enumerated {
     public static final PropertyIdentifier restoreCompletionTime = new PropertyIdentifier(340);
     public static final PropertyIdentifier restorePreparationTime = new PropertyIdentifier(341);
 
+    public static final PropertyIdentifier[] ALL = { ackedTransitions, ackRequired, action, actionText, activeText,
+            activeVtSessions, alarmValue, alarmValues, all, allWritesSuccessful, apduSegmentTimeout, apduTimeout,
+            applicationSoftwareVersion, archive, bias, changeOfStateCount, changeOfStateTime, notificationClass,
+            controlledVariableReference, controlledVariableUnits, controlledVariableValue, covIncrement, dateList,
+            daylightSavingsStatus, deadband, derivativeConstant, derivativeConstantUnits, description,
+            descriptionOfHalt, deviceAddressBinding, deviceType, effectivePeriod, elapsedActiveTime, errorLimit,
+            eventEnable, eventState, eventType, exceptionSchedule, faultValues, feedbackValue, fileAccessMethod,
+            fileSize, fileType, firmwareRevision, highLimit, inactiveText, inProcess, instanceOf, integralConstant,
+            integralConstantUnits, limitEnable, listOfGroupMembers, listOfObjectPropertyReferences, listOfSessionKeys,
+            localDate, localTime, location, lowLimit, manipulatedVariableReference, maximumOutput,
+            maxApduLengthAccepted, maxInfoFrames, maxMaster, maxPresValue, minimumOffTime, minimumOnTime,
+            minimumOutput, minPresValue, modelName, modificationDate, notifyType, numberOfApduRetries, numberOfStates,
+            objectIdentifier, objectList, objectName, objectPropertyReference, objectType, optional, outOfService,
+            outputUnits, eventParameters, polarity, presentValue, priority, priorityArray, priorityForWriting,
+            processIdentifier, programChange, programLocation, programState, proportionalConstant,
+            proportionalConstantUnits, protocolObjectTypesSupported, protocolServicesSupported, protocolVersion,
+            readOnly, reasonForHalt, recipientList, reliability, relinquishDefault, required, resolution,
+            segmentationSupported, setpoint, setpointReference, stateText, statusFlags, systemStatus, timeDelay,
+            timeOfActiveTimeReset, timeOfStateCountReset, timeSynchronizationRecipients, units, updateInterval,
+            utcOffset, vendorIdentifier, vendorName, vtClassesSupported, weeklySchedule, attemptedSamples,
+            averageValue, bufferSize, clientCovIncrement, covResubscriptionInterval, eventTimeStamps, logBuffer,
+            logDeviceObjectProperty, enable, logInterval, maximumValue, minimumValue, notificationThreshold,
+            protocolRevision, recordsSinceNotification, recordCount, startTime, stopTime, stopWhenFull,
+            totalRecordCount, validSamples, windowInterval, windowSamples, maximumValueTimestamp,
+            minimumValueTimestamp, varianceValue, activeCovSubscriptions, backupFailureTimeout, configurationFiles,
+            databaseRevision, directReading, lastRestoreTime, maintenanceRequired, memberOf, mode, operationExpected,
+            setting, silenced, trackingValue, zoneMembers, lifeSafetyAlarmValues, maxSegmentsAccepted, profileName,
+            autoSlaveDiscovery, manualSlaveAddressBinding, slaveAddressBinding, slaveProxyEnable, lastNotifyRecord,
+            scheduleDefault, acceptedModes, adjustValue, count, countBeforeChange, countChangeTime, covPeriod,
+            inputReference, limitMonitoringInterval, loggingObject, loggingRecord, prescale, pulseRate, scale,
+            scaleFactor, updateTime, valueBeforeChange, valueSet, valueChangeTime, alignIntervals, intervalOffset,
+            lastRestartReason, loggingType, restartNotificationRecipients, timeOfDeviceRestart,
+            timeSynchronizationInterval, trigger, utcTimeSynchronizationRecipients, nodeSubtype, nodeType,
+            structuredObjectList, subordinateAnnotations, subordinateList, actualShedLevel, dutyWindow,
+            expectedShedLevel, fullDutyBaseline, requestedShedLevel, shedDuration, shedLevelDescriptions, shedLevels,
+            stateDescription, doorAlarmState, doorExtendedPulseTime, doorMembers, doorOpenTooLongTime, doorPulseTime,
+            doorStatus, doorUnlockDelayTime, lockStatus, maskedAlarmValues, securedStatus, backupAndRestoreState,
+            backupPreparationTime, restoreCompletionTime, restorePreparationTime, };
+
     public PropertyIdentifier(int value) {
         super(value);
     }

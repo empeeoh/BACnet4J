@@ -29,6 +29,8 @@ public class NotifyType extends Enumerated {
     public static final NotifyType event = new NotifyType(1);
     public static final NotifyType ackNotification = new NotifyType(2);
 
+    public static final NotifyType[] ALL = { alarm, event, ackNotification, };
+
     public NotifyType(int value) {
         super(value);
     }

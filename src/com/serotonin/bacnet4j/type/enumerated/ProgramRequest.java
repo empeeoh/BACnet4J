@@ -32,6 +32,8 @@ public class ProgramRequest extends Enumerated {
     public static final ProgramRequest restart = new ProgramRequest(4);
     public static final ProgramRequest unload = new ProgramRequest(5);
 
+    public static final ProgramRequest[] ALL = { ready, load, run, halt, restart, unload, };
+
     public ProgramRequest(int value) {
         super(value);
     }
