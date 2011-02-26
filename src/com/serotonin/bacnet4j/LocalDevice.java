@@ -31,6 +31,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import com.serotonin.bacnet4j.apdu.Abort;
 import com.serotonin.bacnet4j.apdu.AckAPDU;
@@ -126,6 +129,8 @@ public class LocalDevice implements RequestHandler {
     private final List<BACnetObject> localObjects = new CopyOnWriteArrayList<BACnetObject>();
     private final List<RemoteDevice> remoteDevices = new CopyOnWriteArrayList<RemoteDevice>();
     private boolean initialized;
+    private ExecutorService executorService;
+    private boolean ownsExecutorService;
 
     /**
      * The local password of the device. Used in the ReinitializeDeviceRequest service.
@@ -212,16 +217,41 @@ public class LocalDevice implements RequestHandler {
         }
     }
 
+    public void setExecutorService(ExecutorService executorService) {
+        if (initialized)
+            throw new IllegalStateException("Cannot set the executor service. Already initialized");
+        this.executorService = executorService;
+    }
+
     public synchronized void initialize() throws IOException {
-        eventHandler.initialize();
-        messageControl.initialize();
+        if (executorService == null) {
+            executorService = Executors.newCachedThreadPool();
+            ownsExecutorService = true;
+        }
+        else
+            ownsExecutorService = false;
+        eventHandler.initialize(executorService);
+        messageControl.initialize(executorService);
         initialized = true;
     }
 
     public synchronized void terminate() {
         messageControl.terminate();
-        eventHandler.terminate();
         initialized = false;
+
+        if (ownsExecutorService) {
+            ExecutorService temp = executorService;
+            executorService = null;
+            if (temp != null) {
+                temp.shutdown();
+                try {
+                    temp.awaitTermination(3, TimeUnit.SECONDS);
+                }
+                catch (InterruptedException e) {
+                    LocalDevice.getExceptionListener().receivedException(e);
+                }
+            }
+        }
     }
 
     public boolean isInitialized() {

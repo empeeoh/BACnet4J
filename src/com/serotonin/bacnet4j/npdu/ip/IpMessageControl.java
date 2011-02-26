@@ -28,8 +28,6 @@ import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
 import java.util.LinkedList;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 
 import com.serotonin.bacnet4j.LocalDevice;
 import com.serotonin.bacnet4j.Network;
@@ -151,8 +149,8 @@ public class IpMessageControl extends Thread {
         return segWindow;
     }
 
-    public void initialize() throws IOException {
-        incomingExecutorService = Executors.newCachedThreadPool();
+    public void initialize(ExecutorService executorService) throws IOException {
+        incomingExecutorService = executorService;
         socket = new DatagramSocket(port, InetAddress.getByName(localBindAddress));
         socket.setBroadcast(true);
         start();
@@ -161,15 +159,6 @@ public class IpMessageControl extends Thread {
     public void terminate() {
         if (socket != null)
             socket.close();
-
-        // Close the executor service.
-        incomingExecutorService.shutdown();
-        try {
-            incomingExecutorService.awaitTermination(3, TimeUnit.SECONDS);
-        }
-        catch (InterruptedException e) {
-            LocalDevice.getExceptionListener().receivedException(e);
-        }
     }
 
     // private byte getNextInvokeId() {
@@ -426,8 +415,10 @@ public class IpMessageControl extends Thread {
         while (!socket.isClosed()) {
             try {
                 socket.receive(p);
-                incomingExecutorService.execute(new IncomingMessageExecutor(p));
-                p.setData(buffer);
+                if (!incomingExecutorService.isShutdown()) {
+                    incomingExecutorService.execute(new IncomingMessageExecutor(p));
+                    p.setData(buffer);
+                }
             }
             catch (IOException e) {
                 // no op. This happens if the socket gets closed by the destroy method.

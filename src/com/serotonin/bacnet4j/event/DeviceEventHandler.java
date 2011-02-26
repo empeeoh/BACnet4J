@@ -22,7 +22,6 @@ package com.serotonin.bacnet4j.event;
 
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import com.serotonin.bacnet4j.RemoteDevice;
 import com.serotonin.bacnet4j.RemoteObject;
@@ -59,15 +58,8 @@ public class DeviceEventHandler {
     // / Lifecycle
     // /
     //
-    public void initialize() {
-        dispatchService = Executors.newCachedThreadPool();
-    }
-
-    public void terminate() {
-        ExecutorService temp = dispatchService;
-        dispatchService = null;
-        if (temp != null)
-            temp.shutdown();
+    public void initialize(ExecutorService executorService) {
+        dispatchService = executorService;
     }
 
     //
