@@ -74,7 +74,7 @@ public class DateTime extends BaseType {
     }
 
     public long getTimeMillis() {
-        GregorianCalendar gc = new GregorianCalendar(date.getYear(), date.getMonth().getId() - 1, date.getDay(),
+        GregorianCalendar gc = new GregorianCalendar(date.getCenturyYear(), date.getMonth().getId() - 1, date.getDay(),
                 time.getHour(), time.getMinute(), time.getSecond());
         gc.set(Calendar.MILLISECOND, time.getHundredth() * 10);
         return gc.getTimeInMillis();
