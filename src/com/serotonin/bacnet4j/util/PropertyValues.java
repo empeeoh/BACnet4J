@@ -20,6 +20,7 @@
  */
 package com.serotonin.bacnet4j.util;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -33,7 +34,9 @@ import com.serotonin.bacnet4j.type.enumerated.PropertyIdentifier;
 import com.serotonin.bacnet4j.type.primitive.ObjectIdentifier;
 import com.serotonin.bacnet4j.type.primitive.UnsignedInteger;
 
-public class PropertyValues implements Iterable<ObjectPropertyReference> {
+public class PropertyValues implements Iterable<ObjectPropertyReference>, Serializable {
+    private static final long serialVersionUID = 5880275533969236369L;
+
     private final Map<ObjectPropertyReference, Encodable> values = new HashMap<ObjectPropertyReference, Encodable>();
 
     public void add(ObjectIdentifier oid, PropertyIdentifier pid, UnsignedInteger pin, Encodable value) {
