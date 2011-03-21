@@ -79,7 +79,10 @@ public class PropertyValues implements Iterable<ObjectPropertyReference>, Serial
     }
 
     public String getString(ObjectIdentifier oid, PropertyIdentifier pid) {
-        return getNoErrorCheck(oid, pid).toString();
+        Encodable value = getNoErrorCheck(oid, pid);
+        if (value == null)
+            return null;
+        return value.toString();
     }
 
     public String getString(ObjectIdentifier oid, PropertyIdentifier pid, String defaultValue) {
