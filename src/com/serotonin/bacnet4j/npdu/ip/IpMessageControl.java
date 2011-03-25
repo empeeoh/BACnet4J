@@ -71,6 +71,7 @@ public class IpMessageControl extends Thread {
     private static final int MAX_SEGMENTS = 7; // Greater than 64.
 
     // Config
+    int localNetworkNumber;
     private int port;
     private String localBindAddress = "0.0.0.0";
     private String broadcastAddress = "255.255.255.255";
@@ -91,6 +92,14 @@ public class IpMessageControl extends Thread {
 
     public void setRequestHandler(RequestHandler requestHandler) {
         this.requestHandler = requestHandler;
+    }
+
+    public int getLocalNetworkNumber() {
+        return localNetworkNumber;
+    }
+
+    public void setLocalNetworkNumber(int localNetworkNumber) {
+        this.localNetworkNumber = localNetworkNumber;
     }
 
     public void setPort(int port) {
@@ -571,6 +580,13 @@ public class IpMessageControl extends Thread {
                 throw new MessageValidationAssertionException("Invalid protocol version: " + npci.getVersion());
             if (npci.isNetworkMessage())
                 return null; // throw new MessageValidationAssertionException("Network messages are not supported");
+
+            // Check the destination network number work and do not respond to foreign networks requests  
+            if (npci.hasDestinationInfo()) {
+                int destNet = npci.getDestinationNetwork();
+                if (destNet > 0 && destNet != 0xffff && localNetworkNumber > 0 && localNetworkNumber != destNet)
+                    return null;
+            }
 
             if (npci.hasSourceInfo())
                 fromNetwork = new Network(npci.getSourceNetwork(), npci.getSourceAddress());

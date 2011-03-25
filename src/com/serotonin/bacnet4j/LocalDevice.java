@@ -145,11 +145,16 @@ public class LocalDevice implements RequestHandler {
     private final DeviceEventHandler eventHandler = new DeviceEventHandler();
 
     public LocalDevice(int deviceId, String broadcastAddress) {
-        this(deviceId, broadcastAddress, null);
+        this(deviceId, broadcastAddress, null, 0);
     }
 
     public LocalDevice(int deviceId, String broadcastAddress, String localBindAddress) {
+        this(deviceId, broadcastAddress, localBindAddress, 0);
+    }
+
+    public LocalDevice(int deviceId, String broadcastAddress, String localBindAddress, int localNetworkNumber) {
         messageControl = new IpMessageControl();
+        messageControl.setLocalNetworkNumber(localNetworkNumber);
         messageControl.setPort(DEFAULT_PORT);
         if (localBindAddress != null)
             messageControl.setLocalBindAddress(localBindAddress);
