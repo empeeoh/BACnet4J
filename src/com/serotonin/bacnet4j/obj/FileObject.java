@@ -88,7 +88,13 @@ public class FileObject extends BACnetObject {
     public OctetString readData(long start, long length) throws IOException {
         FileInputStream in = new FileInputStream(file);
         try {
-            in.skip(start);
+            while (start > 0) {
+                long result = in.skip(start);
+                if (result == -1)
+                    // EOF
+                    break;
+                start -= result;
+            }
             ByteArrayOutputStream out = new ByteArrayOutputStream();
             StreamUtils.transfer(in, out, length);
             return new OctetString(out.toByteArray());
