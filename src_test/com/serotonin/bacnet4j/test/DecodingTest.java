@@ -2,6 +2,7 @@ package com.serotonin.bacnet4j.test;
 
 import com.serotonin.bacnet4j.npdu.ip.IpMessageControl;
 import com.serotonin.bacnet4j.service.unconfirmed.UnconfirmedRequestService;
+import com.serotonin.bacnet4j.type.constructed.ServicesSupported;
 import com.serotonin.util.queue.ByteQueue;
 
 public class DecodingTest {
@@ -82,13 +83,16 @@ public class DecodingTest {
 
         // String s = "810a0015010030080c0c004003e8195729083e003f";
 
-        new IpMessageControl().testDecoding(toBytes(s));
+        new IpMessageControl(null).testDecoding(toBytes(s));
     }
 
     static void test2() throws Exception {
+        ServicesSupported servicesSupported = new ServicesSupported();
+        servicesSupported.setAll(true);
+
         String s = "[c,2,0,0,7b,29,1,3d,14,3,54,68,69,73,20,69,73,20,74,68,65,20,6d,65,73,73,61,67,65]";
         byte[] b = toBytes(s);
-        UnconfirmedRequestService.createUnconfirmedRequestService((byte) 5, new ByteQueue(b));
+        UnconfirmedRequestService.createUnconfirmedRequestService(servicesSupported, (byte) 5, new ByteQueue(b));
     }
 
     // public static void main(String[] args) throws Exception {

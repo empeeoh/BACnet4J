@@ -158,7 +158,7 @@ public class LocalDevice implements RequestHandler {
     }
 
     public LocalDevice(int deviceId, String broadcastAddress, String localBindAddress, int localNetworkNumber) {
-        messageControl = new IpMessageControl();
+        messageControl = new IpMessageControl(this);
         messageControl.setLocalNetworkNumber(localNetworkNumber);
         messageControl.setPort(DEFAULT_PORT);
         if (localBindAddress != null)
@@ -448,6 +448,10 @@ public class LocalDevice implements RequestHandler {
             // Should never happen, so just wrap in a RuntimeException
             throw new RuntimeException(e);
         }
+    }
+
+    public ServicesSupported getServicesSupported() throws BACnetServiceException {
+        return (ServicesSupported) getConfiguration().getProperty(PropertyIdentifier.protocolServicesSupported);
     }
 
     //

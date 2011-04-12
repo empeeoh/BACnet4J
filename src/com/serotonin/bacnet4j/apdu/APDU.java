@@ -27,18 +27,19 @@ package com.serotonin.bacnet4j.apdu;
 
 import com.serotonin.bacnet4j.exception.BACnetException;
 import com.serotonin.bacnet4j.exception.IllegalPduTypeException;
+import com.serotonin.bacnet4j.type.constructed.ServicesSupported;
 import com.serotonin.util.queue.ByteQueue;
 
 abstract public class APDU {
-    public static APDU createAPDU(ByteQueue queue) throws BACnetException {
+    public static APDU createAPDU(ServicesSupported services, ByteQueue queue) throws BACnetException {
         // Get the first byte. The 4 high-order bits will tell us the type of PDU this is.
         byte type = queue.peek(0);
         type = (byte) ((type & 0xff) >> 4);
 
         if (type == ConfirmedRequest.TYPE_ID)
-            return new ConfirmedRequest(queue);
+            return new ConfirmedRequest(services, queue);
         if (type == UnconfirmedRequest.TYPE_ID)
-            return new UnconfirmedRequest(queue);
+            return new UnconfirmedRequest(services, queue);
         if (type == SimpleACK.TYPE_ID)
             return new SimpleACK(queue);
         if (type == ComplexACK.TYPE_ID)

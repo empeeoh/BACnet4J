@@ -67,14 +67,21 @@ import com.serotonin.bacnet4j.service.confirmed.ConfirmedTextMessageRequest;
 import com.serotonin.bacnet4j.service.confirmed.CreateObjectRequest;
 import com.serotonin.bacnet4j.service.confirmed.DeleteObjectRequest;
 import com.serotonin.bacnet4j.service.confirmed.DeviceCommunicationControlRequest;
+import com.serotonin.bacnet4j.service.confirmed.DeviceCommunicationControlRequest.EnableDisable;
 import com.serotonin.bacnet4j.service.confirmed.GetAlarmSummaryRequest;
 import com.serotonin.bacnet4j.service.confirmed.GetEnrollmentSummaryRequest;
+import com.serotonin.bacnet4j.service.confirmed.GetEnrollmentSummaryRequest.PriorityFilter;
 import com.serotonin.bacnet4j.service.confirmed.GetEventInformation;
 import com.serotonin.bacnet4j.service.confirmed.LifeSafetyOperationRequest;
 import com.serotonin.bacnet4j.service.confirmed.ReadPropertyConditionalRequest;
+import com.serotonin.bacnet4j.service.confirmed.ReadPropertyConditionalRequest.ObjectSelectionCriteria;
+import com.serotonin.bacnet4j.service.confirmed.ReadPropertyConditionalRequest.ObjectSelectionCriteria.SelectionCriteria;
+import com.serotonin.bacnet4j.service.confirmed.ReadPropertyConditionalRequest.ObjectSelectionCriteria.SelectionCriteria.RelationSpecifier;
+import com.serotonin.bacnet4j.service.confirmed.ReadPropertyConditionalRequest.ObjectSelectionCriteria.SelectionLogic;
 import com.serotonin.bacnet4j.service.confirmed.ReadPropertyMultipleRequest;
 import com.serotonin.bacnet4j.service.confirmed.ReadPropertyRequest;
 import com.serotonin.bacnet4j.service.confirmed.ReinitializeDeviceRequest;
+import com.serotonin.bacnet4j.service.confirmed.ReinitializeDeviceRequest.ReinitializedStateOfDevice;
 import com.serotonin.bacnet4j.service.confirmed.RemoveListElementRequest;
 import com.serotonin.bacnet4j.service.confirmed.RequestKeyRequest;
 import com.serotonin.bacnet4j.service.confirmed.SubscribeCOVPropertyRequest;
@@ -84,13 +91,6 @@ import com.serotonin.bacnet4j.service.confirmed.VtDataRequest;
 import com.serotonin.bacnet4j.service.confirmed.VtOpenRequest;
 import com.serotonin.bacnet4j.service.confirmed.WritePropertyMultipleRequest;
 import com.serotonin.bacnet4j.service.confirmed.WritePropertyRequest;
-import com.serotonin.bacnet4j.service.confirmed.DeviceCommunicationControlRequest.EnableDisable;
-import com.serotonin.bacnet4j.service.confirmed.GetEnrollmentSummaryRequest.PriorityFilter;
-import com.serotonin.bacnet4j.service.confirmed.ReadPropertyConditionalRequest.ObjectSelectionCriteria;
-import com.serotonin.bacnet4j.service.confirmed.ReadPropertyConditionalRequest.ObjectSelectionCriteria.SelectionCriteria;
-import com.serotonin.bacnet4j.service.confirmed.ReadPropertyConditionalRequest.ObjectSelectionCriteria.SelectionLogic;
-import com.serotonin.bacnet4j.service.confirmed.ReadPropertyConditionalRequest.ObjectSelectionCriteria.SelectionCriteria.RelationSpecifier;
-import com.serotonin.bacnet4j.service.confirmed.ReinitializeDeviceRequest.ReinitializedStateOfDevice;
 import com.serotonin.bacnet4j.service.unconfirmed.IAmRequest;
 import com.serotonin.bacnet4j.service.unconfirmed.IHaveRequest;
 import com.serotonin.bacnet4j.service.unconfirmed.TimeSynchronizationRequest;
@@ -113,16 +113,17 @@ import com.serotonin.bacnet4j.type.constructed.LogRecord;
 import com.serotonin.bacnet4j.type.constructed.PropertyReference;
 import com.serotonin.bacnet4j.type.constructed.PropertyValue;
 import com.serotonin.bacnet4j.type.constructed.ReadAccessResult;
+import com.serotonin.bacnet4j.type.constructed.ReadAccessResult.Result;
 import com.serotonin.bacnet4j.type.constructed.ReadAccessSpecification;
 import com.serotonin.bacnet4j.type.constructed.Recipient;
 import com.serotonin.bacnet4j.type.constructed.RecipientProcess;
 import com.serotonin.bacnet4j.type.constructed.ResultFlags;
 import com.serotonin.bacnet4j.type.constructed.Sequence;
 import com.serotonin.bacnet4j.type.constructed.SequenceOf;
+import com.serotonin.bacnet4j.type.constructed.ServicesSupported;
 import com.serotonin.bacnet4j.type.constructed.StatusFlags;
 import com.serotonin.bacnet4j.type.constructed.TimeStamp;
 import com.serotonin.bacnet4j.type.constructed.WriteAccessSpecification;
-import com.serotonin.bacnet4j.type.constructed.ReadAccessResult.Result;
 import com.serotonin.bacnet4j.type.enumerated.BinaryPV;
 import com.serotonin.bacnet4j.type.enumerated.ErrorClass;
 import com.serotonin.bacnet4j.type.enumerated.ErrorCode;
@@ -155,6 +156,13 @@ import com.serotonin.util.queue.ByteQueue;
 public class AnnexFEncodingTest {
     public static void main(String[] args) {
         new AnnexFEncodingTest().executeAll();
+    }
+
+    private final ServicesSupported servicesSupported;
+
+    public AnnexFEncodingTest() {
+        servicesSupported = new ServicesSupported();
+        servicesSupported.setAll(true);
     }
 
     public void e1_1aTest() {
@@ -1430,8 +1438,8 @@ public class AnnexFEncodingTest {
     }
 
     public void e5_eTest() {
-        ConfirmedRequestService service = new VtDataRequest(new UnsignedInteger(29), new OctetString("FRED\r"
-                .getBytes()), new UnsignedInteger(0));
+        ConfirmedRequestService service = new VtDataRequest(new UnsignedInteger(29), new OctetString(
+                "FRED\r".getBytes()), new UnsignedInteger(0));
         APDU pdu = new ConfirmedRequest(false, false, false, 0, MaxApduLength.UP_TO_128, (byte) 82, (byte) 0, 0,
                 service);
         byte[] expectedResult = { (byte) 0x00, (byte) 0x01, (byte) 0x52, (byte) 0x17, (byte) 0x21, (byte) 0x1D,
@@ -1632,7 +1640,7 @@ public class AnnexFEncodingTest {
 
         APDU parsedAPDU;
         try {
-            parsedAPDU = APDU.createAPDU(queue);
+            parsedAPDU = APDU.createAPDU(servicesSupported, queue);
             if (parsedAPDU instanceof Segmentable)
                 ((Segmentable) parsedAPDU).parseServiceData();
         }

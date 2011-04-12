@@ -32,6 +32,7 @@ import com.serotonin.bacnet4j.exception.BACnetException;
 import com.serotonin.bacnet4j.service.Service;
 import com.serotonin.bacnet4j.service.acknowledgement.AcknowledgementService;
 import com.serotonin.bacnet4j.type.constructed.Address;
+import com.serotonin.bacnet4j.type.constructed.ServicesSupported;
 import com.serotonin.bacnet4j.type.enumerated.ErrorClass;
 import com.serotonin.bacnet4j.type.enumerated.ErrorCode;
 import com.serotonin.util.queue.ByteQueue;
@@ -39,8 +40,74 @@ import com.serotonin.util.queue.ByteQueue;
 abstract public class ConfirmedRequestService extends Service {
     private static final long serialVersionUID = -7443765811741238314L;
 
+    public static void checkConfirmedRequestService(ServicesSupported services, byte type) throws BACnetException {
+        if (type == AcknowledgeAlarmRequest.TYPE_ID && services.isAcknowledgeAlarm()) // 0
+            return;
+        if (type == ConfirmedCovNotificationRequest.TYPE_ID && services.isConfirmedCovNotification()) // 1
+            return;
+        if (type == ConfirmedEventNotificationRequest.TYPE_ID && services.isConfirmedEventNotification()) // 2
+            return;
+        if (type == GetAlarmSummaryRequest.TYPE_ID && services.isGetAlarmSummary()) // 3
+            return;
+        if (type == GetEnrollmentSummaryRequest.TYPE_ID && services.isGetEnrollmentSummary()) // 4
+            return;
+        if (type == SubscribeCOVRequest.TYPE_ID && services.isSubscribeCov()) // 5
+            return;
+        if (type == AtomicReadFileRequest.TYPE_ID && services.isAtomicReadFile()) // 6
+            return;
+        if (type == AtomicWriteFileRequest.TYPE_ID && services.isAtomicWriteFile()) // 7
+            return;
+        if (type == AddListElementRequest.TYPE_ID && services.isAddListElement()) // 8
+            return;
+        if (type == RemoveListElementRequest.TYPE_ID && services.isRemoveListElement()) // 9
+            return;
+        if (type == CreateObjectRequest.TYPE_ID && services.isCreateObject()) // 10
+            return;
+        if (type == DeleteObjectRequest.TYPE_ID && services.isDeleteObject()) // 11
+            return;
+        if (type == ReadPropertyRequest.TYPE_ID && services.isReadProperty()) // 12
+            return;
+        if (type == ReadPropertyConditionalRequest.TYPE_ID && services.isReadPropertyConditional()) // 13
+            return;
+        if (type == ReadPropertyMultipleRequest.TYPE_ID && services.isReadPropertyMultiple()) // 14
+            return;
+        if (type == WritePropertyRequest.TYPE_ID && services.isWriteProperty()) // 15
+            return;
+        if (type == WritePropertyMultipleRequest.TYPE_ID && services.isWritePropertyMultiple()) // 16
+            return;
+        if (type == DeviceCommunicationControlRequest.TYPE_ID && services.isDeviceCommunicationControl()) // 17
+            return;
+        if (type == ConfirmedPrivateTransferRequest.TYPE_ID && services.isConfirmedPrivateTransfer()) // 18
+            return;
+        if (type == ConfirmedTextMessageRequest.TYPE_ID && services.isConfirmedTextMessage()) // 19
+            return;
+        if (type == ReinitializeDeviceRequest.TYPE_ID && services.isReinitializeDevice()) // 20
+            return;
+        if (type == VtOpenRequest.TYPE_ID && services.isVtOpen()) // 21
+            return;
+        if (type == VtCloseRequest.TYPE_ID && services.isVtClose()) // 22
+            return;
+        if (type == VtDataRequest.TYPE_ID && services.isVtData()) // 23
+            return;
+        if (type == AuthenticateRequest.TYPE_ID && services.isAuthenticate()) // 24
+            return;
+        if (type == RequestKeyRequest.TYPE_ID && services.isRequestKey()) // 25
+            return;
+        if (type == ReadRangeRequest.TYPE_ID && services.isReadRange()) // 26
+            return;
+        if (type == LifeSafetyOperationRequest.TYPE_ID && services.isLifeSafetyOperation()) // 27
+            return;
+        if (type == SubscribeCOVPropertyRequest.TYPE_ID && services.isSubscribeCovProperty()) // 28
+            return;
+        if (type == GetEventInformation.TYPE_ID && services.isGetEventInformation()) // 29
+            return;
+
+        throw new BACnetErrorException(ErrorClass.device, ErrorCode.serviceRequestDenied);
+    }
+
     public static ConfirmedRequestService createConfirmedRequestService(byte type, ByteQueue queue)
             throws BACnetException {
+
         if (type == AcknowledgeAlarmRequest.TYPE_ID) // 0
             return new AcknowledgeAlarmRequest(queue);
         if (type == ConfirmedCovNotificationRequest.TYPE_ID) // 1

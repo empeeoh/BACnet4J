@@ -68,6 +68,9 @@ public class SerializationTests {
         ByteQueue queue = new ByteQueue();
         encodable.write(queue);
 
+        ServicesSupported servicesSupported = new ServicesSupported();
+        servicesSupported.setAll(true);
+
         Encodable deserialized;
         if (BaseError.class.isAssignableFrom(encodable.getClass()))
             deserialized = BaseError.createBaseError(queue);
@@ -79,8 +82,8 @@ public class SerializationTests {
             deserialized = AcknowledgementService.createAcknowledgementService(((Service) encodable).getChoiceId(),
                     queue);
         else if (UnconfirmedRequestService.class.isAssignableFrom(encodable.getClass()))
-            deserialized = UnconfirmedRequestService.createUnconfirmedRequestService(((Service) encodable)
-                    .getChoiceId(), queue);
+            deserialized = UnconfirmedRequestService.createUnconfirmedRequestService(servicesSupported,
+                    ((Service) encodable).getChoiceId(), queue);
         else {
             Constructor<? extends Encodable> c = encodable.getClass().getConstructor(ByteQueue.class);
             deserialized = c.newInstance(queue);

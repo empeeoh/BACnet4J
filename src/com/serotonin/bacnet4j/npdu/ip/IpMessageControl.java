@@ -61,6 +61,7 @@ import com.serotonin.bacnet4j.service.confirmed.ConfirmedRequestService;
 import com.serotonin.bacnet4j.service.unconfirmed.UnconfirmedRequestService;
 import com.serotonin.bacnet4j.type.constructed.Address;
 import com.serotonin.bacnet4j.type.constructed.BACnetError;
+import com.serotonin.bacnet4j.type.constructed.ServicesSupported;
 import com.serotonin.bacnet4j.type.enumerated.ErrorClass;
 import com.serotonin.bacnet4j.type.enumerated.ErrorCode;
 import com.serotonin.bacnet4j.type.enumerated.Segmentation;
@@ -76,6 +77,7 @@ public class IpMessageControl extends Thread {
     private static final int MAX_SEGMENTS = 7; // Greater than 64.
 
     // Config
+    LocalDevice localDevice;
     int localNetworkNumber;
     private int port;
     private String localBindAddress = "0.0.0.0";
@@ -90,6 +92,10 @@ public class IpMessageControl extends Thread {
     private DatagramSocket socket;
     final WaitingRoom waitingRoom = new WaitingRoom();
     private ExecutorService incomingExecutorService;
+
+    public IpMessageControl(LocalDevice localDevice) {
+        this.localDevice = localDevice;
+    }
 
     public RequestHandler getRequestHandler() {
         return requestHandler;
@@ -458,6 +464,7 @@ public class IpMessageControl extends Thread {
         InetAddress fromAddr;
         int fromPort;
         Network fromNetwork;
+        ServicesSupported servicesSupported;
 
         IncomingMessageExecutor(DatagramPacket p) {
             originalQueue = new ByteQueue(p.getData(), 0, p.getLength());
@@ -472,6 +479,13 @@ public class IpMessageControl extends Thread {
 
         public void run() {
             try {
+                if (localDevice == null) {
+                    // Testing
+                    servicesSupported = new ServicesSupported();
+                    servicesSupported.setAll(true);
+                }
+                else
+                    servicesSupported = localDevice.getServicesSupported();
                 runImpl();
             }
             catch (Exception e) {
@@ -494,6 +508,7 @@ public class IpMessageControl extends Thread {
 
             if (apdu instanceof ConfirmedRequest) {
                 ConfirmedRequest confAPDU = (ConfirmedRequest) apdu;
+
                 InetSocketAddress from = new InetSocketAddress(fromAddr, fromPort);
                 byte invokeId = confAPDU.getInvokeId();
 
@@ -598,7 +613,7 @@ public class IpMessageControl extends Thread {
 
             // Create the APDU.
             try {
-                return APDU.createAPDU(queue);
+                return APDU.createAPDU(servicesSupported, queue);
             }
             catch (BACnetException e) {
                 // If it's already a BACnetException, don't bother wrapping it.

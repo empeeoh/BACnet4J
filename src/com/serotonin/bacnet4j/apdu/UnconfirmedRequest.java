@@ -27,6 +27,7 @@ package com.serotonin.bacnet4j.apdu;
 
 import com.serotonin.bacnet4j.exception.BACnetException;
 import com.serotonin.bacnet4j.service.unconfirmed.UnconfirmedRequestService;
+import com.serotonin.bacnet4j.type.constructed.ServicesSupported;
 import com.serotonin.util.queue.ByteQueue;
 
 public class UnconfirmedRequest extends APDU {
@@ -59,10 +60,10 @@ public class UnconfirmedRequest extends APDU {
         service.write(queue);
     }
 
-    public UnconfirmedRequest(ByteQueue queue) throws BACnetException {
+    public UnconfirmedRequest(ServicesSupported services, ByteQueue queue) throws BACnetException {
         queue.pop();
         byte choiceId = queue.pop();
-        service = UnconfirmedRequestService.createUnconfirmedRequestService(choiceId, queue);
+        service = UnconfirmedRequestService.createUnconfirmedRequestService(services, choiceId, queue);
     }
 
     @Override
