@@ -36,6 +36,8 @@ import com.serotonin.util.queue.ByteQueue;
  * @author mlohbihler
  */
 public class Error extends AckAPDU {
+    private static final long serialVersionUID = 1062847933272895140L;
+
     public static final byte TYPE_ID = 5;
 
     /**

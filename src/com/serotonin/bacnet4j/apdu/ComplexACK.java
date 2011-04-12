@@ -30,6 +30,8 @@ import com.serotonin.bacnet4j.service.acknowledgement.AcknowledgementService;
 import com.serotonin.util.queue.ByteQueue;
 
 public class ComplexACK extends AckAPDU implements Segmentable {
+    private static final long serialVersionUID = 3393095437278653112L;
+
     public static final byte TYPE_ID = 3;
 
     public static int getHeaderSize(boolean segmented) {

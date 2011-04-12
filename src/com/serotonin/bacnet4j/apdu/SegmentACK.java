@@ -28,6 +28,8 @@ package com.serotonin.bacnet4j.apdu;
 import com.serotonin.util.queue.ByteQueue;
 
 public class SegmentACK extends AckAPDU {
+    private static final long serialVersionUID = -4754176957008435326L;
+
     public static final byte TYPE_ID = 4;
 
     /**

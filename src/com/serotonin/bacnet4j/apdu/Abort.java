@@ -34,6 +34,8 @@ import com.serotonin.util.queue.ByteQueue;
  * @author mlohbihler
  */
 public class Abort extends AckAPDU {
+    private static final long serialVersionUID = 2521232315250724579L;
+
     public static final byte TYPE_ID = 7;
 
     /**

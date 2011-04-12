@@ -34,6 +34,8 @@ import com.serotonin.util.queue.ByteQueue;
  * request PDUs may be rejected.
  */
 public class Reject extends AckAPDU {
+    private static final long serialVersionUID = 3800544859107653762L;
+
     public static final byte TYPE_ID = 6;
 
     /**

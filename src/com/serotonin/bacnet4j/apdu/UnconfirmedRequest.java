@@ -31,6 +31,8 @@ import com.serotonin.bacnet4j.type.constructed.ServicesSupported;
 import com.serotonin.util.queue.ByteQueue;
 
 public class UnconfirmedRequest extends APDU {
+    private static final long serialVersionUID = 1606568334137370062L;
+
     public static final byte TYPE_ID = 1;
 
     /**

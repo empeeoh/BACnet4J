@@ -32,6 +32,8 @@ import com.serotonin.bacnet4j.type.constructed.ServicesSupported;
 import com.serotonin.util.queue.ByteQueue;
 
 public class ConfirmedRequest extends APDU implements Segmentable {
+    private static final long serialVersionUID = -8338535273752015450L;
+
     public static final byte TYPE_ID = 0;
 
     public static int getHeaderSize(boolean segmented) {
