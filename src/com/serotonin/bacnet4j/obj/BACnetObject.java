@@ -125,9 +125,8 @@ public class BACnetObject implements Serializable {
     }
 
     //
-    // /
-    // / Get property
-    // /
+    //
+    // Get property
     //
     public Encodable getProperty(PropertyIdentifier pid) throws BACnetServiceException {
         if (pid.intValue() == PropertyIdentifier.objectIdentifier.intValue())
@@ -184,9 +183,8 @@ public class BACnetObject implements Serializable {
     }
 
     //
-    // /
-    // / Set property
-    // /
+    //
+    // Set property
     //
     public void setProperty(PropertyIdentifier pid, Encodable value) throws BACnetServiceException {
         ObjectProperties.validateValue(id.getObjectType(), pid, value);
@@ -298,10 +296,21 @@ public class BACnetObject implements Serializable {
         return new PriorityValue((UnsignedInteger) value);
     }
 
+    /**
+     * return all implemented properties
+     * 
+     * @return
+     */
+    public List<PropertyIdentifier> getProperties() {
+        ArrayList<PropertyIdentifier> list = new ArrayList<PropertyIdentifier>();
+        for (PropertyIdentifier pid : properties.keySet())
+            list.add(pid);
+        return list;
+    }
+
     //
-    // /
-    // / COV subscriptions
-    // /
+    //
+    // COV subscriptions
     //
     public void addCovSubscription(Address from, Network network, UnsignedInteger subscriberProcessIdentifier,
             Boolean issueConfirmedNotifications, UnsignedInteger lifetime) throws BACnetServiceException {
