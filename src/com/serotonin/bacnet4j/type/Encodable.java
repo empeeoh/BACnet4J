@@ -326,16 +326,12 @@ abstract public class Encodable implements Serializable {
         if (ObjectProperties.isCommandable(objectType, propertyIdentifier)) {
             // If the object is commandable, it could be set to Null, so we need to treat it as ambiguous.
             AmbiguousValue amb = new AmbiguousValue(queue, contextId);
-            try {
-                // Try converting to the definition value.
-                return amb.convertTo(def.getClazz());
-            }
-            catch (BACnetException e) {
-                // ignore
-            }
 
-            // Convert it to Null.
-            return amb.convertTo(Null.class);
+            if (amb.isNull())
+                return new Null();
+
+            // Try converting to the definition value.
+            return amb.convertTo(def.getClazz());
         }
 
         if (propertyArrayIndex != null) {

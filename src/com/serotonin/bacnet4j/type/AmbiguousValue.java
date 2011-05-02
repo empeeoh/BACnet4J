@@ -106,6 +106,10 @@ public class AmbiguousValue extends Encodable {
             data.push(queue.pop());
     }
 
+    public boolean isNull() {
+        return data.size() == 1 && data.peek(0) == 0;
+    }
+
     public <T extends Encodable> T convertTo(Class<T> clazz) throws BACnetException {
         return read(new ByteQueue(data.peekAll()), clazz);
     }
