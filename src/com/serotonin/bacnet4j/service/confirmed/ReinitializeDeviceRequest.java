@@ -25,6 +25,8 @@
  */
 package com.serotonin.bacnet4j.service.confirmed;
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.serotonin.bacnet4j.LocalDevice;
 import com.serotonin.bacnet4j.Network;
 import com.serotonin.bacnet4j.exception.BACnetErrorException;
@@ -35,7 +37,6 @@ import com.serotonin.bacnet4j.type.enumerated.ErrorClass;
 import com.serotonin.bacnet4j.type.enumerated.ErrorCode;
 import com.serotonin.bacnet4j.type.primitive.CharacterString;
 import com.serotonin.bacnet4j.type.primitive.Enumerated;
-import com.serotonin.util.StringUtils;
 import com.serotonin.util.queue.ByteQueue;
 
 public class ReinitializeDeviceRequest extends ConfirmedRequestService {
@@ -95,7 +96,7 @@ public class ReinitializeDeviceRequest extends ConfirmedRequestService {
             password = "";
 
         // Check the password
-        if (StringUtils.isEqual(localDevice.getPassword(), password)) {
+        if (StringUtils.equals(localDevice.getPassword(), password)) {
             localDevice.getEventHandler().reinitializeDevice(reinitializedStateOfDevice);
             return null;
         }

@@ -31,6 +31,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.ObjectUtils;
+
 import com.serotonin.bacnet4j.LocalDevice;
 import com.serotonin.bacnet4j.Network;
 import com.serotonin.bacnet4j.RemoteDevice;
@@ -59,7 +61,6 @@ import com.serotonin.bacnet4j.type.primitive.ObjectIdentifier;
 import com.serotonin.bacnet4j.type.primitive.Real;
 import com.serotonin.bacnet4j.type.primitive.Time;
 import com.serotonin.bacnet4j.type.primitive.UnsignedInteger;
-import com.serotonin.util.ObjectUtils;
 
 /**
  * Additional validation - all object name values must be unique. - all object id values must be unique.
@@ -264,7 +265,7 @@ public class BACnetObject implements Serializable {
         Encodable oldValue = properties.get(pid);
         properties.put(pid, value);
 
-        if (!ObjectUtils.isEqual(value, oldValue)) {
+        if (!ObjectUtils.equals(value, oldValue)) {
             // Check for subscriptions.
             if (ObjectCovSubscription.sendCovNotification(id.getObjectType(), pid)) {
                 synchronized (covSubscriptions) {

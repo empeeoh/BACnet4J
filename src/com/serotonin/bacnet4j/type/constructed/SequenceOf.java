@@ -30,9 +30,10 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 
+import org.apache.commons.lang3.ObjectUtils;
+
 import com.serotonin.bacnet4j.exception.BACnetException;
 import com.serotonin.bacnet4j.type.Encodable;
-import com.serotonin.util.ObjectUtils;
 import com.serotonin.util.queue.ByteQueue;
 
 public class SequenceOf<E extends Encodable> extends BaseType implements Iterable<E> {
@@ -111,7 +112,7 @@ public class SequenceOf<E extends Encodable> extends BaseType implements Iterabl
             return;
 
         for (int i = 0; i < values.size(); i++) {
-            if (ObjectUtils.isEqual(values.get(i), value)) {
+            if (ObjectUtils.equals(values.get(i), value)) {
                 remove(i + 1);
                 break;
             }
@@ -121,14 +122,14 @@ public class SequenceOf<E extends Encodable> extends BaseType implements Iterabl
     public void removeAll(E value) {
         for (ListIterator<E> it = values.listIterator(); it.hasNext();) {
             E e = it.next();
-            if (ObjectUtils.isEqual(e, value))
+            if (ObjectUtils.equals(e, value))
                 it.remove();
         }
     }
 
     public boolean contains(E value) {
         for (E e : values) {
-            if (ObjectUtils.isEqual(e, value))
+            if (ObjectUtils.equals(e, value))
                 return true;
         }
         return false;

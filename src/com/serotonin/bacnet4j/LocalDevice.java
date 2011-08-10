@@ -40,6 +40,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.commons.lang3.ObjectUtils;
+
 import com.serotonin.bacnet4j.apdu.Abort;
 import com.serotonin.bacnet4j.apdu.AckAPDU;
 import com.serotonin.bacnet4j.apdu.ComplexACK;
@@ -104,7 +106,6 @@ import com.serotonin.bacnet4j.type.primitive.Unsigned16;
 import com.serotonin.bacnet4j.type.primitive.UnsignedInteger;
 import com.serotonin.bacnet4j.util.PropertyReferences;
 import com.serotonin.bacnet4j.util.PropertyValues;
-import com.serotonin.util.ObjectUtils;
 import com.serotonin.util.Tuple;
 
 /**
@@ -555,7 +556,7 @@ public class LocalDevice implements RequestHandler {
     private RemoteDevice getRemoteDeviceImpl(int instanceId, Address address, Network network) {
         for (RemoteDevice d : remoteDevices) {
             if (d.getInstanceNumber() == instanceId && d.getAddress().equals(address)
-                    && ObjectUtils.isEqual(d.getNetwork(), network))
+                    && ObjectUtils.equals(d.getNetwork(), network))
                 return d;
         }
         return null;
@@ -571,7 +572,7 @@ public class LocalDevice implements RequestHandler {
 
     public RemoteDevice getRemoteDevice(Address peer, Network network) {
         for (RemoteDevice d : remoteDevices) {
-            if (d.getAddress().equals(peer) && ObjectUtils.isEqual(d.getNetwork(), network))
+            if (d.getAddress().equals(peer) && ObjectUtils.equals(d.getNetwork(), network))
                 return d;
         }
         return null;
@@ -587,7 +588,7 @@ public class LocalDevice implements RequestHandler {
 
     public RemoteDevice getRemoteDeviceByUserData(Object userData) {
         for (RemoteDevice d : remoteDevices) {
-            if (ObjectUtils.isEqual(userData, d.getUserData()))
+            if (ObjectUtils.equals(userData, d.getUserData()))
                 return d;
         }
         return null;
