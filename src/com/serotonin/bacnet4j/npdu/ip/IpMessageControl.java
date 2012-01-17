@@ -171,7 +171,10 @@ public class IpMessageControl extends Thread {
 
     public void initialize(ExecutorService executorService) throws IOException {
         incomingExecutorService = executorService;
-        socket = new DatagramSocket(port, InetAddress.getByName(localBindAddress));
+        if (localBindAddress.equals("0.0.0.0"))
+            socket = new DatagramSocket(port);
+        else 
+            socket = new DatagramSocket(port, InetAddress.getByName(localBindAddress));
         socket.setBroadcast(true);
         start();
     }
@@ -356,6 +359,10 @@ public class IpMessageControl extends Thread {
         sendImpl(data, new InetSocketAddress(broadcastAddress, port));
     }
 
+    public void sendRegisterForeignDeviceMessage(InetSocketAddress addr, int timeToLive) throws BACnetException {
+        sendImpl(createRegisterForeignDeviceMessage(timeToLive), addr);
+    }
+
     void sendImpl(APDU apdu, boolean broadcast, InetSocketAddress addr, Network network) throws BACnetException {
         sendImpl(createMessageData(apdu, broadcast, network), addr);
     }
@@ -363,6 +370,7 @@ public class IpMessageControl extends Thread {
     private void sendImpl(byte[] data, InetSocketAddress addr) throws BACnetException {
         try {
             DatagramPacket packet = new DatagramPacket(data, data.length, addr);
+//            System.out.println("packet send: "+packet.getAddress()+":"+packet.getPort());
             socket.send(packet);
         }
         catch (Exception e) {
@@ -426,6 +434,23 @@ public class IpMessageControl extends Thread {
         return queue.popAll();
     }
 
+    /** The total length of the foreign device registration package. */
+    private static final int REGISTER_FOREIGN_DEVICE_LENGTH = 6;
+    private byte[] createRegisterForeignDeviceMessage(int timeToLive) {
+        ByteQueue queue = new ByteQueue();
+
+        // BACnet/IP
+        queue.push(0x81);
+
+        // Register foreign device
+        queue.push(0x05);
+        
+        BACnetUtils.pushShort(queue, REGISTER_FOREIGN_DEVICE_LENGTH);
+        BACnetUtils.pushShort(queue, timeToLive);
+
+        return queue.popAll();
+    }
+
     // For receiving
     @Override
     public void run() {
@@ -435,6 +460,7 @@ public class IpMessageControl extends Thread {
         while (!socket.isClosed()) {
             try {
                 socket.receive(p);
+//                System.out.println("packet recv: "+p.getAddress()+":"+p.getPort());
                 if (!incomingExecutorService.isShutdown()) {
                     incomingExecutorService.execute(new IncomingMessageExecutor(p));
                     p.setData(buffer);
@@ -562,7 +588,7 @@ public class IpMessageControl extends Thread {
                 // Used for testing only. This is required to test the parsing of service data in an ack.
                 // ((ComplexACK) ack).parseServiceData();
 
-                waitingRoom.notifyMember(new InetSocketAddress(fromAddr, fromPort), fromNetwork,
+                waitingRoom.notifyMember(localDevice.getCachedRemoteInetSocketAddress(fromAddr, fromPort), fromNetwork,
                         ack.getOriginalInvokeId(), ack.isServer(), ack);
             }
         }
@@ -574,14 +600,25 @@ public class IpMessageControl extends Thread {
                 throw new MessageValidationAssertionException("Protocol id is not BACnet/IP (0x81)");
 
             byte function = queue.pop();
-            if (function != 0xa && function != 0xb && function != 0x4)
+            if (function != 0xa && function != 0xb && function != 0x4 && function != 0x0)
                 throw new MessageValidationAssertionException(
-                        "Function is not unicast, broadcast, or forward (0xa, 0xb, or 0x4)");
+                        "Function is not unicast, broadcast, forward" +
+                            " or foreign device reg anwser (0xa, 0xb, 0x4 or 0x0)");
 
             int length = BACnetUtils.popShort(queue);
             if (length != queue.size() + 4)
                 throw new MessageValidationAssertionException("Length field does not match data: given=" + length
                         + ", expected=" + (queue.size() + 4));
+
+            // answer to foreign device registration
+            if (function == 0x0){
+                int result = BACnetUtils.popShort(queue);
+                if (result != 0){
+                    System.out.println("Foreign device registration not successful! result: "+result);
+                }
+                // not APDU received, return
+                return null;
+            }
 
             if (function == 0x4) {
                 // A forward. Use the addr/port as the from address.

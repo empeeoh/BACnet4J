@@ -116,7 +116,7 @@ import com.serotonin.util.Tuple;
  * @author mlohbihler
  */
 public class LocalDevice implements RequestHandler {
-    public static final int DEFAULT_PORT = 0xBAC0;
+    public static final int DEFAULT_PORT = 0xBAC0; // == 47808
     private static final int VENDOR_ID = 236; // Serotonin Software
     private static ExceptionListener exceptionListener = new DefaultExceptionListener();
 
@@ -467,7 +467,7 @@ public class LocalDevice implements RequestHandler {
     public AcknowledgementService send(Address address, Network network, int maxAPDULengthAccepted,
             Segmentation segmentationSupported, ConfirmedRequestService serviceRequest) throws BACnetException {
         try {
-            return send(new InetSocketAddress(address.getInetAddress(), address.getPort()), network,
+            return send(getCachedRemoteInetSocketAddress(address.getInetAddress(), address.getPort()), network,
                     maxAPDULengthAccepted, segmentationSupported, serviceRequest);
         }
         catch (UnknownHostException e) {
@@ -527,6 +527,18 @@ public class LocalDevice implements RequestHandler {
     public void sendBroadcast(int port, Network network, UnconfirmedRequestService serviceRequest)
             throws BACnetException {
         messageControl.sendBroadcast(port, network, serviceRequest);
+    }
+
+    /**
+     * Sends a foreign device registration request to addr. On successful registration (AKN), we are added
+     * in the foreign device table FDT.
+     * 
+     * @param addr The address of the device where our device wants to be registered as foreign device
+     * @param timeToLive The time until we are automatically removed out of the FDT.
+     * @throws BACnetException
+     */
+    public void sendRegisterForeignDeviceMessage(InetSocketAddress addr, int timeToLive) throws BACnetException {
+        messageControl.sendRegisterForeignDeviceMessage(addr, timeToLive);
     }
 
     //
@@ -1042,4 +1054,23 @@ public class LocalDevice implements RequestHandler {
 
         return d;
     }
+    
+    /** cache remote IndetSocketAddress because the creation takes 10s on Android devices. */
+    private InetSocketAddress cachedRemoteInetSocketAddress;
+    
+    /**
+     * Returns the cached or newly created InetSocketAddress
+     * @param fromAddr The address of the remote device
+     * @param fromPort The port of the remote device
+     * @return the InetSocketAddress of the remote device
+     */
+    public InetSocketAddress getCachedRemoteInetSocketAddress(final InetAddress fromAddr, final int fromPort){
+        if (cachedRemoteInetSocketAddress == null 
+                || !cachedRemoteInetSocketAddress.getAddress().equals(fromAddr)
+                || cachedRemoteInetSocketAddress.getPort() != fromPort){
+            cachedRemoteInetSocketAddress = new InetSocketAddress(fromAddr, fromPort);
+        }
+        return cachedRemoteInetSocketAddress;
+    }
+
 }
