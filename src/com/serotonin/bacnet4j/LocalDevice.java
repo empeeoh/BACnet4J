@@ -533,8 +533,10 @@ public class LocalDevice implements RequestHandler {
      * Sends a foreign device registration request to addr. On successful registration (AKN), we are added
      * in the foreign device table FDT.
      * 
-     * @param addr The address of the device where our device wants to be registered as foreign device
-     * @param timeToLive The time until we are automatically removed out of the FDT.
+     * @param addr
+     *            The address of the device where our device wants to be registered as foreign device
+     * @param timeToLive
+     *            The time until we are automatically removed out of the FDT.
      * @throws BACnetException
      */
     public void sendRegisterForeignDeviceMessage(InetSocketAddress addr, int timeToLive) throws BACnetException {
@@ -722,6 +724,7 @@ public class LocalDevice implements RequestHandler {
     //
     // Request Handler
     //
+    @Override
     public AcknowledgementService handleConfirmedRequest(Address from, Network network, byte invokeId,
             ConfirmedRequestService serviceRequest) throws BACnetException {
         try {
@@ -740,6 +743,7 @@ public class LocalDevice implements RequestHandler {
         }
     }
 
+    @Override
     public void handleUnconfirmedRequest(Address from, Network network, UnconfirmedRequestService serviceRequest) {
         try {
             serviceRequest.handle(this, from, network);
@@ -938,6 +942,7 @@ public class LocalDevice implements RequestHandler {
 
             // If the device supports read property multiple, send them all at once, or at least in partitions.
             List<PropertyReferences> partitions = refs.getPropertiesPartitioned(maxRef);
+            int counter = 0;
             for (PropertyReferences partition : partitions) {
                 properties = partition.getProperties();
                 List<ReadAccessSpecification> specs = new ArrayList<ReadAccessSpecification>();
@@ -950,6 +955,7 @@ public class LocalDevice implements RequestHandler {
                 ReadPropertyMultipleAck ack;
                 try {
                     ack = (ReadPropertyMultipleAck) send(d, request);
+                    counter++;
 
                     List<ReadAccessResult> results = ack.getListOfReadAccessResults().getValues();
                     ObjectIdentifier oid;
@@ -965,7 +971,10 @@ public class LocalDevice implements RequestHandler {
                             || e.getApdu().getAbortReason() == AbortReason.segmentationNotSupported.intValue())
                         sendOneAtATime(d, partition, propertyValues);
                     else
-                        throw e;
+                        throw new BACnetException("Completed " + counter + " requests. Excepted on: " + request, e);
+                }
+                catch (BACnetException e) {
+                    throw new BACnetException("Completed " + counter + " requests. Excepted on: " + request, e);
                 }
             }
         }
@@ -1054,20 +1063,22 @@ public class LocalDevice implements RequestHandler {
 
         return d;
     }
-    
+
     /** cache remote IndetSocketAddress because the creation takes 10s on Android devices. */
     private InetSocketAddress cachedRemoteInetSocketAddress;
-    
+
     /**
      * Returns the cached or newly created InetSocketAddress
-     * @param fromAddr The address of the remote device
-     * @param fromPort The port of the remote device
+     * 
+     * @param fromAddr
+     *            The address of the remote device
+     * @param fromPort
+     *            The port of the remote device
      * @return the InetSocketAddress of the remote device
      */
-    public InetSocketAddress getCachedRemoteInetSocketAddress(final InetAddress fromAddr, final int fromPort){
-        if (cachedRemoteInetSocketAddress == null 
-                || !cachedRemoteInetSocketAddress.getAddress().equals(fromAddr)
-                || cachedRemoteInetSocketAddress.getPort() != fromPort){
+    public InetSocketAddress getCachedRemoteInetSocketAddress(final InetAddress fromAddr, final int fromPort) {
+        if (cachedRemoteInetSocketAddress == null || !cachedRemoteInetSocketAddress.getAddress().equals(fromAddr)
+                || cachedRemoteInetSocketAddress.getPort() != fromPort) {
             cachedRemoteInetSocketAddress = new InetSocketAddress(fromAddr, fromPort);
         }
         return cachedRemoteInetSocketAddress;
