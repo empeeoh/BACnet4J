@@ -95,4 +95,10 @@ public class PropertyReference extends BaseType {
             return false;
         return true;
     }
+
+    @Override
+    public String toString() {
+        return "PropertyReference [propertyIdentifier=" + propertyIdentifier + ", propertyArrayIndex="
+                + propertyArrayIndex + "]";
+    }
 }

@@ -102,4 +102,10 @@ public class ReadAccessSpecification extends BaseType {
             return false;
         return true;
     }
+
+    @Override
+    public String toString() {
+        return "ReadAccessSpecification [objectIdentifier=" + objectIdentifier + ", listOfPropertyReferences="
+                + listOfPropertyReferences + "]";
+    }
 }

@@ -127,6 +127,11 @@ public class ReadPropertyMultipleRequest extends ConfirmedRequestService {
         return true;
     }
 
+    @Override
+    public String toString() {
+        return "ReadPropertyMultipleRequest [listOfReadAccessSpecs=" + listOfReadAccessSpecs + "]";
+    }
+
     private void addProperty(BACnetObject obj, List<Result> results, PropertyIdentifier pid, UnsignedInteger pin) {
         if (pid.intValue() == PropertyIdentifier.all.intValue()) {
             for (PropertyTypeDefinition def : ObjectProperties.getPropertyTypeDefinitions(obj.getId().getObjectType()))
