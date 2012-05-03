@@ -110,6 +110,8 @@ public class CharacterString extends Primitive {
             switch (encoding) {
             case Encodings.ANSI_X3_4:
                 return value.getBytes("UTF-8");
+            case Encodings.ISO_10646_UCS_2:
+                return value.getBytes("UTF-16");
             case Encodings.ISO_8859_1:
                 return value.getBytes("ISO-8859-1");
             }
@@ -126,6 +128,8 @@ public class CharacterString extends Primitive {
             switch (encoding) {
             case Encodings.ANSI_X3_4:
                 return new String(bytes, "UTF-8");
+            case Encodings.ISO_10646_UCS_2:
+                return new String(bytes, "UTF-16");
             case Encodings.ISO_8859_1:
                 return new String(bytes, "ISO-8859-1");
             }
@@ -138,7 +142,8 @@ public class CharacterString extends Primitive {
     }
 
     private void validateEncoding() throws BACnetErrorException {
-        if (encoding != Encodings.ANSI_X3_4 && encoding != Encodings.ISO_8859_1)
+        if (encoding != Encodings.ANSI_X3_4 && encoding != Encodings.ISO_10646_UCS_2
+                && encoding != Encodings.ISO_8859_1)
             throw new BACnetErrorException(ErrorClass.property, ErrorCode.characterSetNotSupported,
                     Byte.toString(encoding));
     }
