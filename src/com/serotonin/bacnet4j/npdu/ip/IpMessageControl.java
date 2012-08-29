@@ -48,6 +48,7 @@ import com.serotonin.bacnet4j.apdu.SimpleACK;
 import com.serotonin.bacnet4j.apdu.UnconfirmedRequest;
 import com.serotonin.bacnet4j.base.BACnetUtils;
 import com.serotonin.bacnet4j.enums.MaxApduLength;
+import com.serotonin.bacnet4j.enums.MaxSegments;
 import com.serotonin.bacnet4j.exception.BACnetErrorException;
 import com.serotonin.bacnet4j.exception.BACnetException;
 import com.serotonin.bacnet4j.exception.BACnetRejectException;
@@ -74,7 +75,7 @@ import com.serotonin.util.queue.ByteQueue;
 public class IpMessageControl extends Thread {
     private static final MaxApduLength APDU_LENGTH = MaxApduLength.UP_TO_1476;
     private static final int MESSAGE_LENGTH = 2048;
-    private static final int MAX_SEGMENTS = 7; // Greater than 64.
+    private static final MaxSegments MAX_SEGMENTS = MaxSegments.MORE_THAN_64;
 
     // Config
     LocalDevice localDevice;
@@ -173,7 +174,7 @@ public class IpMessageControl extends Thread {
         incomingExecutorService = executorService;
         if (localBindAddress.equals("0.0.0.0"))
             socket = new DatagramSocket(port);
-        else 
+        else
             socket = new DatagramSocket(port, InetAddress.getByName(localBindAddress));
         socket.setBroadcast(true);
         start();
@@ -271,7 +272,7 @@ public class IpMessageControl extends Thread {
             if (!request.isSegmentedResponseAccepted())
                 throw new BACnetException("Response too big to send to device without segmentation");
             int segmentsRequired = serviceData.size() / maxServiceData + 1;
-            if (segmentsRequired > request.getMaxSegmentsAccepted() || segmentsRequired > 128)
+            if (segmentsRequired > request.getMaxSegmentsAccepted().getMaxSegments() || segmentsRequired > 128)
                 throw new BACnetException("Response too big to send to device; too many segments required");
 
             Key key = waitingRoom.enterServer(addr, network, request.getInvokeId());
@@ -370,7 +371,7 @@ public class IpMessageControl extends Thread {
     private void sendImpl(byte[] data, InetSocketAddress addr) throws BACnetException {
         try {
             DatagramPacket packet = new DatagramPacket(data, data.length, addr);
-//            System.out.println("packet send: "+packet.getAddress()+":"+packet.getPort());
+            //            System.out.println("packet send: "+packet.getAddress()+":"+packet.getPort());
             socket.send(packet);
         }
         catch (Exception e) {
@@ -436,6 +437,7 @@ public class IpMessageControl extends Thread {
 
     /** The total length of the foreign device registration package. */
     private static final int REGISTER_FOREIGN_DEVICE_LENGTH = 6;
+
     private byte[] createRegisterForeignDeviceMessage(int timeToLive) {
         ByteQueue queue = new ByteQueue();
 
@@ -444,7 +446,7 @@ public class IpMessageControl extends Thread {
 
         // Register foreign device
         queue.push(0x05);
-        
+
         BACnetUtils.pushShort(queue, REGISTER_FOREIGN_DEVICE_LENGTH);
         BACnetUtils.pushShort(queue, timeToLive);
 
@@ -460,7 +462,7 @@ public class IpMessageControl extends Thread {
         while (!socket.isClosed()) {
             try {
                 socket.receive(p);
-//                System.out.println("packet recv: "+p.getAddress()+":"+p.getPort());
+                //                System.out.println("packet recv: "+p.getAddress()+":"+p.getPort());
                 if (!incomingExecutorService.isShutdown()) {
                     incomingExecutorService.execute(new IncomingMessageExecutor(p));
                     p.setData(buffer);
@@ -503,6 +505,7 @@ public class IpMessageControl extends Thread {
             // Added for testing with the main method below.
         }
 
+        @Override
         public void run() {
             try {
                 if (localDevice == null) {
@@ -601,9 +604,8 @@ public class IpMessageControl extends Thread {
 
             byte function = queue.pop();
             if (function != 0xa && function != 0xb && function != 0x4 && function != 0x0)
-                throw new MessageValidationAssertionException(
-                        "Function is not unicast, broadcast, forward" +
-                            " or foreign device reg anwser (0xa, 0xb, 0x4 or 0x0)");
+                throw new MessageValidationAssertionException("Function is not unicast, broadcast, forward"
+                        + " or foreign device reg anwser (0xa, 0xb, 0x4 or 0x0)");
 
             int length = BACnetUtils.popShort(queue);
             if (length != queue.size() + 4)
@@ -611,10 +613,10 @@ public class IpMessageControl extends Thread {
                         + ", expected=" + (queue.size() + 4));
 
             // answer to foreign device registration
-            if (function == 0x0){
+            if (function == 0x0) {
                 int result = BACnetUtils.popShort(queue);
-                if (result != 0){
-                    System.out.println("Foreign device registration not successful! result: "+result);
+                if (result != 0) {
+                    System.out.println("Foreign device registration not successful! result: " + result);
                 }
                 // not APDU received, return
                 return null;

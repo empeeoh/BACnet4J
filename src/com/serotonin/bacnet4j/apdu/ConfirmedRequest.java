@@ -26,6 +26,7 @@
 package com.serotonin.bacnet4j.apdu;
 
 import com.serotonin.bacnet4j.enums.MaxApduLength;
+import com.serotonin.bacnet4j.enums.MaxSegments;
 import com.serotonin.bacnet4j.exception.BACnetException;
 import com.serotonin.bacnet4j.service.confirmed.ConfirmedRequestService;
 import com.serotonin.bacnet4j.type.constructed.ServicesSupported;
@@ -71,7 +72,7 @@ public class ConfirmedRequest extends APDU implements Segmentable {
      * accepted. B'010' 4 segments accepted. B'011' 8 segments accepted. B'100' 16 segments accepted. B'101' 32 segments
      * accepted. B'110' 64 segments accepted. B'111' Greater than 64 segments accepted.
      */
-    private int maxSegmentsAccepted;
+    private MaxSegments maxSegmentsAccepted;
 
     /**
      * This parameter specifies the maximum size of a single APDU that the issuing device will accept. This parameter is
@@ -138,7 +139,7 @@ public class ConfirmedRequest extends APDU implements Segmentable {
     private ByteQueue serviceData;
 
     public ConfirmedRequest(boolean segmentedMessage, boolean moreFollows, boolean segmentedResponseAccepted,
-            int maxSegmentsAccepted, MaxApduLength maxApduLengthAccepted, byte invokeId, int sequenceNumber,
+            MaxSegments maxSegmentsAccepted, MaxApduLength maxApduLengthAccepted, byte invokeId, int sequenceNumber,
             int proposedWindowSize, ConfirmedRequestService serviceRequest) {
 
         setFields(segmentedMessage, moreFollows, segmentedResponseAccepted, maxSegmentsAccepted, maxApduLengthAccepted,
@@ -148,7 +149,7 @@ public class ConfirmedRequest extends APDU implements Segmentable {
     }
 
     public ConfirmedRequest(boolean segmentedMessage, boolean moreFollows, boolean segmentedResponseAccepted,
-            int maxSegmentsAccepted, MaxApduLength maxApduLengthAccepted, byte invokeId, int sequenceNumber,
+            MaxSegments maxSegmentsAccepted, MaxApduLength maxApduLengthAccepted, byte invokeId, int sequenceNumber,
             int proposedWindowSize, byte serviceChoice, ByteQueue serviceData) {
 
         setFields(segmentedMessage, moreFollows, segmentedResponseAccepted, maxSegmentsAccepted, maxApduLengthAccepted,
@@ -158,7 +159,7 @@ public class ConfirmedRequest extends APDU implements Segmentable {
     }
 
     private void setFields(boolean segmentedMessage, boolean moreFollows, boolean segmentedResponseAccepted,
-            int maxSegmentsAccepted, MaxApduLength maxApduLengthAccepted, byte invokeId, int sequenceNumber,
+            MaxSegments maxSegmentsAccepted, MaxApduLength maxApduLengthAccepted, byte invokeId, int sequenceNumber,
             int proposedWindowSize, byte serviceChoice) {
         this.segmentedMessage = segmentedMessage;
         this.moreFollows = moreFollows;
@@ -176,10 +177,12 @@ public class ConfirmedRequest extends APDU implements Segmentable {
         return TYPE_ID;
     }
 
+    @Override
     public byte getInvokeId() {
         return invokeId;
     }
 
+    @Override
     public int getSequenceNumber() {
         return sequenceNumber;
     }
@@ -188,18 +191,21 @@ public class ConfirmedRequest extends APDU implements Segmentable {
         return maxApduLengthAccepted;
     }
 
-    public int getMaxSegmentsAccepted() {
+    public MaxSegments getMaxSegmentsAccepted() {
         return maxSegmentsAccepted;
     }
 
+    @Override
     public boolean isMoreFollows() {
         return moreFollows;
     }
 
+    @Override
     public int getProposedWindowSize() {
         return proposedWindowSize;
     }
 
+    @Override
     public boolean isSegmentedMessage() {
         return segmentedMessage;
     }
@@ -212,10 +218,12 @@ public class ConfirmedRequest extends APDU implements Segmentable {
         return serviceRequest;
     }
 
+    @Override
     public void appendServiceData(ByteQueue data) {
         this.serviceData.push(data);
     }
 
+    @Override
     public ByteQueue getServiceData() {
         return serviceData;
     }
@@ -224,7 +232,7 @@ public class ConfirmedRequest extends APDU implements Segmentable {
     public void write(ByteQueue queue) {
         queue.push(getShiftedTypeId(TYPE_ID) | (segmentedMessage ? 8 : 0) | (moreFollows ? 4 : 0)
                 | (segmentedResponseAccepted ? 2 : 0));
-        queue.push(((maxSegmentsAccepted & 7) << 4) | (maxApduLengthAccepted.getId() & 0xf));
+        queue.push(((maxSegmentsAccepted.getId() & 7) << 4) | (maxApduLengthAccepted.getId() & 0xf));
         queue.push(invokeId);
         if (segmentedMessage) {
             queue.push(sequenceNumber);
@@ -244,7 +252,7 @@ public class ConfirmedRequest extends APDU implements Segmentable {
         segmentedResponseAccepted = (b & 2) != 0;
 
         b = queue.pop();
-        maxSegmentsAccepted = (b & 0x70) >> 4;
+        maxSegmentsAccepted = MaxSegments.valueOf((byte) ((b & 0x70) >> 4));
         maxApduLengthAccepted = MaxApduLength.valueOf((byte) (b & 0xf));
         invokeId = queue.pop();
         if (segmentedMessage) {
@@ -257,6 +265,7 @@ public class ConfirmedRequest extends APDU implements Segmentable {
         ConfirmedRequestService.checkConfirmedRequestService(servicesSupported, serviceChoice);
     }
 
+    @Override
     public void parseServiceData() throws BACnetException {
         if (serviceData != null) {
             serviceRequest = ConfirmedRequestService.createConfirmedRequestService(serviceChoice, serviceData);
@@ -264,6 +273,7 @@ public class ConfirmedRequest extends APDU implements Segmentable {
         }
     }
 
+    @Override
     public APDU clone(boolean moreFollows, int sequenceNumber, int actualSegWindow, ByteQueue serviceData) {
         return new ConfirmedRequest(this.segmentedMessage, moreFollows, this.segmentedResponseAccepted,
                 this.maxSegmentsAccepted, this.maxApduLengthAccepted, this.invokeId, sequenceNumber, actualSegWindow,
@@ -285,7 +295,7 @@ public class ConfirmedRequest extends APDU implements Segmentable {
         int result = 1;
         result = PRIME * result + invokeId;
         result = PRIME * result + ((maxApduLengthAccepted == null) ? 0 : maxApduLengthAccepted.hashCode());
-        result = PRIME * result + maxSegmentsAccepted;
+        result = PRIME * result + ((maxSegmentsAccepted == null) ? 0 : maxSegmentsAccepted.hashCode());
         result = PRIME * result + (moreFollows ? 1231 : 1237);
         result = PRIME * result + proposedWindowSize;
         result = PRIME * result + (segmentedMessage ? 1231 : 1237);
