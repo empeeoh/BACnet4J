@@ -67,6 +67,8 @@ public enum MaxSegments {
             return UP_TO_32;
         if (id == UP_TO_64.id)
             return UP_TO_64;
+        if (id == MORE_THAN_64.id)
+            return MORE_THAN_64;
 
         throw new IllegalArgumentException("Unknown id: " + id);
     }
