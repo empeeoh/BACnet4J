@@ -399,6 +399,8 @@ public class LocalDevice implements RequestHandler {
     public void addObject(BACnetObject obj) throws BACnetServiceException {
         if (getObject(obj.getId()) != null)
             throw new BACnetServiceException(ErrorClass.object, ErrorCode.objectIdentifierAlreadyExists);
+        if (getObject(obj.getObjectName()) != null)
+            throw new BACnetServiceException(ErrorClass.object, ErrorCode.duplicateName);
         obj.validate();
         localObjects.add(obj);
 
