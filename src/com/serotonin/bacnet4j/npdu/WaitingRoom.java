@@ -97,7 +97,13 @@ public class WaitingRoom {
         APDU apdu = getAPDU(key, timeout, throwTimeout);
         if (apdu instanceof Abort)
             throw new SegmentedMessageAbortedException((Abort) apdu);
-        return (Segmentable) apdu;
+        try {
+            return (Segmentable) apdu;
+        }
+        catch (ClassCastException e) {
+            throw new BACnetException("Receiving an APDU of type " + apdu.getClass()
+                    + " when expecting a Segmentable for key " + key);
+        }
     }
 
     public APDU getAPDU(Key key, long timeout, boolean throwTimeout) throws BACnetException {
