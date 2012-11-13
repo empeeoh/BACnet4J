@@ -75,7 +75,7 @@ public class BACnetObject implements Serializable {
     private final ObjectIdentifier id;
     private final Map<PropertyIdentifier, Encodable> properties = new HashMap<PropertyIdentifier, Encodable>();
     private final List<ObjectCovSubscription> covSubscriptions = new ArrayList<ObjectCovSubscription>();
-
+    
     public BACnetObject(LocalDevice localDevice, ObjectIdentifier id) {
         this.localDevice = localDevice;
 
@@ -267,7 +267,7 @@ public class BACnetObject implements Serializable {
 
         if (!ObjectUtils.equals(value, oldValue)) {
             // Check for subscriptions.
-            if (ObjectCovSubscription.sendCovNotification(id.getObjectType(), pid)) {
+            if (ObjectCovSubscription.sendCovNotification(id.getObjectType(), pid, this.getCovIncrement())) {
                 synchronized (covSubscriptions) {
                     long now = System.currentTimeMillis();
                     ObjectCovSubscription sub;
@@ -275,7 +275,7 @@ public class BACnetObject implements Serializable {
                         sub = covSubscriptions.get(i);
                         if (sub.hasExpired(now))
                             covSubscriptions.remove(i);
-                        else
+                        else if (sub.isNotificationRequired(pid, value))
                             sendCovNotification(sub, now);
                     }
                 }
@@ -321,7 +321,7 @@ public class BACnetObject implements Serializable {
 
             if (sub == null) {
                 // Ensure that this object is valid for COV notifications.
-                if (!ObjectCovSubscription.sendCovNotification(id.getObjectType(), null))
+                if (!ObjectCovSubscription.sendCovNotification(id.getObjectType(), null, this.getCovIncrement()))
                     throw new BACnetServiceException(ErrorClass.services, ErrorCode.covSubscriptionFailed,
                             "Object is invalid for COV notifications");
 
@@ -333,13 +333,17 @@ public class BACnetObject implements Serializable {
                                 "From address not found in remote device list. Cannot send confirmed notifications");
                 }
 
-                sub = new ObjectCovSubscription(from, network, subscriberProcessIdentifier);
+                sub = new ObjectCovSubscription(from, network, subscriberProcessIdentifier, this.getCovIncrement());
                 covSubscriptions.add(sub);
             }
 
             sub.setIssueConfirmedNotifications(issueConfirmedNotifications.booleanValue());
             sub.setExpiryTime(lifetime.intValue());
         }
+    }
+    
+    public Real getCovIncrement() {
+       return (Real) properties.get(PropertyIdentifier.covIncrement);
     }
 
     public void removeCovSubscription(Address from, UnsignedInteger subscriberProcessIdentifier) {

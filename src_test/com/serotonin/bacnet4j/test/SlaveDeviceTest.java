@@ -67,11 +67,15 @@ public class SlaveDeviceTest {
         BACnetObject ai0 = new BACnetObject(localDevice,
                 localDevice.getNextInstanceObjectIdentifier(ObjectType.analogInput));
         ai0.setProperty(PropertyIdentifier.units, EngineeringUnits.centimeters);
+        // Set the COV threshold/increment which is the value at which COV notifications will be triggered
+        ai0.setProperty(PropertyIdentifier.covIncrement, new Real(0.2f));
         localDevice.addObject(ai0);
 
         BACnetObject ai1 = new BACnetObject(localDevice,
                 localDevice.getNextInstanceObjectIdentifier(ObjectType.analogInput));
-        ai0.setProperty(PropertyIdentifier.units, EngineeringUnits.percentObscurationPerFoot);
+        ai1.setProperty(PropertyIdentifier.units, EngineeringUnits.percentObscurationPerFoot);
+        // Set the COV threshold/increment which is the value at which COV notifications will be triggered
+        ai1.setProperty(PropertyIdentifier.covIncrement, new Real(1));
         localDevice.addObject(ai1);
 
         BACnetObject bi0 = new BACnetObject(localDevice,
@@ -134,7 +138,7 @@ public class SlaveDeviceTest {
         float ai1value = 0;
         boolean bi0value = false;
         boolean bi1value = false;
-
+        
         Thread.sleep(10000);
 
         mso0.setProperty(PropertyIdentifier.presentValue, new UnsignedInteger(2));
@@ -151,7 +155,7 @@ public class SlaveDeviceTest {
             bi0.setProperty(PropertyIdentifier.presentValue, bi0value ? BinaryPV.active : BinaryPV.inactive);
             bi1.setProperty(PropertyIdentifier.presentValue, bi1value ? BinaryPV.active : BinaryPV.inactive);
 
-            Thread.sleep(5000);
+            Thread.sleep(2500);
         }
     }
 

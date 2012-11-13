@@ -28,6 +28,7 @@ import java.util.List;
 
 import com.serotonin.bacnet4j.LocalDevice;
 import com.serotonin.bacnet4j.RemoteDevice;
+import com.serotonin.bacnet4j.obj.BACnetObject;
 import com.serotonin.bacnet4j.service.acknowledgement.AcknowledgementService;
 import com.serotonin.bacnet4j.service.acknowledgement.CreateObjectAck;
 import com.serotonin.bacnet4j.service.acknowledgement.ReadPropertyAck;
@@ -67,6 +68,10 @@ import com.serotonin.bacnet4j.type.primitive.UnsignedInteger;
 public class Test {
     public static void main(String[] args) throws Exception {
         LocalDevice localDevice = null;
+        int instanceNumber = 1;
+        BACnetObject notif = new BACnetObject(localDevice, new ObjectIdentifier(ObjectType.notificationClass,
+                instanceNumber));
+
         RemoteDevice remoteDevice = null;
 
         ReadPropertyRequest req = new ReadPropertyRequest(new ObjectIdentifier(ObjectType.analogOutput, 1234),

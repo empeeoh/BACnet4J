@@ -17,6 +17,7 @@ public class SimpleSubscriptionClient {
         LocalDevice localDevice = new LocalDevice(1234, "255.255.255.255");
         RemoteDevice d = null;
         ObjectIdentifier oid = new ObjectIdentifier(ObjectType.binaryInput, 0);
+        ObjectIdentifier aoid = new ObjectIdentifier(ObjectType.analogInput, 0);
         try {
             localDevice.initialize();
             localDevice.getEventHandler().addListener(new Listener());
@@ -24,7 +25,13 @@ public class SimpleSubscriptionClient {
             d = localDevice
                     .findRemoteDevice(new Address(new byte[] { (byte) 192, (byte) 168, 0, 2 }, 2068), null, 1968);
 
+            // Subscribe to binary 0
             SubscribeCOVRequest req = new SubscribeCOVRequest(new UnsignedInteger(0), oid, new Boolean(true),
+                                                              new UnsignedInteger(0));
+            localDevice.send(d, req);
+
+            // Also subscribe to analog 0
+            req = new SubscribeCOVRequest(new UnsignedInteger(1), aoid, new Boolean(true),
                     new UnsignedInteger(0));
             localDevice.send(d, req);
 
@@ -33,7 +40,8 @@ public class SimpleSubscriptionClient {
         finally {
             if (d != null)
                 // Unsubscribe
-                localDevice.send(d, new SubscribeCOVRequest(new UnsignedInteger(0), oid, null, null));
+               localDevice.send(d, new SubscribeCOVRequest(new UnsignedInteger(0), oid, null, null));
+               localDevice.send(d, new SubscribeCOVRequest(new UnsignedInteger(1), aoid, null, null));
             localDevice.terminate();
         }
     }
