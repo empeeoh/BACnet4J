@@ -34,8 +34,8 @@ import java.util.Map;
 import org.apache.commons.lang3.ObjectUtils;
 
 import com.serotonin.bacnet4j.LocalDevice;
-import com.serotonin.bacnet4j.Network;
 import com.serotonin.bacnet4j.RemoteDevice;
+import com.serotonin.bacnet4j.event.ExceptionDispatch;
 import com.serotonin.bacnet4j.exception.BACnetException;
 import com.serotonin.bacnet4j.exception.BACnetRuntimeException;
 import com.serotonin.bacnet4j.exception.BACnetServiceException;
@@ -58,6 +58,7 @@ import com.serotonin.bacnet4j.type.primitive.CharacterString;
 import com.serotonin.bacnet4j.type.primitive.Date;
 import com.serotonin.bacnet4j.type.primitive.Null;
 import com.serotonin.bacnet4j.type.primitive.ObjectIdentifier;
+import com.serotonin.bacnet4j.type.primitive.OctetString;
 import com.serotonin.bacnet4j.type.primitive.Real;
 import com.serotonin.bacnet4j.type.primitive.Time;
 import com.serotonin.bacnet4j.type.primitive.UnsignedInteger;
@@ -75,7 +76,7 @@ public class BACnetObject implements Serializable {
     private final ObjectIdentifier id;
     private final Map<PropertyIdentifier, Encodable> properties = new HashMap<PropertyIdentifier, Encodable>();
     private final List<ObjectCovSubscription> covSubscriptions = new ArrayList<ObjectCovSubscription>();
-    
+
     public BACnetObject(LocalDevice localDevice, ObjectIdentifier id) {
         this.localDevice = localDevice;
 
@@ -313,7 +314,7 @@ public class BACnetObject implements Serializable {
     //
     // COV subscriptions
     //
-    public void addCovSubscription(Address from, Network network, UnsignedInteger subscriberProcessIdentifier,
+    public void addCovSubscription(Address from, OctetString linkService, UnsignedInteger subscriberProcessIdentifier,
             Boolean issueConfirmedNotifications, UnsignedInteger lifetime) throws BACnetServiceException {
         synchronized (covSubscriptions) {
             ObjectCovSubscription sub = findCovSubscription(from, subscriberProcessIdentifier);
@@ -333,7 +334,7 @@ public class BACnetObject implements Serializable {
                                 "From address not found in remote device list. Cannot send confirmed notifications");
                 }
 
-                sub = new ObjectCovSubscription(from, network, subscriberProcessIdentifier, this.getCovIncrement());
+                sub = new ObjectCovSubscription(from, linkService, subscriberProcessIdentifier, this.getCovIncrement());
                 covSubscriptions.add(sub);
             }
 
@@ -341,9 +342,9 @@ public class BACnetObject implements Serializable {
             sub.setExpiryTime(lifetime.intValue());
         }
     }
-    
+
     public Real getCovIncrement() {
-       return (Real) properties.get(PropertyIdentifier.covIncrement);
+        return (Real) properties.get(PropertyIdentifier.covIncrement);
     }
 
     public void removeCovSubscription(Address from, UnsignedInteger subscriberProcessIdentifier) {
@@ -356,7 +357,8 @@ public class BACnetObject implements Serializable {
 
     private ObjectCovSubscription findCovSubscription(Address from, UnsignedInteger subscriberProcessIdentifier) {
         for (ObjectCovSubscription sub : covSubscriptions) {
-            if (sub.getPeer().equals(from) && sub.getSubscriberProcessIdentifier().equals(subscriberProcessIdentifier))
+            if (sub.getAddress().equals(from)
+                    && sub.getSubscriberProcessIdentifier().equals(subscriberProcessIdentifier))
                 return sub;
         }
         return null;
@@ -372,7 +374,7 @@ public class BACnetObject implements Serializable {
                 ConfirmedCovNotificationRequest req = new ConfirmedCovNotificationRequest(
                         sub.getSubscriberProcessIdentifier(), localDevice.getConfiguration().getId(), id, timeLeft,
                         values);
-                RemoteDevice d = localDevice.getRemoteDevice(sub.getPeer());
+                RemoteDevice d = localDevice.getRemoteDevice(sub.getAddress());
                 localDevice.send(d, req);
             }
             else {
@@ -380,11 +382,11 @@ public class BACnetObject implements Serializable {
                 UnconfirmedCovNotificationRequest req = new UnconfirmedCovNotificationRequest(
                         sub.getSubscriberProcessIdentifier(), localDevice.getConfiguration().getId(), id, timeLeft,
                         values);
-                localDevice.sendUnconfirmed(sub.getPeer(), sub.getNetwork(), req);
+                localDevice.sendUnconfirmed(sub.getAddress(), sub.getLinkService(), req);
             }
         }
         catch (BACnetException e) {
-            LocalDevice.getExceptionListener().receivedException(e);
+            ExceptionDispatch.fireReceivedException(e);
         }
     }
 

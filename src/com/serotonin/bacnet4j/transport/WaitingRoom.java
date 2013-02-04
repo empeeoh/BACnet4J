@@ -23,13 +23,11 @@
  * included to allow you to distribute a combined work that includes BAcnet4J 
  * without being obliged to provide the source code for any proprietary components.
  */
-package com.serotonin.bacnet4j.npdu;
+package com.serotonin.bacnet4j.transport;
 
-import java.net.InetSocketAddress;
 import java.util.HashMap;
 import java.util.LinkedList;
 
-import com.serotonin.bacnet4j.Network;
 import com.serotonin.bacnet4j.apdu.APDU;
 import com.serotonin.bacnet4j.apdu.Abort;
 import com.serotonin.bacnet4j.apdu.AckAPDU;
@@ -39,20 +37,22 @@ import com.serotonin.bacnet4j.exception.BACnetException;
 import com.serotonin.bacnet4j.exception.BACnetRuntimeException;
 import com.serotonin.bacnet4j.exception.BACnetTimeoutException;
 import com.serotonin.bacnet4j.exception.SegmentedMessageAbortedException;
+import com.serotonin.bacnet4j.type.constructed.Address;
+import com.serotonin.bacnet4j.type.primitive.OctetString;
 
 public class WaitingRoom {
-    private final HashMap<Key, Member> waitHere = new HashMap<Key, Member>();
+    private final HashMap<WaitingRoomKey, Member> waitHere = new HashMap<WaitingRoomKey, Member>();
     private byte nextInvokeId;
 
-    synchronized public Key enterClient(InetSocketAddress peer, Network network) {
+    synchronized public WaitingRoomKey enterClient(Address address, OctetString linkService) {
         Member member = new Member();
-        Key key;
+        WaitingRoomKey key;
 
         // Loop until we find a key that is available.
         int attempts = 256;
         while (true) {
             // We set the server value in the key to true so that it matches with the message from the server.
-            key = new Key(peer, network, nextInvokeId++, true);
+            key = new WaitingRoomKey(address, linkService, nextInvokeId++, true);
 
             synchronized (waitHere) {
                 if (waitHere.get(key) != null) {
@@ -71,9 +71,9 @@ public class WaitingRoom {
         return key;
     }
 
-    public Key enterServer(InetSocketAddress peer, Network network, byte id) {
+    public WaitingRoomKey enterServer(Address address, OctetString linkService, byte id) {
         // We set the server value in the key to false so that it matches with the message from the client.
-        Key key = new Key(peer, network, id, false);
+        WaitingRoomKey key = new WaitingRoomKey(address, linkService, id, false);
         Member member = new Member();
 
         synchronized (waitHere) {
@@ -85,15 +85,15 @@ public class WaitingRoom {
         return key;
     }
 
-    public AckAPDU getAck(Key key, long timeout, boolean throwTimeout) throws BACnetException {
+    public AckAPDU getAck(WaitingRoomKey key, long timeout, boolean throwTimeout) throws BACnetException {
         return (AckAPDU) getAPDU(key, timeout, throwTimeout);
     }
 
-    public ConfirmedRequest getRequest(Key key, long timeout, boolean throwTimeout) throws BACnetException {
+    public ConfirmedRequest getRequest(WaitingRoomKey key, long timeout, boolean throwTimeout) throws BACnetException {
         return (ConfirmedRequest) getAPDU(key, timeout, throwTimeout);
     }
 
-    public Segmentable getSegmentable(Key key, long timeout, boolean throwTimeout) throws BACnetException {
+    public Segmentable getSegmentable(WaitingRoomKey key, long timeout, boolean throwTimeout) throws BACnetException {
         APDU apdu = getAPDU(key, timeout, throwTimeout);
         if (apdu instanceof Abort)
             throw new SegmentedMessageAbortedException((Abort) apdu);
@@ -106,7 +106,7 @@ public class WaitingRoom {
         }
     }
 
-    public APDU getAPDU(Key key, long timeout, boolean throwTimeout) throws BACnetException {
+    public APDU getAPDU(WaitingRoomKey key, long timeout, boolean throwTimeout) throws BACnetException {
         Member member = getMember(key);
         APDU apdu = member.getAPDU(timeout);
         if (apdu == null && throwTimeout)
@@ -114,15 +114,15 @@ public class WaitingRoom {
         return apdu;
     }
 
-    public void leave(Key key) {
+    public void leave(WaitingRoomKey key) {
         synchronized (waitHere) {
             waitHere.remove(key);
         }
     }
 
-    public void notifyMember(InetSocketAddress peer, Network network, byte id, boolean isFromServer, APDU apdu)
+    public void notifyMember(Address address, OctetString linkService, byte id, boolean isFromServer, APDU apdu)
             throws BACnetException {
-        Key key = new Key(peer, network, id, isFromServer);
+        WaitingRoomKey key = new WaitingRoomKey(address, linkService, id, isFromServer);
         Member member = getMember(key);
         if (member != null) {
             member.setAPDU(apdu);
@@ -148,11 +148,11 @@ public class WaitingRoom {
                 // no op
             }
         }
-        throw new BACnetException("No waiting recipient for message: peer=" + peer + ", id=" + (id & 0xff)
+        throw new BACnetException("No waiting recipient for message: address=" + address + ", id=" + (id & 0xff)
                 + ", isFromServer=" + isFromServer + ", message=" + apdu);
     }
 
-    private Member getMember(Key key) {
+    private Member getMember(WaitingRoomKey key) {
         synchronized (waitHere) {
             return waitHere.get(key);
         }
@@ -166,7 +166,7 @@ public class WaitingRoom {
      * 
      * @author mlohbihler
      */
-    class Member {
+    static class Member {
         private final LinkedList<APDU> apdus = new LinkedList<APDU>();
 
         synchronized void setAPDU(APDU apdu) {
@@ -192,80 +192,6 @@ public class WaitingRoom {
             catch (InterruptedException e) {
                 // Ignore
             }
-        }
-    }
-
-    public class Key {
-        private final InetSocketAddress peer;
-        private final Network network;
-        private final byte invokeId;
-        private final boolean fromServer;
-
-        public Key(InetSocketAddress peer, Network network, byte invokeId, boolean fromServer) {
-            this.peer = peer;
-            this.network = network;
-            this.invokeId = invokeId;
-            this.fromServer = fromServer;
-        }
-
-        public InetSocketAddress getPeer() {
-            return peer;
-        }
-
-        public Network getNetwork() {
-            return network;
-        }
-
-        public byte getInvokeId() {
-            return invokeId;
-        }
-
-        public boolean isFromServer() {
-            return fromServer;
-        }
-
-        @Override
-        public String toString() {
-            return "Key(peer=" + peer + ", network=" + network + ", invokeId=" + invokeId + ", fromServer="
-                    + fromServer + ")";
-        }
-
-        @Override
-        public int hashCode() {
-            final int prime = 31;
-            int result = 1;
-            result = prime * result + (fromServer ? 1231 : 1237);
-            result = prime * result + ((network == null) ? 0 : network.hashCode());
-            result = prime * result + ((peer == null) ? 0 : peer.hashCode());
-            return result;
-        }
-
-        @Override
-        public boolean equals(Object obj) {
-            if (this == obj)
-                return true;
-            if (obj == null)
-                return false;
-            if (getClass() != obj.getClass())
-                return false;
-            final Key other = (Key) obj;
-            if (fromServer != other.fromServer)
-                return false;
-            if (invokeId != other.invokeId)
-                return false;
-            if (network == null) {
-                if (other.network != null)
-                    return false;
-            }
-            else if (!network.equals(other.network))
-                return false;
-            if (peer == null) {
-                if (other.peer != null)
-                    return false;
-            }
-            else if (!peer.equals(other.peer))
-                return false;
-            return true;
         }
     }
 }

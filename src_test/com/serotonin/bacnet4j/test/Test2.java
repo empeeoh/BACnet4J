@@ -1,24 +1,24 @@
 package com.serotonin.bacnet4j.test;
 
-import java.net.InetAddress;
-import java.net.InetSocketAddress;
-
 import com.serotonin.bacnet4j.LocalDevice;
-import com.serotonin.bacnet4j.Network;
 import com.serotonin.bacnet4j.RemoteDevice;
 import com.serotonin.bacnet4j.event.DefaultDeviceEventListener;
+import com.serotonin.bacnet4j.npdu.ip.IpNetwork;
 import com.serotonin.bacnet4j.service.acknowledgement.ReadPropertyAck;
 import com.serotonin.bacnet4j.service.confirmed.ReadPropertyRequest;
 import com.serotonin.bacnet4j.service.unconfirmed.WhoIsRequest;
+import com.serotonin.bacnet4j.transport.Transport;
+import com.serotonin.bacnet4j.type.constructed.Address;
 import com.serotonin.bacnet4j.type.constructed.SequenceOf;
 import com.serotonin.bacnet4j.type.enumerated.ObjectType;
 import com.serotonin.bacnet4j.type.enumerated.PropertyIdentifier;
 import com.serotonin.bacnet4j.type.enumerated.Segmentation;
 import com.serotonin.bacnet4j.type.primitive.ObjectIdentifier;
+import com.serotonin.bacnet4j.type.primitive.OctetString;
 
 public class Test2 {
     public static void main(String[] args) throws Exception {
-        LocalDevice localDevice = new LocalDevice(1968, "255.255.255.255");
+        LocalDevice localDevice = new LocalDevice(1968, new Transport(new IpNetwork()));
         //        LocalDevice localDevice = new LocalDevice(1968, "93.93.233.191");
         //        localDevice.setPort(47809);
 
@@ -26,7 +26,7 @@ public class Test2 {
         localDevice.initialize();
 
         try {
-            localDevice.sendBroadcast(new WhoIsRequest());
+            localDevice.sendGlobalBroadcast(new WhoIsRequest());
             Thread.sleep(2000);
 
             // Read
@@ -34,7 +34,9 @@ public class Test2 {
             // PropertyIdentifier.presentValue);
 
             //        getObjectList(localDevice, "192.168.0.68", 0xBAC0, 101);
-            getObjectList(localDevice, "192.168.0.68", 0xBAC0, 76058, new Network(2001, new byte[] { 0x3a }));
+            //            getObjectList(localDevice, "192.168.0.68", 76058, new Address(2001, new byte[] { 0x3a }));
+            getObjectList(localDevice, new Address(2001, new byte[] { 0x3a }), new OctetString("192.168.0.68", 0xBAC0),
+                    76058);
 
             //getObjectList(localDevice, "206.210.100.135", 0xBAC0, 1011);
             // getObjectList(localDevice, "10.174.1.128", 0xBAC0, 57);
@@ -46,18 +48,17 @@ public class Test2 {
         }
     }
 
-    private static void getObjectList(LocalDevice localDevice, String ip, int port, int deviceId) throws Exception {
-        getObjectList(localDevice, ip, port, deviceId, null);
+    private static void getObjectList(LocalDevice localDevice, String ip, int deviceId) throws Exception {
+        getObjectList(localDevice, new Address(ip, 0xBAC0), null, deviceId);
     }
 
-    private static void getObjectList(LocalDevice localDevice, String ip, int port, int deviceId, Network network)
+    private static void getObjectList(LocalDevice localDevice, Address to, OctetString link, int deviceId)
             throws Exception {
-        InetSocketAddress addr = new InetSocketAddress(InetAddress.getByName(ip), port);
         ReadPropertyRequest read = new ReadPropertyRequest(new ObjectIdentifier(ObjectType.device, deviceId),
                 PropertyIdentifier.objectList);
-        ReadPropertyAck ack = (ReadPropertyAck) localDevice.send(addr, network, 1476, Segmentation.segmentedBoth, read);
+        ReadPropertyAck ack = (ReadPropertyAck) localDevice.send(to, link, 1476, Segmentation.segmentedBoth, read);
 
-        System.out.println("IP: " + ip);
+        System.out.println("IP: " + to.getDescription());
         SequenceOf<ObjectIdentifier> oids = (SequenceOf<ObjectIdentifier>) ack.getValue();
         for (ObjectIdentifier oid : oids)
             System.out.println("    " + oid);

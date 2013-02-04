@@ -29,7 +29,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.serotonin.bacnet4j.LocalDevice;
-import com.serotonin.bacnet4j.Network;
 import com.serotonin.bacnet4j.exception.BACnetErrorException;
 import com.serotonin.bacnet4j.exception.BACnetException;
 import com.serotonin.bacnet4j.exception.BACnetServiceException;
@@ -45,6 +44,7 @@ import com.serotonin.bacnet4j.type.constructed.SequenceOf;
 import com.serotonin.bacnet4j.type.enumerated.ObjectType;
 import com.serotonin.bacnet4j.type.error.CreateObjectError;
 import com.serotonin.bacnet4j.type.primitive.ObjectIdentifier;
+import com.serotonin.bacnet4j.type.primitive.OctetString;
 import com.serotonin.bacnet4j.type.primitive.UnsignedInteger;
 import com.serotonin.util.queue.ByteQueue;
 
@@ -79,7 +79,7 @@ public class CreateObjectRequest extends ConfirmedRequestService {
     }
 
     @Override
-    public AcknowledgementService handle(LocalDevice localDevice, Address from, Network network)
+    public AcknowledgementService handle(LocalDevice localDevice, Address from, OctetString linkService)
             throws BACnetErrorException {
         ObjectIdentifier id;
         if (objectSpecifier.getContextId() == 0) {

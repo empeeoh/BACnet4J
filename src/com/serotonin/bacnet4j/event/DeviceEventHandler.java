@@ -59,18 +59,16 @@ public class DeviceEventHandler {
     final ConcurrentLinkedQueue<DeviceEventListener> listeners = new ConcurrentLinkedQueue<DeviceEventListener>();
 
     //
-    // /
-    // / Lifecycle
-    // /
+    //
+    // Lifecycle
     //
     public void initialize(ExecutorService executorService) {
         dispatchService = executorService;
     }
 
     //
-    // /
-    // / Listener management
-    // /
+    //
+    // Listener management
     //
     public void addListener(DeviceEventListener l) {
         listeners.add(l);
@@ -81,9 +79,8 @@ public class DeviceEventHandler {
     }
 
     //
-    // /
-    // / Checks and notifications
-    // /
+    //
+    // Checks and notifications
     //
     public boolean checkAllowPropertyWrite(BACnetObject obj, PropertyValue pv) {
         for (DeviceEventListener l : listeners) {
@@ -105,6 +102,7 @@ public class DeviceEventHandler {
 
     public void fireIAmReceived(final RemoteDevice d) {
         multicast(new EventDispatcher() {
+            @Override
             public void dispatch(DeviceEventListener l) {
                 l.iAmReceived(d);
             }
@@ -113,6 +111,7 @@ public class DeviceEventHandler {
 
     public void propertyWritten(final BACnetObject obj, final PropertyValue pv) {
         multicast(new EventDispatcher() {
+            @Override
             public void dispatch(DeviceEventListener l) {
                 l.propertyWritten(obj, pv);
             }
@@ -121,6 +120,7 @@ public class DeviceEventHandler {
 
     public void fireIHaveReceived(final RemoteDevice d, final RemoteObject o) {
         multicast(new EventDispatcher() {
+            @Override
             public void dispatch(DeviceEventListener l) {
                 l.iHaveReceived(d, o);
             }
@@ -131,6 +131,7 @@ public class DeviceEventHandler {
             final RemoteDevice initiatingDevice, final ObjectIdentifier monitoredObjectIdentifier,
             final UnsignedInteger timeRemaining, final SequenceOf<PropertyValue> listOfValues) {
         multicast(new EventDispatcher() {
+            @Override
             public void dispatch(DeviceEventListener l) {
                 l.covNotificationReceived(subscriberProcessIdentifier, initiatingDevice, monitoredObjectIdentifier,
                         timeRemaining, listOfValues);
@@ -144,6 +145,7 @@ public class DeviceEventHandler {
             final CharacterString messageText, final NotifyType notifyType, final Boolean ackRequired,
             final EventState fromState, final EventState toState, final NotificationParameters eventValues) {
         multicast(new EventDispatcher() {
+            @Override
             public void dispatch(DeviceEventListener l) {
                 l.eventNotificationReceived(processIdentifier, initiatingDevice, eventObjectIdentifier, timeStamp,
                         notificationClass, priority, eventType, messageText, notifyType, ackRequired, fromState,
@@ -155,6 +157,7 @@ public class DeviceEventHandler {
     public void fireTextMessage(final RemoteDevice textMessageSourceDevice, final Choice messageClass,
             final MessagePriority messagePriority, final CharacterString message) {
         multicast(new EventDispatcher() {
+            @Override
             public void dispatch(DeviceEventListener l) {
                 l.textMessageReceived(textMessageSourceDevice, messageClass, messagePriority, message);
             }
@@ -164,6 +167,7 @@ public class DeviceEventHandler {
     public void firePrivateTransfer(final UnsignedInteger vendorId, final UnsignedInteger serviceNumber,
             final Encodable serviceParameters) {
         multicast(new EventDispatcher() {
+            @Override
             public void dispatch(DeviceEventListener l) {
                 l.privateTransferReceived(vendorId, serviceNumber, serviceParameters);
             }
@@ -172,6 +176,7 @@ public class DeviceEventHandler {
 
     public void reinitializeDevice(final ReinitializedStateOfDevice reinitializedStateOfDevice) {
         multicast(new EventDispatcher() {
+            @Override
             public void dispatch(DeviceEventListener l) {
                 l.reinitializeDevice(reinitializedStateOfDevice);
             }
@@ -180,6 +185,7 @@ public class DeviceEventHandler {
 
     public void synchronizeTime(final DateTime dateTime, final boolean utc) {
         multicast(new EventDispatcher() {
+            @Override
             public void dispatch(DeviceEventListener l) {
                 l.synchronizeTime(dateTime, utc);
             }
@@ -209,6 +215,7 @@ public class DeviceEventHandler {
             this.dispatcher = dispatcher;
         }
 
+        @Override
         public void run() {
             for (DeviceEventListener l : listeners) {
                 try {

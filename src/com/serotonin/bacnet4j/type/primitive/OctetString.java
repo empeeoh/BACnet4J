@@ -25,9 +25,16 @@
  */
 package com.serotonin.bacnet4j.type.primitive;
 
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
+import java.net.UnknownHostException;
 import java.util.Arrays;
 
+import com.serotonin.bacnet4j.base.BACnetUtils;
+import com.serotonin.bacnet4j.npdu.ip.InetAddrCache;
+import com.serotonin.bacnet4j.npdu.ip.IpNetwork;
 import com.serotonin.util.ArrayUtils;
+import com.serotonin.util.IpAddressUtils;
 import com.serotonin.util.queue.ByteQueue;
 
 public class OctetString extends Primitive {
@@ -41,8 +48,116 @@ public class OctetString extends Primitive {
         this.value = value;
     }
 
+    public OctetString(String dottedString) {
+        this(dottedString, IpNetwork.DEFAULT_PORT);
+    }
+
+    public OctetString(String dottedString, int defaultPort) {
+        dottedString = dottedString.trim();
+        int colon = dottedString.indexOf(":");
+        if (colon == -1) {
+            byte[] b = BACnetUtils.dottedStringToBytes(dottedString);
+            if (b.length == 4)
+                value = toBytes(b, defaultPort);
+            else
+                value = b;
+        }
+        else {
+            byte[] ip = BACnetUtils.dottedStringToBytes(dottedString.substring(0, colon));
+            int port = Integer.parseInt(dottedString.substring(colon + 1));
+            value = toBytes(ip, port);
+        }
+    }
+
+    /**
+     * Convenience constructor for MS/TP addresses local to this network.
+     * 
+     * @param station
+     *            the station id
+     */
+    public OctetString(byte station) {
+        value = new byte[] { station };
+    }
+
+    /**
+     * Convenience constructor for IP addresses local to this network.
+     * 
+     * @param ipAddress
+     * @param port
+     */
+    public OctetString(byte[] ipAddress, int port) {
+        value = toBytes(ipAddress, port);
+    }
+
+    public OctetString(InetSocketAddress addr) {
+        this(addr.getAddress().getAddress(), addr.getPort());
+    }
+
     public byte[] getBytes() {
         return value;
+    }
+
+    private static byte[] toBytes(byte[] ipAddress, int port) {
+        if (ipAddress.length != 4)
+            throw new IllegalArgumentException("IP address must have 4 parts, not " + ipAddress.length);
+
+        byte[] b = new byte[6];
+        System.arraycopy(ipAddress, 0, b, 0, ipAddress.length);
+        b[ipAddress.length] = (byte) (port >> 8);
+        b[ipAddress.length + 1] = (byte) port;
+        return b;
+    }
+
+    //
+    //
+    // I/P convenience
+    //
+    public String getMacAddressDottedString() {
+        return BACnetUtils.bytesToDottedString(value);
+    }
+
+    public InetAddress getInetAddress() {
+        try {
+            return InetAddress.getByAddress(getIpBytes());
+        }
+        catch (UnknownHostException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public InetSocketAddress getInetSocketAddress() {
+        return InetAddrCache.get(getInetAddress(), getPort());
+    }
+
+    public int getPort() {
+        if (value.length == 6)
+            return ((value[4] & 0xff) << 8) | (value[5] & 0xff);
+        return -1;
+    }
+
+    public String toIpString() {
+        return IpAddressUtils.toIpString(getIpBytes());
+    }
+
+    public String toIpPortString() {
+        return toIpString() + ":" + getPort();
+    }
+
+    public byte[] getIpBytes() {
+        if (value.length == 4)
+            return value;
+
+        byte[] b = new byte[4];
+        System.arraycopy(value, 0, b, 0, 4);
+        return b;
+    }
+
+    //
+    //
+    // MS/TP convenience
+    //
+    public byte getMstpAddress() {
+        return value[0];
     }
 
     //
@@ -94,5 +209,18 @@ public class OctetString extends Primitive {
     @Override
     public String toString() {
         return ArrayUtils.toHexString(value);
+    }
+
+    public String getDescription() {
+        StringBuilder sb = new StringBuilder();
+        if (value.length == 1)
+            // Assume an MS/TP address
+            sb.append(getMstpAddress() & 0xff);
+        else if (value.length == 6)
+            // Assume an I/P address
+            sb.append(toIpPortString());
+        else
+            sb.append(toString());
+        return sb.toString();
     }
 }

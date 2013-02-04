@@ -1,6 +1,6 @@
 package com.serotonin.bacnet4j.test;
 
-import com.serotonin.bacnet4j.npdu.ip.IpMessageControl;
+import com.serotonin.bacnet4j.npdu.ip.IpNetwork;
 import com.serotonin.bacnet4j.service.unconfirmed.UnconfirmedRequestService;
 import com.serotonin.bacnet4j.type.constructed.ServicesSupported;
 import com.serotonin.util.queue.ByteQueue;
@@ -83,7 +83,7 @@ public class DecodingTest {
 
         // String s = "810a0015010030080c0c004003e8195729083e003f";
 
-        new IpMessageControl(null).testDecoding(toBytes(s));
+        new IpNetwork().testDecoding(toBytes(s));
     }
 
     static void test2() throws Exception {

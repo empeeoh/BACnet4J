@@ -28,7 +28,6 @@ package com.serotonin.bacnet4j.service.confirmed;
 import java.io.IOException;
 
 import com.serotonin.bacnet4j.LocalDevice;
-import com.serotonin.bacnet4j.Network;
 import com.serotonin.bacnet4j.exception.BACnetErrorException;
 import com.serotonin.bacnet4j.exception.BACnetException;
 import com.serotonin.bacnet4j.exception.BACnetServiceException;
@@ -82,7 +81,8 @@ public class AtomicWriteFileRequest extends ConfirmedRequestService {
     }
 
     @Override
-    public AcknowledgementService handle(LocalDevice localDevice, Address from, Network network) throws BACnetException {
+    public AcknowledgementService handle(LocalDevice localDevice, Address from, OctetString linkService)
+            throws BACnetException {
         AtomicWriteFileAck response;
 
         BACnetObject obj;

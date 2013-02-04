@@ -25,42 +25,106 @@
  */
 package com.serotonin.bacnet4j.type.constructed;
 
-import java.net.InetAddress;
-import java.net.UnknownHostException;
+import java.net.InetSocketAddress;
 
-import com.serotonin.bacnet4j.Network;
 import com.serotonin.bacnet4j.exception.BACnetException;
+import com.serotonin.bacnet4j.npdu.ip.InetAddrCache;
 import com.serotonin.bacnet4j.type.primitive.OctetString;
 import com.serotonin.bacnet4j.type.primitive.Unsigned16;
 import com.serotonin.bacnet4j.type.primitive.UnsignedInteger;
-import com.serotonin.util.IpAddressUtils;
 import com.serotonin.util.queue.ByteQueue;
 
 public class Address extends BaseType {
+    public static final int LOCAL_NETWORK = 0;
+    public static final Address GLOBAL = new Address(new Unsigned16(0xFFFF), null);
+
     private static final long serialVersionUID = -3376358193474831753L;
     private final Unsigned16 networkNumber;
     private final OctetString macAddress;
+
+    public Address(int networkNumber, byte[] macAddress) {
+        this(new Unsigned16(networkNumber), new OctetString(macAddress));
+    }
+
+    public Address(int networkNumber, String dottedString) {
+        this(new Unsigned16(networkNumber), new OctetString(dottedString));
+    }
+
+    public Address(OctetString macAddress) {
+        this(LOCAL_NETWORK, macAddress);
+    }
+
+    public Address(int networkNumber, OctetString macAddress) {
+        this(new Unsigned16(networkNumber), macAddress);
+    }
 
     public Address(Unsigned16 networkNumber, OctetString macAddress) {
         this.networkNumber = networkNumber;
         this.macAddress = macAddress;
     }
 
-    public Address(byte[] ipAddress, int port) {
-        this(null, ipAddress, port);
+    /**
+     * Convenience constructor for MS/TP addresses local to this network.
+     * 
+     * @param station
+     *            the station id
+     */
+    public Address(byte station) {
+        this(LOCAL_NETWORK, station);
     }
 
-    public Address(Network network, byte[] ipAddress, int port) {
-        if (network == null)
-            networkNumber = new Unsigned16(0);
-        else
-            networkNumber = new Unsigned16(network.getNetworkNumber());
+    /**
+     * Convenience constructor for MS/TP addresses remote to this network.
+     * 
+     * @param network
+     * @param station
+     */
+    public Address(int networkNumber, byte station) {
+        this.networkNumber = new Unsigned16(networkNumber);
+        macAddress = new OctetString(new byte[] { station });
+    }
+
+    /**
+     * Convenience constructor for IP addresses local to this network.
+     * 
+     * @param ipAddress
+     * @param port
+     */
+    public Address(byte[] ipAddress, int port) {
+        this(LOCAL_NETWORK, ipAddress, port);
+    }
+
+    /**
+     * Convenience constructor for IP addresses remote to this network.
+     * 
+     * @param network
+     * @param ipAddress
+     * @param port
+     */
+    public Address(int networkNumber, byte[] ipAddress, int port) {
+        this.networkNumber = new Unsigned16(networkNumber);
 
         byte[] ipMacAddress = new byte[ipAddress.length + 2];
         System.arraycopy(ipAddress, 0, ipMacAddress, 0, ipAddress.length);
         ipMacAddress[ipAddress.length] = (byte) (port >> 8);
         ipMacAddress[ipAddress.length + 1] = (byte) port;
         macAddress = new OctetString(ipMacAddress);
+    }
+
+    public Address(String host, int port) {
+        this(LOCAL_NETWORK, host, port);
+    }
+
+    public Address(int networkNumber, String host, int port) {
+        this(networkNumber, InetAddrCache.get(host, port));
+    }
+
+    public Address(InetSocketAddress addr) {
+        this(LOCAL_NETWORK, addr.getAddress().getAddress(), addr.getPort());
+    }
+
+    public Address(int networkNumber, InetSocketAddress addr) {
+        this(networkNumber, addr.getAddress().getAddress(), addr.getPort());
     }
 
     @Override
@@ -82,37 +146,61 @@ public class Address extends BaseType {
         return networkNumber;
     }
 
-    @Override
-    public String toString() {
-        return "Address(networkNumber=" + networkNumber + ", macAddress=" + macAddress + ")";
+    public boolean isGlobal() {
+        return networkNumber.intValue() == 0xFFFF;
     }
 
-    public InetAddress getInetAddress() throws UnknownHostException {
-        return InetAddress.getByAddress(getIpBytes());
-    }
+    //    //
+    //    //
+    //    // I/P convenience
+    //    //
+    //    public String getMacAddressDottedString() {
+    //        return macAddress.getMacAddressDottedString();
+    //    }
+    //
+    //    public InetAddress getInetAddress() {
+    //        return macAddress.getInetAddress();
+    //    }
+    //
+    //    public InetSocketAddress getInetSocketAddress() {
+    //        return macAddress.getInetSocketAddress();
+    //    }
+    //
+    //    public int getPort() {
+    //        return macAddress.getPort();
+    //    }
+    //
+    //    public String toIpString() {
+    //        return macAddress.toIpString();
+    //    }
+    //
+    //    public String toIpPortString() {
+    //        return macAddress.toIpPortString();
+    //    }
+    //
+    //    //
+    //    //
+    //    // MS/TP convenience
+    //    //
+    //    public byte getMstpAddress() {
+    //        return macAddress.getBytes()[0];
+    //    }
+    //
+    //    @Override
+    //    public String toString() {
+    //        return "Address(networkNumber=" + networkNumber + ", macAddress=" + macAddress + ")";
+    //    }
 
-    public int getPort() {
-        byte[] b = macAddress.getBytes();
-        if (b.length == 6)
-            return ((b[4] & 0xff) << 8) | (b[5] & 0xff);
-        return -1;
-    }
-
-    public String toIpString() {
-        return IpAddressUtils.toIpString(getIpBytes());
-    }
-
-    public String toIpPortString() {
-        return toIpString() + ":" + getPort();
-    }
-
-    private byte[] getIpBytes() {
-        if (macAddress.getLength() == 4)
-            return macAddress.getBytes();
-
-        byte[] b = new byte[4];
-        System.arraycopy(macAddress.getBytes(), 0, b, 0, 4);
-        return b;
+    //
+    //
+    // General convenience
+    //
+    public String getDescription() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(macAddress.getDescription());
+        if (networkNumber.intValue() != 0)
+            sb.append('(').append(networkNumber).append(')');
+        return sb.toString();
     }
 
     @Override

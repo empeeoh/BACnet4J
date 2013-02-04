@@ -25,12 +25,6 @@
  */
 package com.serotonin.bacnet4j;
 
-import java.io.IOException;
-import java.net.InetAddress;
-import java.net.InetSocketAddress;
-import java.net.NetworkInterface;
-import java.net.SocketException;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -42,26 +36,13 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang3.ObjectUtils;
 
-import com.serotonin.bacnet4j.apdu.Abort;
-import com.serotonin.bacnet4j.apdu.AckAPDU;
-import com.serotonin.bacnet4j.apdu.ComplexACK;
-import com.serotonin.bacnet4j.apdu.Error;
-import com.serotonin.bacnet4j.apdu.Reject;
-import com.serotonin.bacnet4j.apdu.SimpleACK;
-import com.serotonin.bacnet4j.event.DefaultExceptionListener;
 import com.serotonin.bacnet4j.event.DeviceEventHandler;
-import com.serotonin.bacnet4j.event.ExceptionListener;
 import com.serotonin.bacnet4j.exception.AbortAPDUException;
-import com.serotonin.bacnet4j.exception.BACnetErrorException;
 import com.serotonin.bacnet4j.exception.BACnetException;
 import com.serotonin.bacnet4j.exception.BACnetRuntimeException;
 import com.serotonin.bacnet4j.exception.BACnetServiceException;
 import com.serotonin.bacnet4j.exception.ErrorAPDUException;
-import com.serotonin.bacnet4j.exception.NotImplementedException;
 import com.serotonin.bacnet4j.exception.PropertyValueException;
-import com.serotonin.bacnet4j.exception.RejectAPDUException;
-import com.serotonin.bacnet4j.npdu.RequestHandler;
-import com.serotonin.bacnet4j.npdu.ip.IpMessageControl;
 import com.serotonin.bacnet4j.obj.BACnetObject;
 import com.serotonin.bacnet4j.obj.ObjectProperties;
 import com.serotonin.bacnet4j.service.acknowledgement.AcknowledgementService;
@@ -75,6 +56,7 @@ import com.serotonin.bacnet4j.service.confirmed.WritePropertyRequest;
 import com.serotonin.bacnet4j.service.unconfirmed.IAmRequest;
 import com.serotonin.bacnet4j.service.unconfirmed.UnconfirmedEventNotificationRequest;
 import com.serotonin.bacnet4j.service.unconfirmed.UnconfirmedRequestService;
+import com.serotonin.bacnet4j.transport.Transport;
 import com.serotonin.bacnet4j.type.Encodable;
 import com.serotonin.bacnet4j.type.constructed.Address;
 import com.serotonin.bacnet4j.type.constructed.Destination;
@@ -102,6 +84,7 @@ import com.serotonin.bacnet4j.type.notificationParameters.NotificationParameters
 import com.serotonin.bacnet4j.type.primitive.Boolean;
 import com.serotonin.bacnet4j.type.primitive.CharacterString;
 import com.serotonin.bacnet4j.type.primitive.ObjectIdentifier;
+import com.serotonin.bacnet4j.type.primitive.OctetString;
 import com.serotonin.bacnet4j.type.primitive.Unsigned16;
 import com.serotonin.bacnet4j.type.primitive.UnsignedInteger;
 import com.serotonin.bacnet4j.util.PropertyReferences;
@@ -115,22 +98,10 @@ import com.serotonin.util.Tuple;
  * 
  * @author mlohbihler
  */
-public class LocalDevice implements RequestHandler {
-    public static final int DEFAULT_PORT = 0xBAC0; // == 47808
+public class LocalDevice {
     private static final int VENDOR_ID = 236; // Serotonin Software
-    private static ExceptionListener exceptionListener = new DefaultExceptionListener();
 
-    public static void setExceptionListener(ExceptionListener l) {
-        if (l == null)
-            l = new DefaultExceptionListener();
-        exceptionListener = l;
-    }
-
-    public static ExceptionListener getExceptionListener() {
-        return exceptionListener;
-    }
-
-    private final IpMessageControl messageControl;
+    private final Transport transport;
     private BACnetObject configuration;
     private final List<BACnetObject> localObjects = new CopyOnWriteArrayList<BACnetObject>();
     private final List<RemoteDevice> remoteDevices = new CopyOnWriteArrayList<RemoteDevice>();
@@ -143,6 +114,8 @@ public class LocalDevice implements RequestHandler {
      */
     private String password = "";
 
+    private boolean strict;
+
     // Misc configuration.
     private int maxReadMultipleReferencesSegmented = 200;
     private int maxReadMultipleReferencesNonsegmented = 20;
@@ -150,22 +123,9 @@ public class LocalDevice implements RequestHandler {
     // Event listeners
     private final DeviceEventHandler eventHandler = new DeviceEventHandler();
 
-    public LocalDevice(int deviceId, String broadcastAddress) {
-        this(deviceId, broadcastAddress, null, 0);
-    }
-
-    public LocalDevice(int deviceId, String broadcastAddress, String localBindAddress) {
-        this(deviceId, broadcastAddress, localBindAddress, 0);
-    }
-
-    public LocalDevice(int deviceId, String broadcastAddress, String localBindAddress, int localNetworkNumber) {
-        messageControl = new IpMessageControl(this);
-        messageControl.setLocalNetworkNumber(localNetworkNumber);
-        messageControl.setPort(DEFAULT_PORT);
-        if (localBindAddress != null)
-            messageControl.setLocalBindAddress(localBindAddress);
-        messageControl.setBroadcastAddress(broadcastAddress);
-        messageControl.setRequestHandler(this);
+    public LocalDevice(int deviceId, Transport transport) {
+        this.transport = transport;
+        transport.setLocalDevice(this);
 
         try {
             ObjectIdentifier deviceIdentifier = new ObjectIdentifier(ObjectType.device, deviceId);
@@ -228,13 +188,32 @@ public class LocalDevice implements RequestHandler {
         }
     }
 
+    public ExecutorService getExecutorService() {
+        return executorService;
+    }
+
     public void setExecutorService(ExecutorService executorService) {
         if (initialized)
             throw new IllegalStateException("Cannot set the executor service. Already initialized");
         this.executorService = executorService;
     }
 
-    public synchronized void initialize() throws IOException {
+    /**
+     * @return the strict
+     */
+    public boolean isStrict() {
+        return strict;
+    }
+
+    /**
+     * @param strict
+     *            the strict to set
+     */
+    public void setStrict(boolean strict) {
+        this.strict = strict;
+    }
+
+    public synchronized void initialize() throws Exception {
         if (executorService == null) {
             executorService = Executors.newCachedThreadPool();
             ownsExecutorService = true;
@@ -242,12 +221,12 @@ public class LocalDevice implements RequestHandler {
         else
             ownsExecutorService = false;
         eventHandler.initialize(executorService);
-        messageControl.initialize(executorService);
+        transport.initialize();
         initialized = true;
     }
 
     public synchronized void terminate() {
-        messageControl.terminate();
+        transport.terminate();
         initialized = false;
 
         if (ownsExecutorService) {
@@ -259,7 +238,7 @@ public class LocalDevice implements RequestHandler {
                     temp.awaitTermination(3, TimeUnit.SECONDS);
                 }
                 catch (InterruptedException e) {
-                    LocalDevice.getExceptionListener().receivedException(e);
+                    // no op
                 }
             }
         }
@@ -279,56 +258,8 @@ public class LocalDevice implements RequestHandler {
 
     //
     //
-    // Controller configuration.
+    // Device configuration.
     //
-    public void setBroadcastAddress(String broadcastAddress) {
-        messageControl.setBroadcastAddress(broadcastAddress);
-    }
-
-    public String getBroadcastAddress() {
-        return messageControl.getBroadcastAddress();
-    }
-
-    public void setPort(int port) {
-        messageControl.setPort(port);
-    }
-
-    public int getPort() {
-        return messageControl.getPort();
-    }
-
-    public void setTimeout(int timeout) {
-        messageControl.setTimeout(timeout);
-    }
-
-    public int getTimeout() {
-        return messageControl.getTimeout();
-    }
-
-    public void setSegTimeout(int segTimeout) {
-        messageControl.setSegTimeout(segTimeout);
-    }
-
-    public int getSegTimeout() {
-        return messageControl.getSegTimeout();
-    }
-
-    public void setSegWindow(int segWindow) {
-        messageControl.setSegWindow(segWindow);
-    }
-
-    public int getSegWindow() {
-        return messageControl.getSegWindow();
-    }
-
-    public void setRetries(int retries) {
-        messageControl.setRetries(retries);
-    }
-
-    public int getRetries() {
-        return messageControl.getRetries();
-    }
-
     public String getPassword() {
         return password;
     }
@@ -462,104 +393,69 @@ public class LocalDevice implements RequestHandler {
     // Message sending
     //
     public AcknowledgementService send(RemoteDevice d, ConfirmedRequestService serviceRequest) throws BACnetException {
-        return send(d.getAddress(), d.getNetwork(), d.getMaxAPDULengthAccepted(), d.getSegmentationSupported(),
-                serviceRequest);
+        return transport.send(d.getAddress(), d.getLinkService(), d.getMaxAPDULengthAccepted(),
+                d.getSegmentationSupported(), serviceRequest);
     }
 
-    public AcknowledgementService send(Address address, Network network, int maxAPDULengthAccepted,
+    public AcknowledgementService send(Address address, int maxAPDULengthAccepted, Segmentation segmentationSupported,
+            ConfirmedRequestService serviceRequest) throws BACnetException {
+        return transport.send(address, null, maxAPDULengthAccepted, segmentationSupported, serviceRequest);
+    }
+
+    public AcknowledgementService send(Address address, OctetString linkService, int maxAPDULengthAccepted,
             Segmentation segmentationSupported, ConfirmedRequestService serviceRequest) throws BACnetException {
-        try {
-            return send(getCachedRemoteInetSocketAddress(address.getInetAddress(), address.getPort()), network,
-                    maxAPDULengthAccepted, segmentationSupported, serviceRequest);
-        }
-        catch (UnknownHostException e) {
-            throw new BACnetException(e);
-        }
+        return transport.send(address, linkService, maxAPDULengthAccepted, segmentationSupported, serviceRequest);
     }
 
-    public AcknowledgementService send(InetSocketAddress addr, Network network, int maxAPDULengthAccepted,
-            Segmentation segmentationSupported, ConfirmedRequestService serviceRequest) throws BACnetException {
-        AckAPDU apdu = messageControl.send(addr, network, maxAPDULengthAccepted, segmentationSupported, serviceRequest);
-
-        if (apdu instanceof SimpleACK)
-            return null;
-
-        if (apdu instanceof ComplexACK)
-            return ((ComplexACK) apdu).getService();
-
-        if (apdu instanceof Error)
-            throw new ErrorAPDUException((Error) apdu);
-
-        if (apdu instanceof Reject)
-            throw new RejectAPDUException((Reject) apdu);
-
-        if (apdu instanceof Abort)
-            throw new AbortAPDUException((Abort) apdu);
-
-        throw new BACnetException("Unexpected APDU: " + apdu);
+    public void sendUnconfirmed(Address address, UnconfirmedRequestService serviceRequest) throws BACnetException {
+        transport.sendUnconfirmed(address, null, serviceRequest, false);
     }
 
-    public void sendUnconfirmed(Address address, Network network, UnconfirmedRequestService serviceRequest)
+    public void sendUnconfirmed(Address address, OctetString linkService, UnconfirmedRequestService serviceRequest)
             throws BACnetException {
-        try {
-            sendUnconfirmed(new InetSocketAddress(address.getInetAddress(), address.getPort()), network, serviceRequest);
-        }
-        catch (UnknownHostException e) {
-            throw new BACnetException(e);
-        }
+        transport.sendUnconfirmed(address, linkService, serviceRequest, false);
     }
 
-    public void sendUnconfirmed(InetSocketAddress addr, Network network, UnconfirmedRequestService serviceRequest)
+    public void sendLocalBroadcast(UnconfirmedRequestService serviceRequest) throws BACnetException {
+        Address bcast = transport.getLocalBroadcastAddress();
+        transport.sendUnconfirmed(bcast, null, serviceRequest, true);
+    }
+
+    public void sendGlobalBroadcast(UnconfirmedRequestService serviceRequest) throws BACnetException {
+        transport.sendUnconfirmed(Address.GLOBAL, null, serviceRequest, true);
+    }
+
+    public void sendBroadcast(Address address, OctetString linkService, UnconfirmedRequestService serviceRequest)
             throws BACnetException {
-        messageControl.sendUnconfirmed(addr, network, serviceRequest);
-    }
-
-    public void sendBroadcast(UnconfirmedRequestService serviceRequest) throws BACnetException {
-        messageControl.sendBroadcast(new Network(0xffff, new byte[0]), serviceRequest);
-    }
-
-    public void sendBroadcast(int port, UnconfirmedRequestService serviceRequest) throws BACnetException {
-        messageControl.sendBroadcast(port, new Network(0xffff, new byte[0]), serviceRequest);
-    }
-
-    public void sendBroadcast(Network network, UnconfirmedRequestService serviceRequest) throws BACnetException {
-        messageControl.sendBroadcast(network, serviceRequest);
-    }
-
-    public void sendBroadcast(int port, Network network, UnconfirmedRequestService serviceRequest)
-            throws BACnetException {
-        messageControl.sendBroadcast(port, network, serviceRequest);
-    }
-
-    /**
-     * Sends a foreign device registration request to addr. On successful registration (AKN), we are added
-     * in the foreign device table FDT.
-     * 
-     * @param addr
-     *            The address of the device where our device wants to be registered as foreign device
-     * @param timeToLive
-     *            The time until we are automatically removed out of the FDT.
-     * @throws BACnetException
-     */
-    public void sendRegisterForeignDeviceMessage(InetSocketAddress addr, int timeToLive) throws BACnetException {
-        messageControl.sendRegisterForeignDeviceMessage(addr, timeToLive);
+        transport.sendUnconfirmed(address, linkService, serviceRequest, true);
     }
 
     //
     //
     // Remote device management
     //
-    public RemoteDevice getRemoteDevice(int instanceId, Address address, Network network) throws BACnetException {
-        RemoteDevice d = getRemoteDeviceImpl(instanceId, address, network);
+    public RemoteDevice getRemoteDevice(int instanceId) throws BACnetException {
+        RemoteDevice d = getRemoteDeviceImpl(instanceId, null, null);
         if (d == null)
-            throw new BACnetException("Unknown device: instance id=" + instanceId + ", address=" + address);
+            throw new BACnetException("Unknown device: instance id=" + instanceId);
         return d;
     }
 
-    public RemoteDevice getRemoteDeviceCreate(int instanceId, Address address, Network network) {
-        RemoteDevice d = getRemoteDeviceImpl(instanceId, address, network);
+    public RemoteDevice getRemoteDevice(int instanceId, Address address, OctetString linkService)
+            throws BACnetException {
+        RemoteDevice d = getRemoteDeviceImpl(instanceId, address, linkService);
+        if (d == null)
+            throw new BACnetException("Unknown device: instance id=" + instanceId + ", address=" + address
+                    + ", linkService=" + linkService);
+        return d;
+    }
+
+    public RemoteDevice getRemoteDeviceCreate(int instanceId, Address address, OctetString linkService) {
+        RemoteDevice d = getRemoteDeviceImpl(instanceId, address, linkService);
         if (d == null) {
-            d = new RemoteDevice(instanceId, address, network);
+            if (address == null)
+                throw new NullPointerException("addr cannot be null");
+            d = new RemoteDevice(instanceId, address, linkService);
             remoteDevices.add(d);
         }
         return d;
@@ -569,11 +465,20 @@ public class LocalDevice implements RequestHandler {
         remoteDevices.add(d);
     }
 
-    private RemoteDevice getRemoteDeviceImpl(int instanceId, Address address, Network network) {
+    private RemoteDevice getRemoteDeviceImpl(int instanceId, Address address, OctetString linkService) {
         for (RemoteDevice d : remoteDevices) {
-            if (d.getInstanceNumber() == instanceId && d.getAddress().equals(address)
-                    && ObjectUtils.equals(d.getNetwork(), network))
-                return d;
+            if (strict || address == null) {
+                // Only compare by device id, as should be sufficient according to the spec's insistence on 
+                // unique device ids.
+                if (d.getInstanceNumber() == instanceId)
+                    return d;
+            }
+            else {
+                // Compare device ids and address.
+                if (d.getInstanceNumber() == instanceId && d.getAddress().equals(address)
+                        && ObjectUtils.equals(d.getLinkService(), linkService))
+                    return d;
+            }
         }
         return null;
     }
@@ -582,21 +487,9 @@ public class LocalDevice implements RequestHandler {
         return remoteDevices;
     }
 
-    public RemoteDevice getRemoteDevice(Address peer) {
-        return getRemoteDevice(peer, null);
-    }
-
-    public RemoteDevice getRemoteDevice(Address peer, Network network) {
+    public RemoteDevice getRemoteDevice(Address address) {
         for (RemoteDevice d : remoteDevices) {
-            if (d.getAddress().equals(peer) && ObjectUtils.equals(d.getNetwork(), network))
-                return d;
-        }
-        return null;
-    }
-
-    public RemoteDevice getRemoteDevice(int instanceNumber) {
-        for (RemoteDevice d : remoteDevices) {
-            if (d.getInstanceNumber() == instanceNumber)
+            if (d.getAddress().equals(address))
                 return d;
         }
         return null;
@@ -709,7 +602,7 @@ public class LocalDevice implements RequestHandler {
                                 timeStamp, new UnsignedInteger(notificationClassId), priority, eventType, messageText,
                                 notifyType, ackRequired, fromState, toState, eventValues);
                         try {
-                            sendUnconfirmed(address, null, req);
+                            transport.sendUnconfirmed(address, null, req, false);
                         }
                         catch (BACnetException e) {
                             sendExceptions.add(e);
@@ -724,78 +617,10 @@ public class LocalDevice implements RequestHandler {
 
     //
     //
-    // Request Handler
-    //
-    @Override
-    public AcknowledgementService handleConfirmedRequest(Address from, Network network, byte invokeId,
-            ConfirmedRequestService serviceRequest) throws BACnetException {
-        try {
-            return serviceRequest.handle(this, from, network);
-        }
-        catch (NotImplementedException e) {
-            System.out.println("Unsupported confirmed request: invokeId=" + invokeId + ", from=" + from + ", request="
-                    + serviceRequest.getClass().getName());
-            throw new BACnetErrorException(ErrorClass.services, ErrorCode.serviceRequestDenied);
-        }
-        catch (BACnetErrorException e) {
-            throw e;
-        }
-        catch (Exception e) {
-            throw new BACnetErrorException(ErrorClass.device, ErrorCode.operationalProblem);
-        }
-    }
-
-    @Override
-    public void handleUnconfirmedRequest(Address from, Network network, UnconfirmedRequestService serviceRequest) {
-        try {
-            serviceRequest.handle(this, from, network);
-        }
-        catch (BACnetException e) {
-            getExceptionListener().receivedException(e);
-        }
-    }
-
-    //
-    //
     // Convenience methods
     //
-    public Address getAddress(InetAddress inetAddress) {
-        try {
-            return new Address(inetAddress.getAddress(), messageControl.getPort());
-        }
-        catch (Exception e) {
-            // Should never happen, so just wrap in a RuntimeException
-            throw new RuntimeException(e);
-        }
-    }
-
-    public InetAddress getDefaultLocalInetAddress() throws UnknownHostException, SocketException {
-        for (NetworkInterface iface : Collections.list(NetworkInterface.getNetworkInterfaces())) {
-            for (InetAddress addr : Collections.list(iface.getInetAddresses())) {
-                if (!addr.isLoopbackAddress() && addr.isSiteLocalAddress())
-                    return addr;
-            }
-        }
-
-        return InetAddress.getLocalHost();
-    }
-
     public Address[] getAllLocalAddresses() {
-        try {
-            ArrayList<Address> result = new ArrayList<Address>();
-            for (NetworkInterface iface : Collections.list(NetworkInterface.getNetworkInterfaces())) {
-                for (InetAddress addr : Collections.list(iface.getInetAddresses())) {
-                    if (!addr.isLoopbackAddress() && addr.isSiteLocalAddress())
-                        result.add(getAddress(addr));
-                }
-            }
-
-            return result.toArray(new Address[result.size()]);
-        }
-        catch (Exception e) {
-            // Should never happen, so just wrap in a RuntimeException
-            throw new RuntimeException(e);
-        }
+        return transport.getNetwork().getAllLocalAddresses();
     }
 
     public IAmRequest getIAm() {
@@ -1042,14 +867,15 @@ public class LocalDevice implements RequestHandler {
 
     //
     // Manual device discovery
-    public RemoteDevice findRemoteDevice(Address address, Network network, int deviceId) throws BACnetException,
-            PropertyValueException {
+    public RemoteDevice findRemoteDevice(Address address, OctetString linkService, int deviceId)
+            throws BACnetException, PropertyValueException {
         ObjectIdentifier deviceOid = new ObjectIdentifier(ObjectType.device, deviceId);
         ReadPropertyRequest req = new ReadPropertyRequest(deviceOid, PropertyIdentifier.maxApduLengthAccepted);
-        ReadPropertyAck ack = (ReadPropertyAck) send(address, network, 1476, Segmentation.noSegmentation, req);
+        ReadPropertyAck ack = (ReadPropertyAck) transport.send(address, linkService, 1476, Segmentation.noSegmentation,
+                req);
 
         // If we got this far, then we got a response. Now get the other required properties.
-        RemoteDevice d = new RemoteDevice(deviceOid.getInstanceNumber(), address, network);
+        RemoteDevice d = new RemoteDevice(deviceOid.getInstanceNumber(), address, linkService);
         d.setMaxAPDULengthAccepted(((UnsignedInteger) ack.getValue()).intValue());
         d.setSegmentationSupported(Segmentation.noSegmentation);
 
@@ -1065,25 +891,4 @@ public class LocalDevice implements RequestHandler {
 
         return d;
     }
-
-    /** cache remote IndetSocketAddress because the creation takes 10s on Android devices. */
-    private InetSocketAddress cachedRemoteInetSocketAddress;
-
-    /**
-     * Returns the cached or newly created InetSocketAddress
-     * 
-     * @param fromAddr
-     *            The address of the remote device
-     * @param fromPort
-     *            The port of the remote device
-     * @return the InetSocketAddress of the remote device
-     */
-    public InetSocketAddress getCachedRemoteInetSocketAddress(final InetAddress fromAddr, final int fromPort) {
-        if (cachedRemoteInetSocketAddress == null || !cachedRemoteInetSocketAddress.getAddress().equals(fromAddr)
-                || cachedRemoteInetSocketAddress.getPort() != fromPort) {
-            cachedRemoteInetSocketAddress = new InetSocketAddress(fromAddr, fromPort);
-        }
-        return cachedRemoteInetSocketAddress;
-    }
-
 }

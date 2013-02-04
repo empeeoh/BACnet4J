@@ -31,7 +31,7 @@ import com.serotonin.util.queue.ByteQueue;
 
 public class AmbiguousValue extends Encodable {
     private static final long serialVersionUID = -1554703777454557893L;
-    private final ByteQueue data = new ByteQueue();
+    private byte[] data;
 
     public AmbiguousValue(ByteQueue queue) {
         TagData tagData = new TagData();
@@ -64,18 +64,24 @@ public class AmbiguousValue extends Encodable {
     }
 
     private void readAmbiguousData(ByteQueue queue, TagData tagData) {
+        ByteQueue data = new ByteQueue();
+        readAmbiguousData(queue, tagData, data);
+        this.data = data.popAll();
+    }
+
+    private void readAmbiguousData(ByteQueue queue, TagData tagData, ByteQueue data) {
         if (!tagData.contextSpecific) {
             // Application class.
             if (tagData.tagNumber == Boolean.TYPE_ID)
-                copyData(queue, 1);
+                copyData(queue, 1, data);
             else
-                copyData(queue, tagData.getTotalLength());
+                copyData(queue, tagData.getTotalLength(), data);
         }
         else {
             // Context specific class.
             if (tagData.isStartTag()) {
                 // Copy the start tag
-                copyData(queue, 1);
+                copyData(queue, 1, data);
 
                 // Remember the context id
                 int contextId = tagData.tagNumber;
@@ -89,10 +95,10 @@ public class AmbiguousValue extends Encodable {
                 }
 
                 // Copy the end tag
-                copyData(queue, 1);
+                copyData(queue, 1, data);
             }
             else
-                copyData(queue, tagData.getTotalLength());
+                copyData(queue, tagData.getTotalLength(), data);
         }
     }
 
@@ -101,17 +107,17 @@ public class AmbiguousValue extends Encodable {
         return "Ambiguous(" + data + ")";
     }
 
-    private void copyData(ByteQueue queue, int length) {
+    private void copyData(ByteQueue queue, int length, ByteQueue data) {
         while (length-- > 0)
             data.push(queue.pop());
     }
 
     public boolean isNull() {
-        return data.size() == 1 && data.peek(0) == 0;
+        return data.length == 1 && data[0] == 0;
     }
 
     public <T extends Encodable> T convertTo(Class<T> clazz) throws BACnetException {
-        return read(new ByteQueue(data.peekAll()), clazz);
+        return read(new ByteQueue(data), clazz);
     }
 
     @Override

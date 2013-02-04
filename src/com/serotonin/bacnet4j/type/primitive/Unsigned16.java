@@ -29,7 +29,7 @@ import com.serotonin.util.queue.ByteQueue;
 
 public class Unsigned16 extends UnsignedInteger {
     private static final long serialVersionUID = -4615555609013008931L;
-    private static final int MAX = 0xffff - 1;
+    private static final int MAX = 0xffff;
 
     public Unsigned16(int value) {
         super(value);

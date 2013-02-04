@@ -26,13 +26,13 @@
 package com.serotonin.bacnet4j.service.unconfirmed;
 
 import com.serotonin.bacnet4j.LocalDevice;
-import com.serotonin.bacnet4j.Network;
 import com.serotonin.bacnet4j.exception.BACnetException;
 import com.serotonin.bacnet4j.exception.BACnetServiceException;
 import com.serotonin.bacnet4j.type.constructed.Address;
 import com.serotonin.bacnet4j.type.constructed.DateTime;
 import com.serotonin.bacnet4j.type.constructed.ServicesSupported;
 import com.serotonin.bacnet4j.type.enumerated.PropertyIdentifier;
+import com.serotonin.bacnet4j.type.primitive.OctetString;
 import com.serotonin.util.queue.ByteQueue;
 
 public class TimeSynchronizationRequest extends UnconfirmedRequestService {
@@ -61,7 +61,7 @@ public class TimeSynchronizationRequest extends UnconfirmedRequestService {
     }
 
     @Override
-    public void handle(LocalDevice localDevice, Address from, Network network) {
+    public void handle(LocalDevice localDevice, Address from, OctetString linkService) {
         try {
             ServicesSupported servicesSupported = (ServicesSupported) localDevice.getConfiguration().getProperty(
                     PropertyIdentifier.protocolServicesSupported);

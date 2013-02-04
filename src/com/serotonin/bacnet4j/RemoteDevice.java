@@ -36,13 +36,14 @@ import com.serotonin.bacnet4j.type.constructed.ServicesSupported;
 import com.serotonin.bacnet4j.type.enumerated.ObjectType;
 import com.serotonin.bacnet4j.type.enumerated.Segmentation;
 import com.serotonin.bacnet4j.type.primitive.ObjectIdentifier;
+import com.serotonin.bacnet4j.type.primitive.OctetString;
 import com.serotonin.bacnet4j.type.primitive.UnsignedInteger;
 
 public class RemoteDevice implements Serializable {
     private static final long serialVersionUID = 6338537708566242078L;
     private final int instanceNumber;
     private final Address address;
-    private final Network network;
+    private final OctetString linkService;
     private int maxAPDULengthAccepted;
     private Segmentation segmentationSupported;
     private int vendorId;
@@ -53,14 +54,10 @@ public class RemoteDevice implements Serializable {
     private final Map<ObjectIdentifier, RemoteObject> objects = new HashMap<ObjectIdentifier, RemoteObject>();
     private Object userData;
 
-    // public RemoteDevice(int instanceNumber, Address address) {
-    // this(instanceNumber, address, null);
-    // }
-
-    public RemoteDevice(int instanceNumber, Address address, Network network) {
+    public RemoteDevice(int instanceNumber, Address address, OctetString linkService) {
         this.instanceNumber = instanceNumber;
         this.address = address;
-        this.network = network;
+        this.linkService = linkService;
     }
 
     public ObjectIdentifier getObjectIdentifier() {
@@ -69,12 +66,13 @@ public class RemoteDevice implements Serializable {
 
     @Override
     public String toString() {
-        return "RemoteDevice(instanceNumber=" + instanceNumber + ", address=" + address + ", network=" + network + ")";
+        return "RemoteDevice(instanceNumber=" + instanceNumber + ", address=" + address + ", linkServiceAddress="
+                + linkService + ")";
     }
 
     public String toExtendedString() {
-        return "RemoteDevice(instanceNumber=" + instanceNumber + ", address=" + address + ", network=" + network
-                + ", maxAPDULengthAccepted=" + maxAPDULengthAccepted + ", segmentationSupported="
+        return "RemoteDevice(instanceNumber=" + instanceNumber + ", address=" + address + ", linkServiceAddress="
+                + linkService + ", maxAPDULengthAccepted=" + maxAPDULengthAccepted + ", segmentationSupported="
                 + segmentationSupported + ", vendorId=" + vendorId + ", name=" + name + ", servicesSupported="
                 + servicesSupported + ", objects=" + objects + ")";
     }
@@ -99,8 +97,8 @@ public class RemoteDevice implements Serializable {
         return address;
     }
 
-    public Network getNetwork() {
-        return network;
+    public OctetString getLinkService() {
+        return linkService;
     }
 
     public int getMaxAPDULengthAccepted() {
@@ -177,7 +175,7 @@ public class RemoteDevice implements Serializable {
         int result = 1;
         result = prime * result + ((address == null) ? 0 : address.hashCode());
         result = prime * result + instanceNumber;
-        result = prime * result + ((network == null) ? 0 : network.hashCode());
+        result = prime * result + ((linkService == null) ? 0 : linkService.hashCode());
         return result;
     }
 
@@ -198,11 +196,11 @@ public class RemoteDevice implements Serializable {
             return false;
         if (instanceNumber != other.instanceNumber)
             return false;
-        if (network == null) {
-            if (other.network != null)
+        if (linkService == null) {
+            if (other.linkService != null)
                 return false;
         }
-        else if (!network.equals(other.network))
+        else if (!linkService.equals(other.linkService))
             return false;
         return true;
     }

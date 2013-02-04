@@ -27,6 +27,7 @@ package com.serotonin.bacnet4j.npdu;
 
 import java.math.BigInteger;
 
+import com.serotonin.bacnet4j.type.constructed.Address;
 import com.serotonin.util.queue.ByteQueue;
 
 /**
@@ -36,7 +37,7 @@ import com.serotonin.util.queue.ByteQueue;
  */
 public class NPCI {
     private final int version;
-    private final BigInteger control;
+    private BigInteger control;
     private int destinationNetwork;
     private int destinationLength;
     private byte[] destinationAddress;
@@ -46,6 +47,59 @@ public class NPCI {
     private int hopCount;
     private int messageType;
     private int vendorId;
+
+    /**
+     * For sending global broadcasts
+     * 
+     * @param source
+     *            optional source address
+     */
+    public NPCI(Address source) {
+        version = 1;
+        control = BigInteger.valueOf(0);
+
+        control = control.setBit(5);
+        destinationNetwork = 0xFFFF;
+        hopCount = 0xFF;
+
+        setSourceAddress(source);
+    }
+
+    public NPCI(Address destination, Address source, boolean expectsReply) {
+        version = 1;
+        control = BigInteger.valueOf(0);
+
+        if (destination != null) {
+            control = control.setBit(5);
+            destinationNetwork = destination.getNetworkNumber().intValue();
+            destinationAddress = destination.getMacAddress().getBytes();
+            if (destinationAddress != null)
+                destinationLength = destinationAddress.length;
+            hopCount = 0xFF;
+        }
+
+        setSourceAddress(source);
+
+        if (expectsReply)
+            control = control.setBit(2);
+    }
+
+    public NPCI(Address destination, Address source, boolean expectsReply, int messageType, int vendorId) {
+        this(destination, source, expectsReply);
+
+        control = control.setBit(7);
+        this.messageType = messageType;
+        this.vendorId = vendorId;
+    }
+
+    private void setSourceAddress(Address source) {
+        if (source != null) {
+            control = control.setBit(3);
+            sourceNetwork = source.getNetworkNumber().intValue();
+            sourceAddress = source.getMacAddress().getBytes();
+            sourceLength = sourceAddress.length;
+        }
+    }
 
     public NPCI(ByteQueue queue) {
         version = queue.popU1B();
@@ -74,6 +128,33 @@ public class NPCI {
             messageType = queue.popU1B();
             if (messageType >= 80)
                 vendorId = queue.popU2B();
+        }
+    }
+
+    public void write(ByteQueue queue) {
+        queue.push(version);
+        queue.push(control.intValue());
+
+        if (control.testBit(5)) {
+            queue.pushU2B(destinationNetwork);
+            queue.push(destinationLength);
+            if (destinationAddress != null)
+                queue.push(destinationAddress);
+        }
+
+        if (control.testBit(3)) {
+            queue.pushU2B(sourceNetwork);
+            queue.push(sourceLength);
+            queue.push(sourceAddress);
+        }
+
+        if (control.testBit(5))
+            queue.push(hopCount);
+
+        if (control.testBit(7)) {
+            queue.push(messageType);
+            if (messageType >= 80)
+                queue.pushU2B(vendorId);
         }
     }
 

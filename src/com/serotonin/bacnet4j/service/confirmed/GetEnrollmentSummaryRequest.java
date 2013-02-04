@@ -26,7 +26,6 @@
 package com.serotonin.bacnet4j.service.confirmed;
 
 import com.serotonin.bacnet4j.LocalDevice;
-import com.serotonin.bacnet4j.Network;
 import com.serotonin.bacnet4j.exception.BACnetException;
 import com.serotonin.bacnet4j.exception.NotImplementedException;
 import com.serotonin.bacnet4j.service.acknowledgement.AcknowledgementService;
@@ -35,6 +34,7 @@ import com.serotonin.bacnet4j.type.constructed.BaseType;
 import com.serotonin.bacnet4j.type.constructed.RecipientProcess;
 import com.serotonin.bacnet4j.type.enumerated.EventType;
 import com.serotonin.bacnet4j.type.primitive.Enumerated;
+import com.serotonin.bacnet4j.type.primitive.OctetString;
 import com.serotonin.bacnet4j.type.primitive.UnsignedInteger;
 import com.serotonin.util.queue.ByteQueue;
 
@@ -80,7 +80,8 @@ public class GetEnrollmentSummaryRequest extends ConfirmedRequestService {
     }
 
     @Override
-    public AcknowledgementService handle(LocalDevice localDevice, Address from, Network network) throws BACnetException {
+    public AcknowledgementService handle(LocalDevice localDevice, Address from, OctetString linkService)
+            throws BACnetException {
         throw new NotImplementedException();
     }
 

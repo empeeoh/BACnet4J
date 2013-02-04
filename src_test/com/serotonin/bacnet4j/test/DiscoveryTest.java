@@ -27,7 +27,9 @@ import java.util.List;
 import com.serotonin.bacnet4j.LocalDevice;
 import com.serotonin.bacnet4j.RemoteDevice;
 import com.serotonin.bacnet4j.event.DefaultDeviceEventListener;
+import com.serotonin.bacnet4j.npdu.ip.IpNetwork;
 import com.serotonin.bacnet4j.service.unconfirmed.WhoIsRequest;
+import com.serotonin.bacnet4j.transport.Transport;
 import com.serotonin.bacnet4j.type.constructed.SequenceOf;
 import com.serotonin.bacnet4j.type.enumerated.ObjectType;
 import com.serotonin.bacnet4j.type.enumerated.PropertyIdentifier;
@@ -41,15 +43,18 @@ import com.serotonin.bacnet4j.util.PropertyValues;
 public class DiscoveryTest {
     @SuppressWarnings("unchecked")
     public static void main(String[] args) throws Exception {
+        IpNetwork network = new IpNetwork(IpNetwork.DEFAULT_BROADCAST_IP, IpNetwork.DEFAULT_PORT,
+                IpNetwork.DEFAULT_BIND_IP, 9746);
+
         // LocalDevice localDevice = new LocalDevice(1234, "192.168.0.255");
-        LocalDevice localDevice = new LocalDevice(1234, "255.255.255.255");
+        LocalDevice localDevice = new LocalDevice(1234, new Transport(network));
         localDevice.getEventHandler().addListener(new Listener());
         localDevice.initialize();
 
         // Who is
         // InetSocketAddress addr = new InetSocketAddress(InetAddress.getByName("96.51.27.33"), 47808);
         // localDevice.sendUnconfirmed(addr, null, new WhoIsRequest());
-        localDevice.sendBroadcast(2068, null, new WhoIsRequest());
+        //        localDevice.sendBroadcast(network.getBroadcastAddress(2068), null, new WhoIsRequest());
         // localDevice.sendUnconfirmed(new Address(new UnsignedInteger(47808), new OctetString(new byte[] { (byte) 96,
         // (byte) 51, (byte) 24, (byte) 1 })), null, new WhoIsRequest());
         // RemoteDevice rd = new RemoteDevice(105, new Address(new UnsignedInteger(47808),
@@ -57,6 +62,8 @@ public class DiscoveryTest {
         // rd.setSegmentationSupported(Segmentation.segmentedBoth);
         // rd.setMaxAPDULengthAccepted(1476);
         // localDevice.addRemoteDevice(rd);
+        //        localDevice.sendLocalBroadcast(new WhoIsRequest());
+        localDevice.sendGlobalBroadcast(new WhoIsRequest());
 
         // Wait a bit for responses to come in.
         Thread.sleep(1000);
@@ -64,8 +71,8 @@ public class DiscoveryTest {
         // Get extended information for all remote devices.
         for (RemoteDevice d : localDevice.getRemoteDevices()) {
             localDevice.getExtendedDeviceInformation(d);
-            List<ObjectIdentifier> oids = ((SequenceOf<ObjectIdentifier>) localDevice.sendReadPropertyAllowNull(d, d
-                    .getObjectIdentifier(), PropertyIdentifier.objectList)).getValues();
+            List<ObjectIdentifier> oids = ((SequenceOf<ObjectIdentifier>) localDevice.sendReadPropertyAllowNull(d,
+                    d.getObjectIdentifier(), PropertyIdentifier.objectList)).getValues();
 
             PropertyReferences refs = new PropertyReferences();
             for (ObjectIdentifier oid : oids)

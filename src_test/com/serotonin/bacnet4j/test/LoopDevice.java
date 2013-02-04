@@ -22,15 +22,15 @@
  */
 package com.serotonin.bacnet4j.test;
 
-import java.io.IOException;
-
 import com.serotonin.bacnet4j.LocalDevice;
 import com.serotonin.bacnet4j.RemoteDevice;
 import com.serotonin.bacnet4j.RemoteObject;
 import com.serotonin.bacnet4j.event.DeviceEventListener;
 import com.serotonin.bacnet4j.exception.BACnetServiceException;
+import com.serotonin.bacnet4j.npdu.ip.IpNetwork;
 import com.serotonin.bacnet4j.obj.BACnetObject;
 import com.serotonin.bacnet4j.service.confirmed.ReinitializeDeviceRequest.ReinitializedStateOfDevice;
+import com.serotonin.bacnet4j.transport.Transport;
 import com.serotonin.bacnet4j.type.Encodable;
 import com.serotonin.bacnet4j.type.constructed.Choice;
 import com.serotonin.bacnet4j.type.constructed.DateTime;
@@ -61,14 +61,14 @@ import com.serotonin.bacnet4j.type.primitive.UnsignedInteger;
  * @author aploese
  */
 public class LoopDevice implements Runnable {
-
     public static void main(String[] args) throws Exception {
-        LoopDevice ld = new LoopDevice("127.0.0.255", LocalDevice.DEFAULT_PORT + 1);
+        LoopDevice ld = new LoopDevice("127.0.0.255", IpNetwork.DEFAULT_PORT + 1);
         Thread.sleep(12000); // wait 2 min
         ld.doTerminate();
     }
 
     private boolean terminate;
+    private IpNetwork network;
     private LocalDevice localDevice;
     private BACnetObject ai0;
     private BACnetObject ai1;
@@ -77,39 +77,46 @@ public class LoopDevice implements Runnable {
     private BACnetObject mso0;
     private BACnetObject ao0;
 
-    public LoopDevice(String broadcastAddress, int port) throws BACnetServiceException, IOException {
-        localDevice = new LocalDevice(1968, broadcastAddress);
+    public LoopDevice(String broadcastAddress, int port) throws BACnetServiceException, Exception {
+        network = new IpNetwork(broadcastAddress, port);
+        localDevice = new LocalDevice(1968, new Transport(network));
         try {
-            localDevice.setPort(port);
             localDevice.getEventHandler().addListener(new DeviceEventListener() {
 
+                @Override
                 public void listenerException(Throwable e) {
                     System.out.println("loopDevice listenerException");
                 }
 
+                @Override
                 public void iAmReceived(RemoteDevice d) {
                     System.out.println("loopDevice iAmReceived");
                 }
 
+                @Override
                 public boolean allowPropertyWrite(BACnetObject obj, PropertyValue pv) {
                     System.out.println("loopDevice allowPropertyWrite");
                     return true;
                 }
 
+                @Override
                 public void propertyWritten(BACnetObject obj, PropertyValue pv) {
                     System.out.println("loopDevice propertyWritten");
                 }
 
+                @Override
                 public void iHaveReceived(RemoteDevice d, RemoteObject o) {
                     System.out.println("loopDevice iHaveReceived");
                 }
 
+                @Override
                 public void covNotificationReceived(UnsignedInteger subscriberProcessIdentifier,
                         RemoteDevice initiatingDevice, ObjectIdentifier monitoredObjectIdentifier,
                         UnsignedInteger timeRemaining, SequenceOf<PropertyValue> listOfValues) {
                     System.out.println("loopDevice covNotificationReceived");
                 }
 
+                @Override
                 public void eventNotificationReceived(UnsignedInteger processIdentifier, RemoteDevice initiatingDevice,
                         ObjectIdentifier eventObjectIdentifier, TimeStamp timeStamp, UnsignedInteger notificationClass,
                         UnsignedInteger priority, EventType eventType, CharacterString messageText,
@@ -118,16 +125,19 @@ public class LoopDevice implements Runnable {
                     System.out.println("loopDevice eventNotificationReceived");
                 }
 
+                @Override
                 public void textMessageReceived(RemoteDevice textMessageSourceDevice, Choice messageClass,
                         MessagePriority messagePriority, CharacterString message) {
                     System.out.println("loopDevice textMessageReceived");
                 }
 
+                @Override
                 public void privateTransferReceived(UnsignedInteger vendorId, UnsignedInteger serviceNumber,
                         Encodable serviceParameters) {
                     System.out.println("loopDevice privateTransferReceived");
                 }
 
+                @Override
                 public void reinitializeDevice(ReinitializedStateOfDevice reinitializedStateOfDevice) {
                     System.out.println("loopDevice reinitializeDevice");
                 }
@@ -187,8 +197,8 @@ public class LoopDevice implements Runnable {
             bi1.setProperty(PropertyIdentifier.inactiveText, new CharacterString("Bad"));
             bi1.setProperty(PropertyIdentifier.activeText, new CharacterString("Good"));
 
-            mso0 = new BACnetObject(localDevice, localDevice
-                    .getNextInstanceObjectIdentifier(ObjectType.multiStateOutput));
+            mso0 = new BACnetObject(localDevice,
+                    localDevice.getNextInstanceObjectIdentifier(ObjectType.multiStateOutput));
             mso0.setProperty(PropertyIdentifier.objectName, new CharacterString("Vegetable"));
             mso0.setProperty(PropertyIdentifier.numberOfStates, new UnsignedInteger(4));
             mso0.setProperty(PropertyIdentifier.stateText, 1, new CharacterString("Tomato"));
@@ -215,6 +225,7 @@ public class LoopDevice implements Runnable {
         }
     }
 
+    @Override
     public void run() {
         try {
             System.out.println("LoopDevice start changing values" + this);
@@ -278,14 +289,14 @@ public class LoopDevice implements Runnable {
      * @return the broadcastAddress
      */
     public String getBroadcastAddress() {
-        return localDevice.getBroadcastAddress();
+        return network.getBroadcastIp();
     }
 
     /**
      * @return the port
      */
     public int getPort() {
-        return localDevice.getPort();
+        return network.getPort();
     }
 
     /**

@@ -28,12 +28,13 @@ package com.serotonin.bacnet4j.service.unconfirmed;
 import java.util.logging.Logger;
 
 import com.serotonin.bacnet4j.LocalDevice;
-import com.serotonin.bacnet4j.Network;
 import com.serotonin.bacnet4j.RemoteDevice;
 import com.serotonin.bacnet4j.exception.BACnetException;
 import com.serotonin.bacnet4j.type.constructed.Address;
+import com.serotonin.bacnet4j.type.enumerated.ObjectType;
 import com.serotonin.bacnet4j.type.enumerated.Segmentation;
 import com.serotonin.bacnet4j.type.primitive.ObjectIdentifier;
+import com.serotonin.bacnet4j.type.primitive.OctetString;
 import com.serotonin.bacnet4j.type.primitive.UnsignedInteger;
 import com.serotonin.util.queue.ByteQueue;
 
@@ -62,14 +63,19 @@ public class IAmRequest extends UnconfirmedRequestService {
     }
 
     @Override
-    public void handle(LocalDevice localDevice, Address from, Network network) {
+    public void handle(LocalDevice localDevice, Address from, OctetString linkService) {
+        if (!ObjectType.device.equals(iAmDeviceIdentifier.getObjectType())) {
+            LOGGER.warning("Received IAm from an object that is not a device.");
+            return;
+        }
+
         // Make sure we're not hearing from ourselves.
         int myDoi = localDevice.getConfiguration().getInstanceId();
         int remoteDoi = iAmDeviceIdentifier.getInstanceNumber();
         if (remoteDoi == myDoi) {
             // Get my bacnet address and compare the addresses
             for (Address addr : localDevice.getAllLocalAddresses()) {
-                if (addr.equals(from))
+                if (addr.getMacAddress().equals(from.getMacAddress()))
                     // This is a local address, so ignore.
                     return;
                 LOGGER.warning("Another instance with my device instance ID found!");
@@ -77,7 +83,7 @@ public class IAmRequest extends UnconfirmedRequestService {
         }
 
         // Register the device in the list of known devices.
-        RemoteDevice d = localDevice.getRemoteDeviceCreate(remoteDoi, from, network);
+        RemoteDevice d = localDevice.getRemoteDeviceCreate(remoteDoi, from, linkService);
         d.setMaxAPDULengthAccepted(maxAPDULengthAccepted.intValue());
         d.setSegmentationSupported(segmentationSupported);
         d.setVendorId(vendorId.intValue());

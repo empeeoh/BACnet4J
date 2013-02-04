@@ -29,7 +29,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.serotonin.bacnet4j.LocalDevice;
-import com.serotonin.bacnet4j.Network;
 import com.serotonin.bacnet4j.exception.BACnetException;
 import com.serotonin.bacnet4j.obj.BACnetObject;
 import com.serotonin.bacnet4j.type.Encodable;
@@ -38,6 +37,7 @@ import com.serotonin.bacnet4j.type.constructed.BaseType;
 import com.serotonin.bacnet4j.type.constructed.Choice;
 import com.serotonin.bacnet4j.type.primitive.CharacterString;
 import com.serotonin.bacnet4j.type.primitive.ObjectIdentifier;
+import com.serotonin.bacnet4j.type.primitive.OctetString;
 import com.serotonin.bacnet4j.type.primitive.UnsignedInteger;
 import com.serotonin.util.queue.ByteQueue;
 
@@ -74,7 +74,7 @@ public class WhoHasRequest extends UnconfirmedRequestService {
     }
 
     @Override
-    public void handle(LocalDevice localDevice, Address from, Network network) throws BACnetException {
+    public void handle(LocalDevice localDevice, Address from, OctetString linkService) throws BACnetException {
         // Check if we're in the device id range.
         if (limits != null) {
             int localId = localDevice.getConfiguration().getInstanceId();
@@ -100,8 +100,7 @@ public class WhoHasRequest extends UnconfirmedRequestService {
             // Return the result in an i have message.
             IHaveRequest response = new IHaveRequest(localDevice.getConfiguration().getId(), result.getId(),
                     result.getRawObjectName());
-            // localDevice.sendUnconfirmed(from, network, response);
-            localDevice.sendBroadcast(from.getPort(), network, response);
+            localDevice.sendGlobalBroadcast(response);
         }
     }
 

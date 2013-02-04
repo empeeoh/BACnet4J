@@ -27,9 +27,11 @@ package com.serotonin.bacnet4j.enums;
 
 public enum MaxApduLength {
     UP_TO_50(0, 50), // MinimumMessageSize
-    UP_TO_128(1, 128), UP_TO_206(2, 206), // Fits in a LonTalk frame
+    UP_TO_128(1, 128), //
+    UP_TO_206(2, 206), // Fits in a LonTalk frame
     UP_TO_480(3, 480), // Fits in an ARCNET frame
-    UP_TO_1024(4, 1024), UP_TO_1476(5, 1476); // Fits in an ISO 8802-3 frame
+    UP_TO_1024(4, 1024), //
+    UP_TO_1476(5, 1476); // Fits in an ISO 8802-3 frame
 
     private byte id;
     private int maxLength;

@@ -30,10 +30,11 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import java.util.Map;
 
-import com.serotonin.bacnet4j.LocalDevice;
 import com.serotonin.bacnet4j.base.BACnetUtils;
+import com.serotonin.bacnet4j.event.ExceptionDispatch;
 import com.serotonin.bacnet4j.exception.BACnetErrorException;
 import com.serotonin.bacnet4j.exception.BACnetException;
+import com.serotonin.bacnet4j.exception.ReflectionException;
 import com.serotonin.bacnet4j.obj.ObjectProperties;
 import com.serotonin.bacnet4j.obj.PropertyTypeDefinition;
 import com.serotonin.bacnet4j.service.VendorServiceKey;
@@ -205,7 +206,7 @@ abstract public class Encodable implements Serializable {
             // Check if there is a wrapped BACnet exception
             if (e.getCause() instanceof BACnetException)
                 throw (BACnetException) e.getCause();
-            throw new BACnetException(e);
+            throw new ReflectionException(e);
         }
         catch (Exception e) {
             throw new BACnetException(e);
@@ -375,7 +376,7 @@ abstract public class Encodable implements Serializable {
         VendorServiceKey key = new VendorServiceKey(vendorId, serviceNumber);
         SequenceDefinition def = resolutions.get(key);
         if (def == null) {
-            LocalDevice.getExceptionListener().unimplementedVendorService(vendorId, serviceNumber, queue);
+            ExceptionDispatch.fireUnimplementedVendorService(vendorId, serviceNumber, queue);
             return null;
         }
 

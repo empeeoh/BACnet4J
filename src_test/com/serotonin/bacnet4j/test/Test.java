@@ -22,16 +22,14 @@
  */
 package com.serotonin.bacnet4j.test;
 
-import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.List;
 
 import com.serotonin.bacnet4j.LocalDevice;
 import com.serotonin.bacnet4j.RemoteDevice;
-import com.serotonin.bacnet4j.obj.BACnetObject;
+import com.serotonin.bacnet4j.npdu.ip.InetAddrCache;
 import com.serotonin.bacnet4j.service.acknowledgement.AcknowledgementService;
 import com.serotonin.bacnet4j.service.acknowledgement.CreateObjectAck;
-import com.serotonin.bacnet4j.service.acknowledgement.ReadPropertyAck;
 import com.serotonin.bacnet4j.service.confirmed.ConfirmedRequestService;
 import com.serotonin.bacnet4j.service.confirmed.CreateObjectRequest;
 import com.serotonin.bacnet4j.service.confirmed.DeleteObjectRequest;
@@ -48,7 +46,6 @@ import com.serotonin.bacnet4j.service.unconfirmed.WhoIsRequest;
 import com.serotonin.bacnet4j.type.constructed.Address;
 import com.serotonin.bacnet4j.type.constructed.Destination;
 import com.serotonin.bacnet4j.type.constructed.EventTransitionBits;
-import com.serotonin.bacnet4j.type.constructed.PriorityArray;
 import com.serotonin.bacnet4j.type.constructed.PropertyReference;
 import com.serotonin.bacnet4j.type.constructed.PropertyValue;
 import com.serotonin.bacnet4j.type.constructed.ReadAccessSpecification;
@@ -66,20 +63,24 @@ import com.serotonin.bacnet4j.type.primitive.Real;
 import com.serotonin.bacnet4j.type.primitive.UnsignedInteger;
 
 public class Test {
-    public static void main(String[] args) throws Exception {
-        LocalDevice localDevice = null;
-        int instanceNumber = 1;
-        BACnetObject notif = new BACnetObject(localDevice, new ObjectIdentifier(ObjectType.notificationClass,
-                instanceNumber));
-
-        RemoteDevice remoteDevice = null;
-
-        ReadPropertyRequest req = new ReadPropertyRequest(new ObjectIdentifier(ObjectType.analogOutput, 1234),
-                PropertyIdentifier.priorityArray);
-        ReadPropertyAck ack = (ReadPropertyAck) localDevice.send(remoteDevice, req);
-        PriorityArray priorityArray = (PriorityArray) ack.getValue();
-        int priority = priorityArray.get(16).getIntegerValue().intValue();
+    public static void main(String[] args) {
+        new Address(0, "192.168.0.70:47808");
     }
+
+    //    public static void main(String[] args) throws Exception {
+    //        LocalDevice localDevice = null;
+    //        int instanceNumber = 1;
+    //        BACnetObject notif = new BACnetObject(localDevice, new ObjectIdentifier(ObjectType.notificationClass,
+    //                instanceNumber));
+    //
+    //        RemoteDevice remoteDevice = null;
+    //
+    //        ReadPropertyRequest req = new ReadPropertyRequest(new ObjectIdentifier(ObjectType.analogOutput, 1234),
+    //                PropertyIdentifier.priorityArray);
+    //        ReadPropertyAck ack = (ReadPropertyAck) localDevice.send(remoteDevice, req);
+    //        PriorityArray priorityArray = (PriorityArray) ack.getValue();
+    //        int priority = priorityArray.get(16).getIntegerValue().intValue();
+    //    }
 
     // public static void main(String[] args) throws Exception {
     // Enumeration<NetworkInterface> netInter = NetworkInterface.getNetworkInterfaces();
@@ -171,7 +172,7 @@ public class Test {
 
     public static void test(LocalDevice d) throws Exception {
         // Who is
-        d.sendBroadcast(new WhoIsRequest(null, null));
+        d.sendGlobalBroadcast(new WhoIsRequest(null, null));
 
         AcknowledgementService result;
 
@@ -275,11 +276,12 @@ public class Test {
     }
 
     public static AcknowledgementService send(LocalDevice d, ConfirmedRequestService s) throws Exception {
-        return d.send(new InetSocketAddress("localhost", 0xbac1), null, 35, Segmentation.segmentedBoth, s);
+        Address a = new Address(InetAddrCache.get("localhost", 0xbac1));
+        return d.send(a, null, 35, Segmentation.segmentedBoth, s);
     }
 
     public static void test2(LocalDevice d) throws Exception {
-        d.sendBroadcast(new WhoIsRequest(null, null));
+        d.sendGlobalBroadcast(new WhoIsRequest(null, null));
         Thread.sleep(500);
 
         RemoteDevice rd = d.getRemoteDevices().get(0);
@@ -288,7 +290,7 @@ public class Test {
         ObjectIdentifier nc1 = new ObjectIdentifier(ObjectType.notificationClass, 4194001);
         ObjectIdentifier nc2 = new ObjectIdentifier(ObjectType.notificationClass, 4194002);
 
-        Recipient recipient = new Recipient(d.getAddress(d.getDefaultLocalInetAddress()));
+        Recipient recipient = new Recipient(d.getConfiguration().getId());
         Destination dest = new Destination(recipient, new UnsignedInteger(0), new Boolean(false),
                 new EventTransitionBits(true, true, true));
         // System.out.println(send(d, rd, new AddListElementRequest(nc0, PropertyIdentifier.recipientList, new

@@ -26,10 +26,10 @@
 package com.serotonin.bacnet4j.service.unconfirmed;
 
 import com.serotonin.bacnet4j.LocalDevice;
-import com.serotonin.bacnet4j.Network;
 import com.serotonin.bacnet4j.exception.BACnetException;
 import com.serotonin.bacnet4j.obj.BACnetObject;
 import com.serotonin.bacnet4j.type.constructed.Address;
+import com.serotonin.bacnet4j.type.primitive.OctetString;
 import com.serotonin.bacnet4j.type.primitive.UnsignedInteger;
 import com.serotonin.util.queue.ByteQueue;
 
@@ -56,7 +56,7 @@ public class WhoIsRequest extends UnconfirmedRequestService {
     }
 
     @Override
-    public void handle(LocalDevice localDevice, Address from, Network network) throws BACnetException {
+    public void handle(LocalDevice localDevice, Address from, OctetString linkService) throws BACnetException {
         BACnetObject local = localDevice.getConfiguration();
 
         // Check if we're in the device id range.
@@ -68,8 +68,7 @@ public class WhoIsRequest extends UnconfirmedRequestService {
 
         // Return the result in a i am message.
         IAmRequest iam = localDevice.getIAm();
-        // localDevice.sendUnconfirmed(from, network, iam);
-        localDevice.sendBroadcast(from.getPort(), network, iam);
+        localDevice.sendGlobalBroadcast(iam);
     }
 
     @Override

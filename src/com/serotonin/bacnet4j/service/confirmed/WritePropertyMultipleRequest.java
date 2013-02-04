@@ -26,7 +26,6 @@
 package com.serotonin.bacnet4j.service.confirmed;
 
 import com.serotonin.bacnet4j.LocalDevice;
-import com.serotonin.bacnet4j.Network;
 import com.serotonin.bacnet4j.exception.BACnetErrorException;
 import com.serotonin.bacnet4j.exception.BACnetException;
 import com.serotonin.bacnet4j.exception.BACnetServiceException;
@@ -41,6 +40,7 @@ import com.serotonin.bacnet4j.type.constructed.WriteAccessSpecification;
 import com.serotonin.bacnet4j.type.enumerated.ErrorClass;
 import com.serotonin.bacnet4j.type.enumerated.ErrorCode;
 import com.serotonin.bacnet4j.type.error.WritePropertyMultipleError;
+import com.serotonin.bacnet4j.type.primitive.OctetString;
 import com.serotonin.util.queue.ByteQueue;
 
 public class WritePropertyMultipleRequest extends ConfirmedRequestService {
@@ -69,7 +69,8 @@ public class WritePropertyMultipleRequest extends ConfirmedRequestService {
     }
 
     @Override
-    public AcknowledgementService handle(LocalDevice localDevice, Address from, Network network) throws BACnetException {
+    public AcknowledgementService handle(LocalDevice localDevice, Address from, OctetString linkService)
+            throws BACnetException {
         BACnetObject obj;
         for (WriteAccessSpecification spec : listOfWriteAccessSpecifications) {
             obj = localDevice.getObject(spec.getObjectIdentifier());

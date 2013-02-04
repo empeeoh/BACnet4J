@@ -28,9 +28,11 @@ import com.serotonin.bacnet4j.LocalDevice;
 import com.serotonin.bacnet4j.RemoteDevice;
 import com.serotonin.bacnet4j.RemoteObject;
 import com.serotonin.bacnet4j.event.DeviceEventListener;
+import com.serotonin.bacnet4j.npdu.ip.IpNetwork;
 import com.serotonin.bacnet4j.obj.BACnetObject;
 import com.serotonin.bacnet4j.obj.FileObject;
 import com.serotonin.bacnet4j.service.confirmed.ReinitializeDeviceRequest.ReinitializedStateOfDevice;
+import com.serotonin.bacnet4j.transport.Transport;
 import com.serotonin.bacnet4j.type.Encodable;
 import com.serotonin.bacnet4j.type.constructed.Choice;
 import com.serotonin.bacnet4j.type.constructed.DateTime;
@@ -55,10 +57,9 @@ import com.serotonin.bacnet4j.type.primitive.UnsignedInteger;
 
 public class SlaveDeviceTest {
     public static void main(String[] args) throws Exception {
-        LocalDevice localDevice = new LocalDevice(1968, "192.168.0.255");
+        LocalDevice localDevice = new LocalDevice(1968, new Transport(new IpNetwork("192.168.0.255", 2068)));
         localDevice.getConfiguration().setProperty(PropertyIdentifier.objectName,
                 new CharacterString("BACnet4J slave device test"));
-        localDevice.setPort(2068);
         localDevice.getEventHandler().addListener(new Listener());
         // localDevice.getConfiguration().setProperty(PropertyIdentifier.segmentationSupported,
         // Segmentation.noSegmentation);
@@ -131,14 +132,14 @@ public class SlaveDeviceTest {
         localDevice.initialize();
 
         // Send an iam.
-        localDevice.sendBroadcast(47808, localDevice.getIAm());
+        localDevice.sendGlobalBroadcast(localDevice.getIAm());
 
         // Let it go...
         float ai0value = 0;
         float ai1value = 0;
         boolean bi0value = false;
         boolean bi1value = false;
-        
+
         Thread.sleep(10000);
 
         mso0.setProperty(PropertyIdentifier.presentValue, new UnsignedInteger(2));
