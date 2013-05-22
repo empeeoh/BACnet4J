@@ -16,6 +16,7 @@ import com.serotonin.bacnet4j.type.enumerated.ObjectType;
 import com.serotonin.bacnet4j.type.enumerated.PropertyIdentifier;
 import com.serotonin.bacnet4j.type.primitive.ObjectIdentifier;
 import com.serotonin.bacnet4j.util.PropertyReferences;
+import com.serotonin.bacnet4j.util.RequestUtils;
 
 /**
  * Tests what happens when a request for an object list causes an overflow abort.
@@ -36,17 +37,17 @@ public class OverflowTest {
 
         // Get extended information for all remote devices.
         for (RemoteDevice d : localDevice.getRemoteDevices()) {
-            localDevice.getExtendedDeviceInformation(d);
+            RequestUtils.getExtendedDeviceInformation(localDevice, d);
 
-            List<ObjectIdentifier> oids = ((SequenceOf<ObjectIdentifier>) localDevice.sendReadPropertyAllowNull(d,
-                    d.getObjectIdentifier(), PropertyIdentifier.objectList)).getValues();
+            List<ObjectIdentifier> oids = ((SequenceOf<ObjectIdentifier>) RequestUtils.sendReadPropertyAllowNull(
+                    localDevice, d, d.getObjectIdentifier(), PropertyIdentifier.objectList)).getValues();
             System.out.println("Object count: " + oids.size());
 
             PropertyReferences refs = new PropertyReferences();
             for (ObjectIdentifier oid : oids)
                 addPropertyReferences(refs, oid);
 
-            localDevice.readProperties(d, refs);
+            RequestUtils.readProperties(localDevice, d, refs, null);
             System.out.println(d);
         }
 

@@ -8,7 +8,7 @@ import com.serotonin.bacnet4j.type.constructed.ServicesSupported;
 import com.serotonin.bacnet4j.type.primitive.OctetString;
 import com.serotonin.util.queue.ByteQueue;
 
-abstract public class IncomingRequestParser implements Runnable {
+abstract public class IncomingRequestParser {
     private final Network network;
     protected final ByteQueue originalQueue;
     protected final ByteQueue queue;
@@ -23,7 +23,6 @@ abstract public class IncomingRequestParser implements Runnable {
         linkService = localFrom;
     }
 
-    @Override
     public void run() {
         try {
             // Determine the supported services. Logical branch supports testing.

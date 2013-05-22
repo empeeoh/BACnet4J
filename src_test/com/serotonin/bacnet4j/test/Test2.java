@@ -2,7 +2,8 @@ package com.serotonin.bacnet4j.test;
 
 import com.serotonin.bacnet4j.LocalDevice;
 import com.serotonin.bacnet4j.RemoteDevice;
-import com.serotonin.bacnet4j.event.DefaultDeviceEventListener;
+import com.serotonin.bacnet4j.enums.MaxApduLength;
+import com.serotonin.bacnet4j.event.DeviceEventAdapter;
 import com.serotonin.bacnet4j.npdu.ip.IpNetwork;
 import com.serotonin.bacnet4j.service.acknowledgement.ReadPropertyAck;
 import com.serotonin.bacnet4j.service.confirmed.ReadPropertyRequest;
@@ -56,7 +57,8 @@ public class Test2 {
             throws Exception {
         ReadPropertyRequest read = new ReadPropertyRequest(new ObjectIdentifier(ObjectType.device, deviceId),
                 PropertyIdentifier.objectList);
-        ReadPropertyAck ack = (ReadPropertyAck) localDevice.send(to, link, 1476, Segmentation.segmentedBoth, read);
+        ReadPropertyAck ack = (ReadPropertyAck) localDevice.send(to, link, MaxApduLength.UP_TO_1476,
+                Segmentation.segmentedBoth, read);
 
         System.out.println("IP: " + to.getDescription());
         SequenceOf<ObjectIdentifier> oids = (SequenceOf<ObjectIdentifier>) ack.getValue();
@@ -64,7 +66,7 @@ public class Test2 {
             System.out.println("    " + oid);
     }
 
-    static class Listener extends DefaultDeviceEventListener {
+    static class Listener extends DeviceEventAdapter {
         @Override
         public void iAmReceived(RemoteDevice d) {
             System.out.println("IAm received" + d);

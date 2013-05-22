@@ -1,9 +1,6 @@
 package com.serotonin.bacnet4j.transport;
 
-import java.util.ArrayList;
 import java.util.LinkedList;
-import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -31,6 +28,7 @@ import com.serotonin.bacnet4j.exception.NotImplementedException;
 import com.serotonin.bacnet4j.exception.ReflectionException;
 import com.serotonin.bacnet4j.exception.RejectAPDUException;
 import com.serotonin.bacnet4j.npdu.Network;
+import com.serotonin.bacnet4j.npdu.NetworkIdentifier;
 import com.serotonin.bacnet4j.npdu.ip.SegmentWindow;
 import com.serotonin.bacnet4j.service.acknowledgement.AcknowledgementService;
 import com.serotonin.bacnet4j.service.confirmed.ConfirmedRequestService;
@@ -50,8 +48,6 @@ import com.serotonin.util.queue.ByteQueue;
  * @author Matthew
  */
 public class Transport {
-    private static final List<Transport> runningTransports = new ArrayList<Transport>();
-
     public static final int DEFAULT_TIMEOUT = 6000;
     public static final int DEFAULT_SEG_TIMEOUT = 5000;
     public static final int DEFAULT_SEG_WINDOW = 5;
@@ -69,28 +65,12 @@ public class Transport {
     private int segWindow = DEFAULT_SEG_WINDOW;
     private int retries = DEFAULT_RETRIES;
 
-    private final boolean useProxy;
-
-    /**
-     * If this transport is initialized when there is already a similar transport running, it will use the running
-     * transport as a proxy rather than initialize it's own network (will will likely cause resource contention).
-     * If this value is non-null, it indicates that a proxy is in use.
-     */
-    private Transport proxy;
-
-    /**
-     * If this transport is running when another similar transport attempts to initialize, it may become a proxy. In
-     * order to forward unconfirmed messages to this other transport, it is added to the list of peers.
-     */
-    private final List<Transport> peers = new CopyOnWriteArrayList<Transport>();
-
     public Transport(Network network) {
-        this(network, false);
+        this.network = network;
     }
 
-    public Transport(Network network, boolean useProxy) {
-        this.useProxy = useProxy;
-        this.network = network;
+    public NetworkIdentifier getNetworkIdentifier() {
+        return network.getNetworkIdentifier();
     }
 
     public void setTimeout(int timeout) {
@@ -138,44 +118,11 @@ public class Transport {
     }
 
     public void initialize() throws Exception {
-        if (useProxy) {
-            synchronized (runningTransports) {
-                // Check for an equivalent running transport.
-                int index = runningTransports.indexOf(this);
-                if (index != -1)
-                    proxy = runningTransports.get(index);
-                else
-                    runningTransports.add(this);
-            }
-        }
-
-        if (proxy == null)
-            network.initialize(this);
-        else
-            proxy.peers.add(this);
+        network.initialize(this);
     }
 
     public void terminate() {
-        if (useProxy) {
-            synchronized (runningTransports) {
-                if (proxy == null)
-                    runningTransports.remove(this);
-            }
-        }
-
-        if (proxy == null)
-            network.terminate();
-        else {
-            // We use equivalence to determine whether we need a proxy or not, so we can't use equals() to find the
-            // peer to remove. We need to use pointer equivalence instead.
-            for (int i = 0; i < proxy.peers.size(); i++) {
-                Transport t = proxy.peers.get(i);
-                if (t == this) {
-                    proxy.peers.remove(i);
-                    break;
-                }
-            }
-        }
+        network.terminate();
     }
 
     //
@@ -195,11 +142,9 @@ public class Transport {
      */
     public AcknowledgementService send(Address address, OctetString linkService, int maxAPDULengthAccepted,
             Segmentation segmentationSupported, ConfirmedRequestService service) throws BACnetException {
-        if (proxy != null)
-            return proxy.send(address, linkService, maxAPDULengthAccepted, segmentationSupported, service);
-
         if (address == null)
             throw new IllegalArgumentException("address cannot be null");
+        network.checkSendThread();
         if (address.equals(linkService))
             linkService = null;
 
@@ -271,17 +216,13 @@ public class Transport {
 
     public void sendUnconfirmed(Address address, OctetString linkService, UnconfirmedRequestService serviceRequest,
             boolean broadcast) throws BACnetException {
-        if (proxy != null)
-            proxy.sendUnconfirmed(address, linkService, serviceRequest, broadcast);
-        else {
-            if (address == null)
-                throw new IllegalArgumentException("address cannot be null");
-            if (address.equals(linkService))
-                linkService = null;
+        if (address == null)
+            throw new IllegalArgumentException("address cannot be null");
+        if (address.equals(linkService))
+            linkService = null;
 
-            // Unconfirmed services will never have to be segmented, so just send it.
-            network.sendAPDU(address, linkService, new UnconfirmedRequest(serviceRequest), broadcast);
-        }
+        // Unconfirmed services will never have to be segmented, so just send it.
+        network.sendAPDU(address, linkService, new UnconfirmedRequest(serviceRequest), broadcast);
     }
 
     //
@@ -477,8 +418,8 @@ public class Transport {
      * @throws BACnetException
      */
     void receiveSegmented(WaitingRoomKey key, Segmentable firstPart) throws BACnetException {
-        if (LOG.isLoggable(Level.INFO))
-            LOG.info("receiveSegmented: start");
+        if (LOG.isLoggable(Level.FINER))
+            LOG.finer("receiveSegmented: start");
 
         boolean server = !key.isFromServer();
         byte id = firstPart.getInvokeId();
@@ -520,8 +461,8 @@ public class Transport {
             // We have the required segment. Append the part to the first part.
             // System.out.println("Received segment "+ segment.getSequenceNumber());
             firstPart.appendServiceData(segment.getServiceData());
-            if (LOG.isLoggable(Level.INFO))
-                LOG.info("receiveSegmented: got segment " + lastSeq);
+            if (LOG.isLoggable(Level.FINER))
+                LOG.finer("receiveSegmented: got segment " + lastSeq);
             lastSeq++;
 
             // Do we need to send an ack?
@@ -538,8 +479,8 @@ public class Transport {
                 break;
         }
 
-        if (LOG.isLoggable(Level.INFO))
-            LOG.info("receiveSegmented: done");
+        if (LOG.isLoggable(Level.FINER))
+            LOG.finer("receiveSegmented: done");
     }
 
     public void incomingApdu(APDU apdu, Address address, OctetString linkService) throws BACnetException {
@@ -592,10 +533,6 @@ public class Transport {
 
             try {
                 ur.getService().handle(localDevice, address, linkService);
-
-                // Also send to peers
-                for (Transport peer : peers)
-                    ur.getService().handle(peer.localDevice, address, linkService);
             }
             catch (BACnetException e) {
                 ExceptionDispatch.fireReceivedException(e);

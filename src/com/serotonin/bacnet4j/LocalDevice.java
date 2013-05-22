@@ -36,23 +36,18 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang3.ObjectUtils;
 
+import com.serotonin.bacnet4j.enums.MaxApduLength;
 import com.serotonin.bacnet4j.event.DeviceEventHandler;
-import com.serotonin.bacnet4j.exception.AbortAPDUException;
 import com.serotonin.bacnet4j.exception.BACnetException;
 import com.serotonin.bacnet4j.exception.BACnetRuntimeException;
 import com.serotonin.bacnet4j.exception.BACnetServiceException;
-import com.serotonin.bacnet4j.exception.ErrorAPDUException;
-import com.serotonin.bacnet4j.exception.PropertyValueException;
+import com.serotonin.bacnet4j.npdu.NetworkIdentifier;
 import com.serotonin.bacnet4j.obj.BACnetObject;
-import com.serotonin.bacnet4j.obj.ObjectProperties;
 import com.serotonin.bacnet4j.service.acknowledgement.AcknowledgementService;
 import com.serotonin.bacnet4j.service.acknowledgement.ReadPropertyAck;
-import com.serotonin.bacnet4j.service.acknowledgement.ReadPropertyMultipleAck;
 import com.serotonin.bacnet4j.service.confirmed.ConfirmedEventNotificationRequest;
 import com.serotonin.bacnet4j.service.confirmed.ConfirmedRequestService;
-import com.serotonin.bacnet4j.service.confirmed.ReadPropertyMultipleRequest;
 import com.serotonin.bacnet4j.service.confirmed.ReadPropertyRequest;
-import com.serotonin.bacnet4j.service.confirmed.WritePropertyRequest;
 import com.serotonin.bacnet4j.service.unconfirmed.IAmRequest;
 import com.serotonin.bacnet4j.service.unconfirmed.UnconfirmedEventNotificationRequest;
 import com.serotonin.bacnet4j.service.unconfirmed.UnconfirmedRequestService;
@@ -61,16 +56,10 @@ import com.serotonin.bacnet4j.type.Encodable;
 import com.serotonin.bacnet4j.type.constructed.Address;
 import com.serotonin.bacnet4j.type.constructed.Destination;
 import com.serotonin.bacnet4j.type.constructed.EventTransitionBits;
-import com.serotonin.bacnet4j.type.constructed.ObjectPropertyReference;
 import com.serotonin.bacnet4j.type.constructed.ObjectTypesSupported;
-import com.serotonin.bacnet4j.type.constructed.PropertyReference;
-import com.serotonin.bacnet4j.type.constructed.ReadAccessResult;
-import com.serotonin.bacnet4j.type.constructed.ReadAccessResult.Result;
-import com.serotonin.bacnet4j.type.constructed.ReadAccessSpecification;
 import com.serotonin.bacnet4j.type.constructed.SequenceOf;
 import com.serotonin.bacnet4j.type.constructed.ServicesSupported;
 import com.serotonin.bacnet4j.type.constructed.TimeStamp;
-import com.serotonin.bacnet4j.type.enumerated.AbortReason;
 import com.serotonin.bacnet4j.type.enumerated.DeviceStatus;
 import com.serotonin.bacnet4j.type.enumerated.ErrorClass;
 import com.serotonin.bacnet4j.type.enumerated.ErrorCode;
@@ -87,9 +76,7 @@ import com.serotonin.bacnet4j.type.primitive.ObjectIdentifier;
 import com.serotonin.bacnet4j.type.primitive.OctetString;
 import com.serotonin.bacnet4j.type.primitive.Unsigned16;
 import com.serotonin.bacnet4j.type.primitive.UnsignedInteger;
-import com.serotonin.bacnet4j.util.PropertyReferences;
-import com.serotonin.bacnet4j.util.PropertyValues;
-import com.serotonin.util.Tuple;
+import com.serotonin.bacnet4j.util.RequestUtils;
 
 /**
  * Enhancements: - default character string encoding - BIBBs (B-OWS) (services to implement) - AE-N-A - AE-ACK-A -
@@ -116,12 +103,10 @@ public class LocalDevice {
 
     private boolean strict;
 
-    // Misc configuration.
-    private int maxReadMultipleReferencesSegmented = 200;
-    private int maxReadMultipleReferencesNonsegmented = 20;
-
     // Event listeners
     private final DeviceEventHandler eventHandler = new DeviceEventHandler();
+
+    //private final DeviceEventHandler eventHandler = new DeviceEventAsyncHandler();
 
     public LocalDevice(int deviceId, Transport transport) {
         this.transport = transport;
@@ -198,6 +183,10 @@ public class LocalDevice {
         this.executorService = executorService;
     }
 
+    public NetworkIdentifier getNetworkIdentifier() {
+        return transport.getNetworkIdentifier();
+    }
+
     /**
      * @return the strict
      */
@@ -220,7 +209,8 @@ public class LocalDevice {
         }
         else
             ownsExecutorService = false;
-        eventHandler.initialize(executorService);
+        // For the async handler
+        //eventHandler.initialize(executorService);
         transport.initialize();
         initialized = true;
     }
@@ -268,22 +258,6 @@ public class LocalDevice {
         if (password == null)
             password = "";
         this.password = password;
-    }
-
-    public int getMaxReadMultipleReferencesSegmented() {
-        return maxReadMultipleReferencesSegmented;
-    }
-
-    public void setMaxReadMultipleReferencesSegmented(int maxReadMultipleReferencesSegmented) {
-        this.maxReadMultipleReferencesSegmented = maxReadMultipleReferencesSegmented;
-    }
-
-    public int getMaxReadMultipleReferencesNonsegmented() {
-        return maxReadMultipleReferencesNonsegmented;
-    }
-
-    public void setMaxReadMultipleReferencesNonsegmented(int maxReadMultipleReferencesNonsegmented) {
-        this.maxReadMultipleReferencesNonsegmented = maxReadMultipleReferencesNonsegmented;
     }
 
     //
@@ -397,14 +371,15 @@ public class LocalDevice {
                 d.getSegmentationSupported(), serviceRequest);
     }
 
-    public AcknowledgementService send(Address address, int maxAPDULengthAccepted, Segmentation segmentationSupported,
-            ConfirmedRequestService serviceRequest) throws BACnetException {
-        return transport.send(address, null, maxAPDULengthAccepted, segmentationSupported, serviceRequest);
+    public AcknowledgementService send(Address address, MaxApduLength maxAPDULength,
+            Segmentation segmentationSupported, ConfirmedRequestService serviceRequest) throws BACnetException {
+        return transport.send(address, null, maxAPDULength.getMaxLength(), segmentationSupported, serviceRequest);
     }
 
-    public AcknowledgementService send(Address address, OctetString linkService, int maxAPDULengthAccepted,
+    public AcknowledgementService send(Address address, OctetString linkService, MaxApduLength maxAPDULength,
             Segmentation segmentationSupported, ConfirmedRequestService serviceRequest) throws BACnetException {
-        return transport.send(address, linkService, maxAPDULengthAccepted, segmentationSupported, serviceRequest);
+        return transport
+                .send(address, linkService, maxAPDULength.getMaxLength(), segmentationSupported, serviceRequest);
     }
 
     public void sendUnconfirmed(Address address, UnconfirmedRequestService serviceRequest) throws BACnetException {
@@ -636,256 +611,29 @@ public class LocalDevice {
         }
     }
 
-    public Encodable sendReadPropertyAllowNull(RemoteDevice d, ObjectIdentifier oid, PropertyIdentifier pid)
-            throws BACnetException {
-        return sendReadPropertyAllowNull(d, oid, pid, null);
-    }
-
-    /**
-     * Sends a ReadProperty-Request and ignores Error responses where the class is Property and the code is
-     * unknownProperty. Returns null in this case.
-     */
-    public Encodable sendReadPropertyAllowNull(RemoteDevice d, ObjectIdentifier oid, PropertyIdentifier pid,
-            UnsignedInteger propertyArrayIndex) throws BACnetException {
-        try {
-            ReadPropertyAck ack = (ReadPropertyAck) send(d, new ReadPropertyRequest(oid, pid, propertyArrayIndex));
-            return ack.getValue();
-        }
-        catch (AbortAPDUException e) {
-            if (e.getApdu().getAbortReason() == AbortReason.bufferOverflow.intValue()
-                    || e.getApdu().getAbortReason() == AbortReason.segmentationNotSupported.intValue()) {
-                // The response may be too long to send. If the property is a sequence...
-                if (ObjectProperties.getPropertyTypeDefinition(oid.getObjectType(), pid).isSequence()) {
-                    // ... then try getting it by sending requests for indices. Find out how many there are.
-                    int len = ((UnsignedInteger) sendReadPropertyAllowNull(d, oid, pid, new UnsignedInteger(0)))
-                            .intValue();
-
-                    // Create a list of individual property references.
-                    PropertyReferences refs = new PropertyReferences();
-                    for (int i = 1; i <= len; i++)
-                        refs.add(oid, new PropertyReference(pid, new UnsignedInteger(i)));
-
-                    // Send the request. Use the method that automatically partitions the request.
-                    PropertyValues pvs = readProperties(d, refs);
-
-                    // We know that the original request property was a sequence, so create one to store the result.
-                    SequenceOf<Encodable> list = new SequenceOf<Encodable>();
-                    for (int i = 1; i <= len; i++)
-                        list.add(pvs.getNoErrorCheck(oid, new PropertyReference(pid, new UnsignedInteger(i))));
-
-                    // And there you go.
-                    return list;
-                }
-                throw e;
-            }
-            throw e;
-        }
-        catch (ErrorAPDUException e) {
-            if (e.getBACnetError().equals(ErrorClass.property, ErrorCode.unknownProperty))
-                return null;
-            throw e;
-        }
-    }
-
-    public void getExtendedDeviceInformation(RemoteDevice d) throws BACnetException {
-        ObjectIdentifier oid = d.getObjectIdentifier();
-
-        // Get the device's supported services
-        ReadPropertyAck supportedServicesAck = (ReadPropertyAck) send(d, new ReadPropertyRequest(oid,
-                PropertyIdentifier.protocolServicesSupported));
-        d.setServicesSupported((ServicesSupported) supportedServicesAck.getValue());
-
-        // Uses the readProperties method here because this list will probably be extended.
-        PropertyReferences properties = new PropertyReferences();
-        properties.add(oid, PropertyIdentifier.objectName);
-        properties.add(oid, PropertyIdentifier.protocolVersion);
-        properties.add(oid, PropertyIdentifier.protocolRevision);
-
-        PropertyValues values = readProperties(d, properties);
-
-        d.setName(values.getString(oid, PropertyIdentifier.objectName));
-        d.setProtocolVersion((UnsignedInteger) values.getNullOnError(oid, PropertyIdentifier.protocolVersion));
-        d.setProtocolRevision((UnsignedInteger) values.getNullOnError(oid, PropertyIdentifier.protocolRevision));
-    }
-
-    /**
-     * This version of the readProperties method will preserve the order of properties given in the list in the results.
-     * 
-     * @param d
-     *            the device to which to send the request
-     * @param oprs
-     *            the list of property references to request
-     * @return a list of the original property reference objects wrapped with their values
-     * @throws BACnetException
-     */
-    public List<Tuple<ObjectPropertyReference, Encodable>> readProperties(RemoteDevice d,
-            List<ObjectPropertyReference> oprs) throws BACnetException {
-        PropertyReferences refs = new PropertyReferences();
-        for (ObjectPropertyReference opr : oprs)
-            refs.add(opr.getObjectIdentifier(), opr.getPropertyIdentifier());
-
-        PropertyValues pvs = readProperties(d, refs);
-
-        // Read the properties in the same order.
-        List<Tuple<ObjectPropertyReference, Encodable>> results = new ArrayList<Tuple<ObjectPropertyReference, Encodable>>();
-        for (ObjectPropertyReference opr : oprs)
-            results.add(new Tuple<ObjectPropertyReference, Encodable>(opr, pvs.getNoErrorCheck(opr)));
-
-        return results;
-    }
-
-    public PropertyValues readProperties(RemoteDevice d, PropertyReferences refs) throws BACnetException {
-        Map<ObjectIdentifier, List<PropertyReference>> properties;
-        PropertyValues propertyValues = new PropertyValues();
-
-        boolean multipleSupported = d.getServicesSupported() != null
-                && d.getServicesSupported().isReadPropertyMultiple();
-
-        boolean forceMultiple = false;
-        // Check if a "special" property identifier is contained in the references.
-        for (List<PropertyReference> prs : refs.getProperties().values()) {
-            for (PropertyReference pr : prs) {
-                PropertyIdentifier pi = pr.getPropertyIdentifier();
-                if (pi.equals(PropertyIdentifier.all) || pi.equals(PropertyIdentifier.required)
-                        || pi.equals(PropertyIdentifier.optional)) {
-                    forceMultiple = true;
-                    break;
-                }
-            }
-
-            if (forceMultiple)
-                break;
-        }
-
-        if (forceMultiple && !multipleSupported)
-            throw new BACnetException("Cannot send request. ReadPropertyMultiple is required but not supported.");
-
-        if (forceMultiple || (refs.size() > 1 && multipleSupported)) {
-            // Read property multiple can be used. Determine the max references
-            int maxRef = maxReadMultipleReferencesNonsegmented;
-            if (d.getSegmentationSupported().hasTransmitSegmentation())
-                // If the device can transmit segmented, we can probably send a lot more references.
-                maxRef = maxReadMultipleReferencesSegmented;
-
-            // If the device supports read property multiple, send them all at once, or at least in partitions.
-            List<PropertyReferences> partitions = refs.getPropertiesPartitioned(maxRef);
-            int counter = 0;
-            for (PropertyReferences partition : partitions) {
-                properties = partition.getProperties();
-                List<ReadAccessSpecification> specs = new ArrayList<ReadAccessSpecification>();
-                for (ObjectIdentifier oid : properties.keySet())
-                    specs.add(new ReadAccessSpecification(oid, new SequenceOf<PropertyReference>(properties.get(oid))));
-
-                ReadPropertyMultipleRequest request = new ReadPropertyMultipleRequest(
-                        new SequenceOf<ReadAccessSpecification>(specs));
-
-                ReadPropertyMultipleAck ack;
-                try {
-                    ack = (ReadPropertyMultipleAck) send(d, request);
-                    counter++;
-
-                    List<ReadAccessResult> results = ack.getListOfReadAccessResults().getValues();
-                    ObjectIdentifier oid;
-                    for (ReadAccessResult objectResult : results) {
-                        oid = objectResult.getObjectIdentifier();
-                        for (Result result : objectResult.getListOfResults().getValues())
-                            propertyValues.add(oid, result.getPropertyIdentifier(), result.getPropertyArrayIndex(),
-                                    result.getReadResult().getDatum());
-                    }
-                }
-                catch (AbortAPDUException e) {
-                    if (e.getApdu().getAbortReason() == AbortReason.bufferOverflow.intValue()
-                            || e.getApdu().getAbortReason() == AbortReason.segmentationNotSupported.intValue())
-                        sendOneAtATime(d, partition, propertyValues);
-                    else
-                        throw new BACnetException("Completed " + counter + " requests. Excepted on: " + request, e);
-                }
-                catch (BACnetException e) {
-                    throw new BACnetException("Completed " + counter + " requests. Excepted on: " + request, e);
-                }
-            }
-        }
-        else
-            // If it doesn't support read property multiple, send them one at a time.
-            sendOneAtATime(d, refs, propertyValues);
-
-        return propertyValues;
-    }
-
-    private void sendOneAtATime(RemoteDevice d, PropertyReferences refs, PropertyValues propertyValues)
-            throws BACnetException {
-        List<PropertyReference> refList;
-        ReadPropertyRequest request;
-        ReadPropertyAck ack;
-        Map<ObjectIdentifier, List<PropertyReference>> properties = refs.getProperties();
-        for (ObjectIdentifier oid : properties.keySet()) {
-            refList = properties.get(oid);
-            for (PropertyReference ref : refList) {
-                request = new ReadPropertyRequest(oid, ref.getPropertyIdentifier(), ref.getPropertyArrayIndex());
-                try {
-                    ack = (ReadPropertyAck) send(d, request);
-                    propertyValues.add(oid, ack.getPropertyIdentifier(), ack.getPropertyArrayIndex(), ack.getValue());
-                }
-                catch (ErrorAPDUException e) {
-                    propertyValues.add(oid, ref.getPropertyIdentifier(), ref.getPropertyArrayIndex(),
-                            e.getBACnetError());
-                }
-            }
-        }
-    }
-
-    public PropertyValues readPresentValues(RemoteDevice d) throws BACnetException {
-        return readPresentValues(d, d.getObjects());
-    }
-
-    public PropertyValues readPresentValues(RemoteDevice d, List<RemoteObject> objs) throws BACnetException {
-        List<ObjectIdentifier> oids = new ArrayList<ObjectIdentifier>(objs.size());
-        for (RemoteObject o : d.getObjects())
-            oids.add(o.getObjectIdentifier());
-        return readOidPresentValues(d, oids);
-    }
-
-    public PropertyValues readOidPresentValues(RemoteDevice d, List<ObjectIdentifier> oids) throws BACnetException {
-        if (oids.size() == 0)
-            return new PropertyValues();
-
-        PropertyReferences refs = new PropertyReferences();
-        for (ObjectIdentifier oid : oids)
-            refs.add(oid, PropertyIdentifier.presentValue);
-
-        return readProperties(d, refs);
-    }
-
-    public void setProperty(RemoteDevice d, ObjectIdentifier oid, PropertyIdentifier pid, Encodable value)
-            throws BACnetException {
-        send(d, new WritePropertyRequest(oid, pid, null, value, null));
-    }
-
-    public void setPresentValue(RemoteDevice d, ObjectIdentifier oid, Encodable value) throws BACnetException {
-        setProperty(d, oid, PropertyIdentifier.presentValue, value);
-    }
-
     //
     // Manual device discovery
-    public RemoteDevice findRemoteDevice(Address address, OctetString linkService, int deviceId)
-            throws BACnetException, PropertyValueException {
+    public RemoteDevice findRemoteDevice(Address address, OctetString linkService, int deviceId) throws BACnetException {
+        RemoteDevice d = getRemoteDeviceImpl(deviceId, address, linkService);
+        if (d != null)
+            return d;
+
         ObjectIdentifier deviceOid = new ObjectIdentifier(ObjectType.device, deviceId);
         ReadPropertyRequest req = new ReadPropertyRequest(deviceOid, PropertyIdentifier.maxApduLengthAccepted);
-        ReadPropertyAck ack = (ReadPropertyAck) transport.send(address, linkService, 1476, Segmentation.noSegmentation,
-                req);
+        ReadPropertyAck ack = (ReadPropertyAck) transport.send(address, linkService,
+                MaxApduLength.UP_TO_50.getMaxLength(), Segmentation.noSegmentation, req);
 
         // If we got this far, then we got a response. Now get the other required properties.
-        RemoteDevice d = new RemoteDevice(deviceOid.getInstanceNumber(), address, linkService);
+        d = new RemoteDevice(deviceOid.getInstanceNumber(), address, linkService);
         d.setMaxAPDULengthAccepted(((UnsignedInteger) ack.getValue()).intValue());
         d.setSegmentationSupported(Segmentation.noSegmentation);
 
-        PropertyReferences refs = new PropertyReferences();
-        refs.add(deviceOid, PropertyIdentifier.segmentationSupported);
-        refs.add(deviceOid, PropertyIdentifier.vendorIdentifier);
-        PropertyValues values = readProperties(d, refs);
-
-        d.setSegmentationSupported((Segmentation) values.get(deviceOid, PropertyIdentifier.segmentationSupported));
-        d.setVendorId(((Unsigned16) values.get(deviceOid, PropertyIdentifier.vendorIdentifier)).intValue());
+        Map<PropertyIdentifier, Encodable> map = RequestUtils.getProperties(this, d, null,
+                PropertyIdentifier.segmentationSupported, PropertyIdentifier.vendorIdentifier,
+                PropertyIdentifier.protocolServicesSupported);
+        d.setSegmentationSupported((Segmentation) map.get(PropertyIdentifier.segmentationSupported));
+        d.setVendorId(((Unsigned16) map.get(PropertyIdentifier.vendorIdentifier)).intValue());
+        d.setServicesSupported((ServicesSupported) map.get(PropertyIdentifier.protocolServicesSupported));
 
         addRemoteDevice(d);
 

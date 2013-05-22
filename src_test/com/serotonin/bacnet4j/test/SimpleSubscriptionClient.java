@@ -2,7 +2,7 @@ package com.serotonin.bacnet4j.test;
 
 import com.serotonin.bacnet4j.LocalDevice;
 import com.serotonin.bacnet4j.RemoteDevice;
-import com.serotonin.bacnet4j.event.DefaultDeviceEventListener;
+import com.serotonin.bacnet4j.event.DeviceEventAdapter;
 import com.serotonin.bacnet4j.npdu.ip.InetAddrCache;
 import com.serotonin.bacnet4j.npdu.ip.IpNetwork;
 import com.serotonin.bacnet4j.service.confirmed.SubscribeCOVRequest;
@@ -50,7 +50,7 @@ public class SimpleSubscriptionClient {
         }
     }
 
-    static class Listener extends DefaultDeviceEventListener {
+    static class Listener extends DeviceEventAdapter {
         @Override
         public void covNotificationReceived(UnsignedInteger subscriberProcessIdentifier, RemoteDevice initiatingDevice,
                 ObjectIdentifier monitoredObjectIdentifier, UnsignedInteger timeRemaining,

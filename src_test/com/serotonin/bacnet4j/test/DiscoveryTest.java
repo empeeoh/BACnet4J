@@ -26,7 +26,7 @@ import java.util.List;
 
 import com.serotonin.bacnet4j.LocalDevice;
 import com.serotonin.bacnet4j.RemoteDevice;
-import com.serotonin.bacnet4j.event.DefaultDeviceEventListener;
+import com.serotonin.bacnet4j.event.DeviceEventAdapter;
 import com.serotonin.bacnet4j.npdu.ip.IpNetwork;
 import com.serotonin.bacnet4j.service.unconfirmed.WhoIsRequest;
 import com.serotonin.bacnet4j.transport.Transport;
@@ -36,6 +36,7 @@ import com.serotonin.bacnet4j.type.enumerated.PropertyIdentifier;
 import com.serotonin.bacnet4j.type.primitive.ObjectIdentifier;
 import com.serotonin.bacnet4j.util.PropertyReferences;
 import com.serotonin.bacnet4j.util.PropertyValues;
+import com.serotonin.bacnet4j.util.RequestUtils;
 
 /**
  * @author Matthew Lohbihler
@@ -44,7 +45,7 @@ public class DiscoveryTest {
     @SuppressWarnings("unchecked")
     public static void main(String[] args) throws Exception {
         IpNetwork network = new IpNetwork(IpNetwork.DEFAULT_BROADCAST_IP, IpNetwork.DEFAULT_PORT,
-                IpNetwork.DEFAULT_BIND_IP, 9746);
+                IpNetwork.DEFAULT_BIND_IP, 1);
 
         // LocalDevice localDevice = new LocalDevice(1234, "192.168.0.255");
         LocalDevice localDevice = new LocalDevice(1234, new Transport(network));
@@ -70,15 +71,15 @@ public class DiscoveryTest {
 
         // Get extended information for all remote devices.
         for (RemoteDevice d : localDevice.getRemoteDevices()) {
-            localDevice.getExtendedDeviceInformation(d);
-            List<ObjectIdentifier> oids = ((SequenceOf<ObjectIdentifier>) localDevice.sendReadPropertyAllowNull(d,
-                    d.getObjectIdentifier(), PropertyIdentifier.objectList)).getValues();
+            RequestUtils.getExtendedDeviceInformation(localDevice, d);
+            List<ObjectIdentifier> oids = ((SequenceOf<ObjectIdentifier>) RequestUtils.sendReadPropertyAllowNull(
+                    localDevice, d, d.getObjectIdentifier(), PropertyIdentifier.objectList)).getValues();
 
             PropertyReferences refs = new PropertyReferences();
             for (ObjectIdentifier oid : oids)
                 addPropertyReferences(refs, oid);
 
-            PropertyValues pvs = localDevice.readProperties(d, refs);
+            PropertyValues pvs = RequestUtils.readProperties(localDevice, d, refs, null);
             // pvs.
             System.out.println(pvs);
             System.out.println(d);
@@ -122,7 +123,7 @@ public class DiscoveryTest {
         refs.add(oid, PropertyIdentifier.presentValue);
     }
 
-    static class Listener extends DefaultDeviceEventListener {
+    static class Listener extends DeviceEventAdapter {
         @Override
         public void iAmReceived(RemoteDevice d) {
             System.out.println("IAm received" + d);

@@ -204,6 +204,11 @@ public class Address extends BaseType {
     }
 
     @Override
+    public String toString() {
+        return "Address [networkNumber=" + networkNumber + ", macAddress=" + macAddress + "]";
+    }
+
+    @Override
     public int hashCode() {
         final int PRIME = 31;
         int result = 1;

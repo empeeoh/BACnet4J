@@ -6,6 +6,7 @@ import com.serotonin.bacnet4j.exception.BACnetException;
 import com.serotonin.bacnet4j.npdu.IncomingRequestParser;
 import com.serotonin.bacnet4j.npdu.MessageValidationAssertionException;
 import com.serotonin.bacnet4j.npdu.Network;
+import com.serotonin.bacnet4j.npdu.NetworkIdentifier;
 import com.serotonin.bacnet4j.transport.Transport;
 import com.serotonin.bacnet4j.type.constructed.Address;
 import com.serotonin.bacnet4j.type.primitive.OctetString;
@@ -41,6 +42,11 @@ public class MstpNetwork extends Network {
     }
 
     @Override
+    public NetworkIdentifier getNetworkIdentifier() {
+        return new MstpNetworkIdentifier(node.getCommPortId());
+    }
+
+    @Override
     public Address getLocalBroadcastAddress() {
         return new Address(getLocalNetworkNumber(), (byte) 0xFF);
     }
@@ -48,6 +54,12 @@ public class MstpNetwork extends Network {
     @Override
     public Address[] getAllLocalAddresses() {
         return new Address[] { new Address(getLocalNetworkNumber(), node.getThisStation()) };
+    }
+
+    @Override
+    public void checkSendThread() {
+        if (Thread.currentThread() == node.thread)
+            throw new IllegalStateException("Cannot send a request in the socket listener thread.");
     }
 
     @Override
@@ -92,7 +104,7 @@ public class MstpNetwork extends Network {
     // Incoming frames
     //
     void receivedFrame(Frame frame) {
-        executeParser(new IncomingFrameHandler(this, frame));
+        new IncomingFrameHandler(this, frame).run();
     }
 
     class IncomingFrameHandler extends IncomingRequestParser {

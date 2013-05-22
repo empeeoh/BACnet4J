@@ -17,6 +17,7 @@ import com.serotonin.bacnet4j.type.constructed.SequenceOf;
 import com.serotonin.bacnet4j.type.enumerated.ObjectType;
 import com.serotonin.bacnet4j.type.enumerated.PropertyIdentifier;
 import com.serotonin.bacnet4j.type.primitive.ObjectIdentifier;
+import com.serotonin.bacnet4j.util.RequestUtils;
 
 /**
  * Use with SlaveDeviceTest
@@ -37,9 +38,9 @@ public class FileAccessTest {
             RemoteDevice fileDev = null;
             ObjectIdentifier file = null;
             for (RemoteDevice d : localDevice.getRemoteDevices()) {
-                localDevice.getExtendedDeviceInformation(d);
-                List<ObjectIdentifier> oids = ((SequenceOf<ObjectIdentifier>) localDevice.sendReadPropertyAllowNull(d,
-                        d.getObjectIdentifier(), PropertyIdentifier.objectList)).getValues();
+                RequestUtils.getExtendedDeviceInformation(localDevice, d);
+                List<ObjectIdentifier> oids = ((SequenceOf<ObjectIdentifier>) RequestUtils.sendReadPropertyAllowNull(
+                        localDevice, d, d.getObjectIdentifier(), PropertyIdentifier.objectList)).getValues();
 
                 for (ObjectIdentifier oid : oids) {
                     if (oid.getObjectType().equals(ObjectType.file)) {

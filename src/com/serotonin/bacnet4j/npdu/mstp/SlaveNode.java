@@ -2,6 +2,7 @@ package com.serotonin.bacnet4j.npdu.mstp;
 
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.serotonin.io.serial.SerialParameters;
@@ -62,28 +63,35 @@ public class SlaveNode extends MstpNode {
     private void idle() {
         if (receivedInvalidFrame != null) {
             // ReceivedInvalidFrame
-            debug("idle:ReceivedInvalidFrame");
-            LOG.warning("Received invalid frame: " + receivedInvalidFrame);
+            // debug("idle:ReceivedInvalidFrame");
+            if (LOG.isLoggable(Level.FINE))
+                LOG.fine("Received invalid frame: " + receivedInvalidFrame);
             receivedInvalidFrame = null;
             activity = true;
         }
         else if (receivedValidFrame) {
             FrameType type = frame.getFrameType();
 
-            if (type == null)
+            if (type == null) {
                 // ReceivedUnwantedFrame
-                LOG.warning("Unknown frame type");
+                if (LOG.isLoggable(Level.FINE))
+                    LOG.fine("Unknown frame type");
+            }
             else if (frame.broadcast()
-                    && type.oneOf(FrameType.token, FrameType.bacnetDataExpectingReply, FrameType.testRequest))
+                    && type.oneOf(FrameType.token, FrameType.bacnetDataExpectingReply, FrameType.testRequest)) {
                 // ReceivedUnwantedFrame
-                LOG.warning("Frame type should not be broadcast: " + type);
+                if (LOG.isLoggable(Level.FINE))
+                    LOG.fine("Frame type should not be broadcast: " + type);
+            }
             else if (type.oneOf(FrameType.pollForMaster))
                 // ReceivedUnwantedFrame
                 ; // It happens
             else if (type.oneOf(FrameType.token, FrameType.pollForMaster, FrameType.replyToPollForMaster,
-                    FrameType.replyPostponed))
+                    FrameType.replyPostponed)) {
                 // ReceivedUnwantedFrame
-                LOG.warning("Received unwanted frame type: " + type);
+                if (LOG.isLoggable(Level.FINE))
+                    LOG.fine("Received unwanted frame type: " + type);
+            }
             else if (frame.forStationOrBroadcast(thisStation)
                     && type.oneOf(FrameType.bacnetDataNotExpectingReply, FrameType.testResponse)) {
                 // ReceivedDataNoReply
@@ -122,7 +130,8 @@ public class SlaveNode extends MstpNode {
             else if (replyDeadline >= timeSource.currentTimeMillis()) {
                 // CannotReply
                 //                debug("answerDataRequest:CannotReply");
-                LOG.warning("Failed to respond to request: " + frame);
+                if (LOG.isLoggable(Level.FINE))
+                    LOG.fine("Failed to respond to request: " + frame);
                 state = SlaveNodeState.idle;
                 activity = true;
             }

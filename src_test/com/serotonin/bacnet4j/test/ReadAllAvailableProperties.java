@@ -56,6 +56,7 @@ import com.serotonin.bacnet4j.type.primitive.ObjectIdentifier;
 import com.serotonin.bacnet4j.type.primitive.UnsignedInteger;
 import com.serotonin.bacnet4j.util.PropertyReferences;
 import com.serotonin.bacnet4j.util.PropertyValues;
+import com.serotonin.bacnet4j.util.RequestUtils;
 
 /**
  * Discovers and devices and print all properties of all objects found. this is done by using PropertyIdentifier.all so
@@ -175,10 +176,10 @@ public class ReadAllAvailableProperties {
     private void printDevices() throws BACnetException {
         for (RemoteDevice d : remoteDevices) {
 
-            localDevice.getExtendedDeviceInformation(d);
+            RequestUtils.getExtendedDeviceInformation(localDevice, d);
 
-            List<ObjectIdentifier> oids = ((SequenceOf<ObjectIdentifier>) localDevice.sendReadPropertyAllowNull(d,
-                    d.getObjectIdentifier(), PropertyIdentifier.objectList)).getValues();
+            List<ObjectIdentifier> oids = ((SequenceOf<ObjectIdentifier>) RequestUtils.sendReadPropertyAllowNull(
+                    localDevice, d, d.getObjectIdentifier(), PropertyIdentifier.objectList)).getValues();
 
             PropertyReferences refs = new PropertyReferences();
             // add the property references of the "device object" to the list
@@ -192,7 +193,7 @@ public class ReadAllAvailableProperties {
             System.out.println("Start read properties");
             final long start = System.currentTimeMillis();
 
-            PropertyValues pvs = localDevice.readProperties(d, refs);
+            PropertyValues pvs = RequestUtils.readProperties(localDevice, d, refs, null);
             System.out.println(String.format("Properties read done in %d ms", System.currentTimeMillis() - start));
             printObject(d.getObjectIdentifier(), pvs);
             for (ObjectIdentifier oid : oids) {

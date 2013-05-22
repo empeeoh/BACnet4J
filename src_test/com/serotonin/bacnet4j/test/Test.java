@@ -27,6 +27,7 @@ import java.util.List;
 
 import com.serotonin.bacnet4j.LocalDevice;
 import com.serotonin.bacnet4j.RemoteDevice;
+import com.serotonin.bacnet4j.enums.MaxApduLength;
 import com.serotonin.bacnet4j.npdu.ip.InetAddrCache;
 import com.serotonin.bacnet4j.service.acknowledgement.AcknowledgementService;
 import com.serotonin.bacnet4j.service.acknowledgement.CreateObjectAck;
@@ -59,12 +60,15 @@ import com.serotonin.bacnet4j.type.enumerated.Segmentation;
 import com.serotonin.bacnet4j.type.primitive.Boolean;
 import com.serotonin.bacnet4j.type.primitive.CharacterString;
 import com.serotonin.bacnet4j.type.primitive.ObjectIdentifier;
+import com.serotonin.bacnet4j.type.primitive.OctetString;
 import com.serotonin.bacnet4j.type.primitive.Real;
 import com.serotonin.bacnet4j.type.primitive.UnsignedInteger;
+import com.serotonin.bacnet4j.util.RequestUtils;
 
 public class Test {
     public static void main(String[] args) {
-        new Address(0, "192.168.0.70:47808");
+        //        new Address(0, "192.168.0.70:47808");
+        new OctetString("192.168.2.3:47808", 47808);
     }
 
     //    public static void main(String[] args) throws Exception {
@@ -158,7 +162,7 @@ public class Test {
         rd.setMaxAPDULengthAccepted(1476);
 
         d.addRemoteDevice(rd);
-        d.getExtendedDeviceInformation(rd);
+        RequestUtils.getExtendedDeviceInformation(d, rd);
 
         // List<ObjectIdentifier> oids = ((SequenceOf<ObjectIdentifier>)d.sendReadPropertyAllowNull(
         // rd, rd.getObjectIdentifier(), PropertyIdentifier.objectList)).getValues();
@@ -277,7 +281,7 @@ public class Test {
 
     public static AcknowledgementService send(LocalDevice d, ConfirmedRequestService s) throws Exception {
         Address a = new Address(InetAddrCache.get("localhost", 0xbac1));
-        return d.send(a, null, 35, Segmentation.segmentedBoth, s);
+        return d.send(a, null, MaxApduLength.UP_TO_50, Segmentation.segmentedBoth, s);
     }
 
     public static void test2(LocalDevice d) throws Exception {

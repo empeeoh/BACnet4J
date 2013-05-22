@@ -1,7 +1,5 @@
 package com.serotonin.bacnet4j.npdu;
 
-import java.util.concurrent.ExecutorService;
-
 import com.serotonin.bacnet4j.apdu.APDU;
 import com.serotonin.bacnet4j.enums.MaxApduLength;
 import com.serotonin.bacnet4j.exception.BACnetException;
@@ -13,7 +11,6 @@ import com.serotonin.util.queue.ByteQueue;
 abstract public class Network {
     private final int localNetworkNumber;
     private Transport transport;
-    private ExecutorService incomingExecutorService;
 
     public Network() {
         this(0);
@@ -27,15 +24,20 @@ abstract public class Network {
         return localNetworkNumber;
     }
 
+    public void setTransport(Transport transport) {
+        this.transport = transport;
+    }
+
     public Transport getTransport() {
         return transport;
     }
+
+    abstract public NetworkIdentifier getNetworkIdentifier();
 
     abstract public MaxApduLength getMaxApduLength();
 
     public void initialize(Transport transport) throws Exception {
         this.transport = transport;
-        incomingExecutorService = transport.getLocalDevice().getExecutorService();
     }
 
     abstract public void terminate();
@@ -46,6 +48,8 @@ abstract public class Network {
 
     abstract public void sendAPDU(Address recipient, OctetString linkService, APDU apdu, boolean broadcast)
             throws BACnetException;
+
+    abstract public void checkSendThread();
 
     protected void writeNpci(ByteQueue queue, Address recipient, OctetString link, APDU apdu) {
         NPCI npci;
@@ -63,13 +67,6 @@ abstract public class Network {
             npci = new NPCI(recipient, null, apdu.expectsReply());
         }
         npci.write(queue);
-    }
-
-    protected void executeParser(IncomingRequestParser parser) {
-        if (incomingExecutorService == null)
-            parser.run();
-        else if (!incomingExecutorService.isShutdown())
-            incomingExecutorService.execute(parser);
     }
 
     protected boolean isLocal(Address recipient) {

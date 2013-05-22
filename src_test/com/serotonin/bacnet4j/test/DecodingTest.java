@@ -1,13 +1,16 @@
 package com.serotonin.bacnet4j.test;
 
-import com.serotonin.bacnet4j.npdu.ip.IpNetwork;
+import com.serotonin.bacnet4j.apdu.APDU;
+import com.serotonin.bacnet4j.apdu.ComplexACK;
 import com.serotonin.bacnet4j.service.unconfirmed.UnconfirmedRequestService;
 import com.serotonin.bacnet4j.type.constructed.ServicesSupported;
 import com.serotonin.util.queue.ByteQueue;
 
 public class DecodingTest {
     public static void main(String[] args) throws Exception {
-        String s = "81,a,0,d,1,0,50,9d,9,91,1,91,1f";
+        String s = "3c0700030c0c02000075194c3ec402000075c400000001c400000002c400800003c400800004c401400005c404c00006c404c00007c400800008c40000000ac40080000bc40080000cc40080000dc40080000ec40080000fc400800010c400000011c400800012c400800013c400800014c400800015c400800016c400800017c400c00018c400c00019c40140001ac40140001bc40140001cc404c0001dc404c0001ec40140001fc404c00020c404c00021c400800022c400800023c401400024c404c00025c400800026c401400027c401400028c404c00029c404c0002ac404c0002bc404c0002cc40000002dc40000002ec40000002fc400800030c400800031c400800032c400800033c400800034c400800035c400800036c400800037c400c00038c400c00039c40140003ac40140003bc40140003cc40140003dc404c0003ec404c0003fc404c00040c404c00041c400000042c400000043c400800044c400800045c400800046c400800047c400800048c400800049c40080004ac40080004bc400c0004cc400c0004dc40140004ec40140004fc401400050c401400051c404c00052c404c00053c404c00054c404c00055c400800056c401400057c400000058c404c00059c404c0005ac40080005bc40080005cc40140005dc404c0005ec400";
+
+        //String s = "81,a,0,d,1,0,50,9d,9,91,1,91,1f";
         // String s = "[81,b,0,14,1,0,10,0,c4,2,0,8,98,22,1,e0,91,0,21,8]";
         // String input = "[81,4,0,23,c0,a8,1,5a,ba,c0,1,8,27,28,6,0,40,ae,0,73,8f,10,0,c4,2,0,9,60,22,1,e0,91,0,21,8]";
         // String input = "[81,4,0,1e,c0,a8,1,5a,ba,c0,1,8,4e,38,1,3,10,0,c4,2,0,9,63,22,1,e0,91,0,21,8]";
@@ -83,7 +86,10 @@ public class DecodingTest {
 
         // String s = "810a0015010030080c0c004003e8195729083e003f";
 
-        new IpNetwork().testDecoding(toBytes(s));
+        //        new IpNetwork().testDecoding(toBytes(s));
+
+        ComplexACK ca = (ComplexACK) APDU.createAPDU(null, new ByteQueue(toBytes(s)));
+        ca.parseServiceData();
     }
 
     static void test2() throws Exception {

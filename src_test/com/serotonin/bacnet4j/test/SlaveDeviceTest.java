@@ -57,7 +57,7 @@ import com.serotonin.bacnet4j.type.primitive.UnsignedInteger;
 
 public class SlaveDeviceTest {
     public static void main(String[] args) throws Exception {
-        LocalDevice localDevice = new LocalDevice(1968, new Transport(new IpNetwork("192.168.0.255", 2068)));
+        LocalDevice localDevice = new LocalDevice(1969, new Transport(new IpNetwork("192.168.0.255", 2068)));
         localDevice.getConfiguration().setProperty(PropertyIdentifier.objectName,
                 new CharacterString("BACnet4J slave device test"));
         localDevice.getEventHandler().addListener(new Listener());

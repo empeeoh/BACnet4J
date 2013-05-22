@@ -5,13 +5,14 @@ import java.util.logging.Logger;
 
 import com.serotonin.bacnet4j.LocalDevice;
 import com.serotonin.bacnet4j.RemoteDevice;
-import com.serotonin.bacnet4j.event.DefaultDeviceEventListener;
+import com.serotonin.bacnet4j.event.DeviceEventAdapter;
 import com.serotonin.bacnet4j.exception.BACnetException;
 import com.serotonin.bacnet4j.npdu.mstp.MasterNode;
 import com.serotonin.bacnet4j.npdu.mstp.MstpNetwork;
 import com.serotonin.bacnet4j.service.unconfirmed.WhoIsRequest;
 import com.serotonin.bacnet4j.transport.Transport;
 import com.serotonin.bacnet4j.type.enumerated.PropertyIdentifier;
+import com.serotonin.bacnet4j.util.RequestUtils;
 import com.serotonin.io.serial.SerialParameters;
 
 /**
@@ -27,7 +28,7 @@ public class SerialTest {
         Logger.getLogger(Logger.GLOBAL_LOGGER_NAME).setLevel(Level.FINEST);
 
         SerialParameters params = new SerialParameters();
-        params.setCommPortId("COM6");
+        params.setCommPortId("COM4");
         params.setBaudRate(9600);
         params.setPortOwnerName("Testing");
 
@@ -44,13 +45,13 @@ public class SerialTest {
         network.sendTestRequest((byte) 8);
     }
 
-    static class Listener extends DefaultDeviceEventListener {
+    static class Listener extends DeviceEventAdapter {
         @Override
         public void iAmReceived(RemoteDevice d) {
             System.out.println("Received IAm from " + d);
 
             try {
-                System.out.println(localDevice.sendReadPropertyAllowNull(d, d.getObjectIdentifier(),
+                System.out.println(RequestUtils.sendReadPropertyAllowNull(localDevice, d, d.getObjectIdentifier(),
                         PropertyIdentifier.objectList));
             }
             catch (BACnetException e) {

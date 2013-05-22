@@ -32,6 +32,7 @@ import java.util.LinkedList;
 import com.serotonin.bacnet4j.apdu.APDU;
 import com.serotonin.bacnet4j.apdu.Abort;
 import com.serotonin.bacnet4j.apdu.AckAPDU;
+import com.serotonin.bacnet4j.apdu.ComplexACK;
 import com.serotonin.bacnet4j.apdu.ConfirmedRequest;
 import com.serotonin.bacnet4j.apdu.Segmentable;
 import com.serotonin.bacnet4j.exception.BACnetException;
@@ -122,6 +123,10 @@ public class WaitingRoom {
 
     public void notifyMember(InetSocketAddress peer, Address linkService, byte id, boolean isFromServer, APDU apdu)
             throws BACnetException {
+        System.out.println("Received APDU (1): " + apdu);
+        if (apdu != null && apdu instanceof ComplexACK)
+            ((ComplexACK) apdu).parseServiceData();
+        System.out.println("Received APDU: " + apdu);
         Key key = new Key(peer, linkService, id, isFromServer);
         Member member = getMember(key);
         if (member != null) {

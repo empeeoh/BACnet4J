@@ -14,6 +14,7 @@ import com.serotonin.bacnet4j.type.enumerated.ObjectType;
 import com.serotonin.bacnet4j.type.enumerated.PropertyIdentifier;
 import com.serotonin.bacnet4j.type.primitive.CharacterString;
 import com.serotonin.bacnet4j.type.primitive.Real;
+import com.serotonin.bacnet4j.util.RequestUtils;
 
 /**
  * Tests that the UDP too many segments bug for more than 7 segments is fixed.
@@ -46,13 +47,13 @@ public class LargeSegmentTest {
         localDevice.initialize();
         Address address = new Address(BACnetUtils.dottedStringToBytes("127.0.0.1"), IpNetwork.DEFAULT_PORT);
         RemoteDevice remoteDevice = localDevice.findRemoteDevice(address, null, deviceWithObjectsId);
-        localDevice.getExtendedDeviceInformation(remoteDevice);
+        RequestUtils.getExtendedDeviceInformation(localDevice, remoteDevice);
 
         try {
             // When querying the list of objects
             @SuppressWarnings("unchecked")
-            SequenceOf<Encodable> list = (SequenceOf<Encodable>) localDevice.sendReadPropertyAllowNull(remoteDevice,
-                    remoteDevice.getObjectIdentifier(), PropertyIdentifier.objectList);
+            SequenceOf<Encodable> list = (SequenceOf<Encodable>) RequestUtils.sendReadPropertyAllowNull(localDevice,
+                    remoteDevice, remoteDevice.getObjectIdentifier(), PropertyIdentifier.objectList);
 
             // The device comes back in the object list, hence the extra 1
             final int expectedNumeberOfProperties = numberOfObjectsToCreate + 1;

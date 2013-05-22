@@ -75,29 +75,37 @@ public class PropertyValues implements Iterable<ObjectPropertyReference>, Serial
     }
 
     public Encodable getNullOnError(ObjectIdentifier oid, PropertyIdentifier pid) {
-        Encodable e = getNoErrorCheck(new ObjectPropertyReference(oid, pid));
-
-        if (e instanceof BACnetError)
-            return null;
-
-        return e;
+        return getNullOnError(getNoErrorCheck(new ObjectPropertyReference(oid, pid)));
     }
 
     public String getString(ObjectIdentifier oid, PropertyIdentifier pid) {
-        Encodable value = getNoErrorCheck(oid, pid);
+        return getString(getNoErrorCheck(oid, pid));
+    }
+
+    public String getString(ObjectIdentifier oid, PropertyIdentifier pid, String defaultValue) {
+        return getString(getNoErrorCheck(oid, pid), defaultValue);
+    }
+
+    @Override
+    public Iterator<ObjectPropertyReference> iterator() {
+        return values.keySet().iterator();
+    }
+
+    public static String getString(Encodable value) {
         if (value == null)
             return null;
         return value.toString();
     }
 
-    public String getString(ObjectIdentifier oid, PropertyIdentifier pid, String defaultValue) {
-        Encodable value = getNoErrorCheck(oid, pid);
+    public static String getString(Encodable value, String defaultValue) {
         if (value == null || value instanceof BACnetError)
             return defaultValue;
         return value.toString();
     }
 
-    public Iterator<ObjectPropertyReference> iterator() {
-        return values.keySet().iterator();
+    public static Encodable getNullOnError(Encodable value) {
+        if (value instanceof BACnetError)
+            return null;
+        return value;
     }
 }

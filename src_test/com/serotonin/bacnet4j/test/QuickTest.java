@@ -32,6 +32,7 @@ import com.serotonin.bacnet4j.type.primitive.Boolean;
 import com.serotonin.bacnet4j.type.primitive.CharacterString;
 import com.serotonin.bacnet4j.type.primitive.ObjectIdentifier;
 import com.serotonin.bacnet4j.type.primitive.UnsignedInteger;
+import com.serotonin.bacnet4j.util.RequestUtils;
 
 /**
  * @author Matthew Lohbihler
@@ -92,7 +93,7 @@ public class QuickTest {
             System.out.println("iAmReceived: d=" + d);
 
             try {
-                Encodable e = localDevice.sendReadPropertyAllowNull(d, d.getObjectIdentifier(),
+                Encodable e = RequestUtils.sendReadPropertyAllowNull(localDevice, d, d.getObjectIdentifier(),
                         PropertyIdentifier.objectList);
                 System.out.println(e);
             }

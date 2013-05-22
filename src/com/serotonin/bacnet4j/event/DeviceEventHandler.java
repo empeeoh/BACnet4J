@@ -26,7 +26,6 @@
 package com.serotonin.bacnet4j.event;
 
 import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.ExecutorService;
 
 import com.serotonin.bacnet4j.RemoteDevice;
 import com.serotonin.bacnet4j.RemoteObject;
@@ -49,22 +48,13 @@ import com.serotonin.bacnet4j.type.primitive.ObjectIdentifier;
 import com.serotonin.bacnet4j.type.primitive.UnsignedInteger;
 
 /**
- * Class to handle various events that occur on the local device. This class accepts 0 to many listeners, and uses a
- * executor queue to dispatch notifications where appropriate.
+ * Class to handle various events that occur on the local device. This class accepts 0 to many listeners, and dispatches
+ * notifications synchronously.
  * 
- * @author mlohbihler
+ * @author Matthew Lohbihler
  */
 public class DeviceEventHandler {
-    private ExecutorService dispatchService;
     final ConcurrentLinkedQueue<DeviceEventListener> listeners = new ConcurrentLinkedQueue<DeviceEventListener>();
-
-    //
-    //
-    // Lifecycle
-    //
-    public void initialize(ExecutorService executorService) {
-        dispatchService = executorService;
-    }
 
     //
     //
@@ -78,6 +68,10 @@ public class DeviceEventHandler {
         listeners.remove(l);
     }
 
+    public int getListenerCount() {
+        return listeners.size();
+    }
+
     //
     //
     // Checks and notifications
@@ -89,54 +83,57 @@ public class DeviceEventHandler {
                     return false;
             }
             catch (Throwable e) {
-                try {
-                    l.listenerException(e);
-                }
-                catch (Throwable e1) {
-                    // no op
-                }
+                handleException(l, e);
             }
         }
         return true;
     }
 
     public void fireIAmReceived(final RemoteDevice d) {
-        multicast(new EventDispatcher() {
-            @Override
-            public void dispatch(DeviceEventListener l) {
+        for (DeviceEventListener l : listeners) {
+            try {
                 l.iAmReceived(d);
             }
-        });
+            catch (Throwable e) {
+                handleException(l, e);
+            }
+        }
     }
 
     public void propertyWritten(final BACnetObject obj, final PropertyValue pv) {
-        multicast(new EventDispatcher() {
-            @Override
-            public void dispatch(DeviceEventListener l) {
+        for (DeviceEventListener l : listeners) {
+            try {
                 l.propertyWritten(obj, pv);
             }
-        });
+            catch (Throwable e) {
+                handleException(l, e);
+            }
+        }
     }
 
     public void fireIHaveReceived(final RemoteDevice d, final RemoteObject o) {
-        multicast(new EventDispatcher() {
-            @Override
-            public void dispatch(DeviceEventListener l) {
+        for (DeviceEventListener l : listeners) {
+            try {
                 l.iHaveReceived(d, o);
             }
-        });
+            catch (Throwable e) {
+                handleException(l, e);
+            }
+        }
     }
 
     public void fireCovNotification(final UnsignedInteger subscriberProcessIdentifier,
             final RemoteDevice initiatingDevice, final ObjectIdentifier monitoredObjectIdentifier,
             final UnsignedInteger timeRemaining, final SequenceOf<PropertyValue> listOfValues) {
-        multicast(new EventDispatcher() {
-            @Override
-            public void dispatch(DeviceEventListener l) {
+        for (DeviceEventListener l : listeners) {
+            try {
                 l.covNotificationReceived(subscriberProcessIdentifier, initiatingDevice, monitoredObjectIdentifier,
                         timeRemaining, listOfValues);
             }
-        });
+            catch (Throwable e) {
+                handleException(l, e);
+            }
+        }
     }
 
     public void fireEventNotification(final UnsignedInteger processIdentifier, final RemoteDevice initiatingDevice,
@@ -144,101 +141,70 @@ public class DeviceEventHandler {
             final UnsignedInteger notificationClass, final UnsignedInteger priority, final EventType eventType,
             final CharacterString messageText, final NotifyType notifyType, final Boolean ackRequired,
             final EventState fromState, final EventState toState, final NotificationParameters eventValues) {
-        multicast(new EventDispatcher() {
-            @Override
-            public void dispatch(DeviceEventListener l) {
+        for (DeviceEventListener l : listeners) {
+            try {
                 l.eventNotificationReceived(processIdentifier, initiatingDevice, eventObjectIdentifier, timeStamp,
                         notificationClass, priority, eventType, messageText, notifyType, ackRequired, fromState,
                         toState, eventValues);
             }
-        });
+            catch (Throwable e) {
+                handleException(l, e);
+            }
+        }
     }
 
     public void fireTextMessage(final RemoteDevice textMessageSourceDevice, final Choice messageClass,
             final MessagePriority messagePriority, final CharacterString message) {
-        multicast(new EventDispatcher() {
-            @Override
-            public void dispatch(DeviceEventListener l) {
+        for (DeviceEventListener l : listeners) {
+            try {
                 l.textMessageReceived(textMessageSourceDevice, messageClass, messagePriority, message);
             }
-        });
+            catch (Throwable e) {
+                handleException(l, e);
+            }
+        }
     }
 
     public void firePrivateTransfer(final UnsignedInteger vendorId, final UnsignedInteger serviceNumber,
             final Encodable serviceParameters) {
-        multicast(new EventDispatcher() {
-            @Override
-            public void dispatch(DeviceEventListener l) {
+        for (DeviceEventListener l : listeners) {
+            try {
                 l.privateTransferReceived(vendorId, serviceNumber, serviceParameters);
             }
-        });
+            catch (Throwable e) {
+                handleException(l, e);
+            }
+        }
     }
 
     public void reinitializeDevice(final ReinitializedStateOfDevice reinitializedStateOfDevice) {
-        multicast(new EventDispatcher() {
-            @Override
-            public void dispatch(DeviceEventListener l) {
+        for (DeviceEventListener l : listeners) {
+            try {
                 l.reinitializeDevice(reinitializedStateOfDevice);
             }
-        });
+            catch (Throwable e) {
+                handleException(l, e);
+            }
+        }
     }
 
     public void synchronizeTime(final DateTime dateTime, final boolean utc) {
-        multicast(new EventDispatcher() {
-            @Override
-            public void dispatch(DeviceEventListener l) {
+        for (DeviceEventListener l : listeners) {
+            try {
                 l.synchronizeTime(dateTime, utc);
             }
-        });
-    }
-
-    /**
-     * Creates an event multicaster and gives it to the execution service for running out of process.
-     * 
-     * @param dispatcher
-     */
-    private void multicast(EventDispatcher dispatcher) {
-        if (dispatchService == null)
-            throw new IllegalStateException("DeviceEventHandler has not been initialized");
-        dispatchService.execute(new EventMulticaster(dispatcher));
-    }
-
-    /**
-     * Class for dispatching an event to multiple listeners
-     * 
-     * @author mlohbihler
-     */
-    private class EventMulticaster implements Runnable {
-        EventDispatcher dispatcher;
-
-        EventMulticaster(EventDispatcher dispatcher) {
-            this.dispatcher = dispatcher;
-        }
-
-        @Override
-        public void run() {
-            for (DeviceEventListener l : listeners) {
-                try {
-                    dispatcher.dispatch(l);
-                }
-                catch (Throwable e) {
-                    try {
-                        l.listenerException(e);
-                    }
-                    catch (Throwable e1) {
-                        // no op
-                    }
-                }
+            catch (Throwable e) {
+                handleException(l, e);
             }
         }
     }
 
-    /**
-     * Interface for defining how a particular event is dispatched to listeners
-     * 
-     * @author mlohbihler
-     */
-    private interface EventDispatcher {
-        void dispatch(DeviceEventListener l);
+    private void handleException(DeviceEventListener l, Throwable e) {
+        try {
+            l.listenerException(e);
+        }
+        catch (Throwable e1) {
+            // no op
+        }
     }
 }

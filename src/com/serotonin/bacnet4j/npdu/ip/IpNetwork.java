@@ -44,6 +44,7 @@ import com.serotonin.bacnet4j.exception.BACnetException;
 import com.serotonin.bacnet4j.npdu.IncomingRequestParser;
 import com.serotonin.bacnet4j.npdu.MessageValidationAssertionException;
 import com.serotonin.bacnet4j.npdu.Network;
+import com.serotonin.bacnet4j.npdu.NetworkIdentifier;
 import com.serotonin.bacnet4j.transport.Transport;
 import com.serotonin.bacnet4j.type.constructed.Address;
 import com.serotonin.bacnet4j.type.primitive.OctetString;
@@ -63,6 +64,7 @@ public class IpNetwork extends Network implements Runnable {
     private final String broadcastIp;
 
     // Runtime
+    private Thread thread;
     private DatagramSocket socket;
     private Address broadcastAddress;
 
@@ -87,6 +89,11 @@ public class IpNetwork extends Network implements Runnable {
         this.broadcastIp = broadcastIp;
         this.port = port;
         this.localBindAddress = localBindAddress;
+    }
+
+    @Override
+    public NetworkIdentifier getNetworkIdentifier() {
+        return new IpNetworkIdentifier(port, localBindAddress);
     }
 
     @Override
@@ -121,7 +128,8 @@ public class IpNetwork extends Network implements Runnable {
         //        broadcastAddress = new Address(broadcastIp, port, new Network(0xffff, new byte[0]));
         broadcastAddress = new Address(BACnetUtils.dottedStringToBytes(broadcastIp), port);
 
-        new Thread(this).start();
+        thread = new Thread(this);
+        thread.start();
     }
 
     @Override
@@ -137,6 +145,12 @@ public class IpNetwork extends Network implements Runnable {
 
     public Address getBroadcastAddress(int port) {
         return new Address(BACnetUtils.dottedStringToBytes(broadcastIp), port);
+    }
+
+    @Override
+    public void checkSendThread() {
+        if (Thread.currentThread() == thread)
+            throw new IllegalStateException("Cannot send a request in the socket listener thread.");
     }
 
     /** The total length of the foreign device registration package. */
@@ -225,7 +239,7 @@ public class IpNetwork extends Network implements Runnable {
 
                 ByteQueue queue = new ByteQueue(p.getData(), 0, p.getLength());
                 OctetString link = new OctetString(p.getAddress().getAddress(), p.getPort());
-                executeParser(new IncomingMessageExecutor(this, queue, link));
+                new IncomingMessageExecutor(this, queue, link).run();
                 p.setData(buffer);
             }
             catch (IOException e) {

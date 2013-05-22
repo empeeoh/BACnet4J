@@ -47,12 +47,15 @@ public class RemoteDevice implements Serializable {
     private int maxAPDULengthAccepted;
     private Segmentation segmentationSupported;
     private int vendorId;
+    private String vendorName;
     private String name;
+    private String modelName;
     private UnsignedInteger protocolVersion;
     private UnsignedInteger protocolRevision;
     private ServicesSupported servicesSupported;
     private final Map<ObjectIdentifier, RemoteObject> objects = new HashMap<ObjectIdentifier, RemoteObject>();
     private Object userData;
+    private int maxReadMultipleReferences = -1;
 
     public RemoteDevice(int instanceNumber, Address address, OctetString linkService) {
         this.instanceNumber = instanceNumber;
@@ -73,8 +76,8 @@ public class RemoteDevice implements Serializable {
     public String toExtendedString() {
         return "RemoteDevice(instanceNumber=" + instanceNumber + ", address=" + address + ", linkServiceAddress="
                 + linkService + ", maxAPDULengthAccepted=" + maxAPDULengthAccepted + ", segmentationSupported="
-                + segmentationSupported + ", vendorId=" + vendorId + ", name=" + name + ", servicesSupported="
-                + servicesSupported + ", objects=" + objects + ")";
+                + segmentationSupported + ", vendorId=" + vendorId + ", vendorName=" + vendorName + ", name=" + name
+                + ", servicesSupported=" + servicesSupported + ", objects=" + objects + ")";
     }
 
     public void setObject(RemoteObject o) {
@@ -125,6 +128,14 @@ public class RemoteDevice implements Serializable {
         this.vendorId = vendorId;
     }
 
+    public String getVendorName() {
+        return vendorName;
+    }
+
+    public void setVendorName(String vendorName) {
+        this.vendorName = vendorName;
+    }
+
     public int getInstanceNumber() {
         return instanceNumber;
     }
@@ -135,6 +146,14 @@ public class RemoteDevice implements Serializable {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getModelName() {
+        return modelName;
+    }
+
+    public void setModelName(String modelName) {
+        this.modelName = modelName;
     }
 
     public UnsignedInteger getProtocolVersion() {
@@ -167,6 +186,17 @@ public class RemoteDevice implements Serializable {
 
     public void setUserData(Object userData) {
         this.userData = userData;
+    }
+
+    public int getMaxReadMultipleReferences() {
+        if (maxReadMultipleReferences == -1)
+            maxReadMultipleReferences = segmentationSupported.hasTransmitSegmentation() ? 200 : 20;
+        return maxReadMultipleReferences;
+    }
+
+    public void reduceMaxReadMultipleReferences() {
+        if (maxReadMultipleReferences > 1)
+            maxReadMultipleReferences = (int) (maxReadMultipleReferences * 0.75);
     }
 
     @Override

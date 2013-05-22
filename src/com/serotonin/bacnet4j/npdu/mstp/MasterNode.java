@@ -154,8 +154,8 @@ public class MasterNode extends MstpNode {
         }
         else if (receivedInvalidFrame != null) {
             // ReceivedInvalidFrame
-            if (LOG.isLoggable(Level.INFO))
-                LOG.info(thisStation + " idle:Received invalid frame: " + receivedInvalidFrame);
+            if (LOG.isLoggable(Level.FINE))
+                LOG.fine(thisStation + " idle:Received invalid frame: " + receivedInvalidFrame);
             receivedInvalidFrame = null;
             activity = true;
         }
@@ -171,14 +171,14 @@ public class MasterNode extends MstpNode {
 
         if (type == null) {
             // ReceivedUnwantedFrame
-            if (LOG.isLoggable(Level.INFO))
-                LOG.info(thisStation + " idle:Unknown frame type");
+            if (LOG.isLoggable(Level.FINE))
+                LOG.fine(thisStation + " idle:Unknown frame type");
         }
         else if (frame.broadcast()
                 && type.oneOf(FrameType.token, FrameType.bacnetDataExpectingReply, FrameType.testRequest)) {
             // ReceivedUnwantedFrame
-            if (LOG.isLoggable(Level.INFO))
-                LOG.info(thisStation + " Frame type should not be broadcast: " + type);
+            if (LOG.isLoggable(Level.FINE))
+                LOG.fine(thisStation + " Frame type should not be broadcast: " + type);
         }
         else if (frame.forStation(thisStation) && type == FrameType.token) {
             // ReceivedToken
@@ -233,8 +233,7 @@ public class MasterNode extends MstpNode {
             // NothingToSend
             //            debug("useToken:NothingToSend");
             if (LOG.isLoggable(Level.FINE))
-                ;
-            LOG.fine(thisStation + " useToken:NothingToSend");
+                LOG.fine(thisStation + " useToken:NothingToSend");
             frameCount = maxInfoFrames;
             state = MasterNodeState.doneWithToken;
         }
@@ -274,8 +273,8 @@ public class MasterNode extends MstpNode {
         else if (receivedInvalidFrame != null) {
             // InvalidFrame
             //            debug("waitForReply:InvalidFrame: '" + receivedInvalidFrame + "', frame=" + frame);
-            if (LOG.isLoggable(Level.INFO))
-                LOG.info("Received invalid frame: " + receivedInvalidFrame);
+            if (LOG.isLoggable(Level.FINE))
+                LOG.fine("Received invalid frame: " + receivedInvalidFrame);
             receivedInvalidFrame = null;
             state = MasterNodeState.doneWithToken;
             activity = true;
@@ -287,14 +286,14 @@ public class MasterNode extends MstpNode {
             if (frame.forStation(thisStation)) {
                 if (type.oneOf(FrameType.testResponse, FrameType.bacnetDataNotExpectingReply)) {
                     // ReceivedReply
-                    //                    debug("waitForReply:ReceivedReply from " + frame.getSourceAddress());
+                    //debug("waitForReply:ReceivedReply from " + frame.getSourceAddress());
                     if (LOG.isLoggable(Level.FINE))
                         LOG.fine(thisStation + " waitForReply:ReceivedReply");
                     receivedDataNoReply(frame);
                 }
                 else if (type.oneOf(FrameType.replyPostponed)) {
                     // ReceivedPostpone
-                    //                    debug("waitForReply:ReceivedPostpone from " + frame.getSourceAddress());
+                    //debug("waitForReply:ReceivedPostpone from " + frame.getSourceAddress());
                     if (LOG.isLoggable(Level.FINE))
                         LOG.fine(thisStation + " waitForReply:ReceivedPostpone");
                     ; // the reply to the message has been postponed until a later time.
@@ -304,12 +303,13 @@ public class MasterNode extends MstpNode {
             }
             else if (!type.oneOf(FrameType.testResponse, FrameType.bacnetDataNotExpectingReply)) {
                 // ReceivedUnexpectedFrame
-                //                debug("waitForReply:ReceivedUnexpectedFrame: " + frame);
+                //debug("waitForReply:ReceivedUnexpectedFrame: " + frame);
                 if (LOG.isLoggable(Level.FINE))
                     LOG.fine(thisStation + " waitForReply:ReceivedUnexpectedFrame");
+
+                // This may indicate the presence of multiple tokens.
+                state = MasterNodeState.idle;
             }
-            // This may indicate the presence of multiple tokens.
-            state = MasterNodeState.idle;
 
             receivedValidFrame = false;
         }
@@ -323,14 +323,14 @@ public class MasterNode extends MstpNode {
         activity = true;
         if (frameCount < maxInfoFrames) {
             // SendAnotherFrame
-            //            debug("doneWithToken:SendAnotherFrame");
+            //debug("doneWithToken:SendAnotherFrame");
             if (LOG.isLoggable(Level.FINE))
                 LOG.fine(thisStation + " doneWithToken:SendAnotherFrame");
             state = MasterNodeState.useToken;
         }
         else if (tokenCount < Constants.POLL - 1 && soleMaster) {
             // SoleMaster
-            //            debug("doneWithToken:SoleMaster");
+            //debug("doneWithToken:SoleMaster");
             if (LOG.isLoggable(Level.FINE))
                 LOG.fine(thisStation + " doneWithToken:SoleMaster");
             frameCount = 0;
@@ -339,7 +339,7 @@ public class MasterNode extends MstpNode {
         }
         else if ((tokenCount < Constants.POLL - 1 && !soleMaster) || nextStation == adjacentStation(thisStation)) {
             // SendToken
-            //            debug("doneWithToken:SendToken to " + nextStation);
+            //debug("doneWithToken:SendToken to " + nextStation);
             if (LOG.isLoggable(Level.FINE))
                 LOG.fine(thisStation + " doneWithToken:SendToken");
             tokenCount++;
@@ -350,7 +350,7 @@ public class MasterNode extends MstpNode {
         }
         else if (tokenCount >= Constants.POLL - 1 && adjacentStation(pollStation) != nextStation) {
             // SendMaintenancePFM
-            //            debug("doneWithToken:SendMaintenancePFM to " + adjacentStation(pollStation));
+            //debug("doneWithToken:SendMaintenancePFM to " + adjacentStation(pollStation));
             if (LOG.isLoggable(Level.FINE))
                 LOG.fine(thisStation + " doneWithToken:SendMaintenancePFM");
             pollStation = adjacentStation(pollStation);
@@ -360,7 +360,7 @@ public class MasterNode extends MstpNode {
         }
         else if (tokenCount >= Constants.POLL - 1 && adjacentStation(pollStation) == nextStation && !soleMaster) {
             // ResetMaintenancePFM
-            //            debug("doneWithToken:ResetMaintenancePFM: next=" + nextStation);
+            //debug("doneWithToken:ResetMaintenancePFM: next=" + nextStation);
             if (LOG.isLoggable(Level.FINE))
                 LOG.fine(thisStation + " doneWithToken:ResetMaintenancePFM");
             pollStation = thisStation;
@@ -373,7 +373,7 @@ public class MasterNode extends MstpNode {
         // NOTE: variation from spec here ----vvv (i.e. added the "- 1")
         else if (tokenCount >= Constants.POLL - 1 && adjacentStation(pollStation) == nextStation && soleMaster) {
             // SoleMasterRestartMaintenancePFM
-            //            debug("doneWithToken:SoleMasterRestartMaintenancePFM: poll=" + pollStation);
+            //debug("doneWithToken:SoleMasterRestartMaintenancePFM: poll=" + pollStation);
             if (LOG.isLoggable(Level.FINE))
                 LOG.fine(thisStation + " doneWithToken:SoleMasterRestartMaintenancePFM");
             pollStation = adjacentStation(nextStation);
