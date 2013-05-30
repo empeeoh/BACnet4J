@@ -29,7 +29,13 @@ import com.serotonin.bacnet4j.exception.BACnetException;
 import com.serotonin.bacnet4j.type.primitive.Primitive;
 import com.serotonin.bacnet4j.type.primitive.Time;
 import com.serotonin.util.queue.ByteQueue;
-
+/**
+ * ASHRAE Standard 135-2012 Clause 21 p. 712 <br>
+ * BACnetTimeValue ::= SEQUENCE { <br>
+ * time Time, <br>
+ * value ABSTRACT-SYNTAX.&Type -- any primitive datatype; complex types cannot be decoded <br>
+ * }
+ */
 public class TimeValue extends BaseType {
     private static final long serialVersionUID = 6449737212397369712L;
     private final Time time;

@@ -27,7 +27,11 @@ package com.serotonin.bacnet4j.type.constructed;
 
 import com.serotonin.bacnet4j.exception.BACnetException;
 import com.serotonin.util.queue.ByteQueue;
-
+/**
+ * ASHRAE Standard 135-2012 Clause 21 p. 667<br> 
+ * BACnetDailySchedule ::= SEQUENCE {<br>
+ * 							  day-schedule [0] SEQUENCE OF BACnetTimeValue }<br>
+ */
 public class DailySchedule extends BaseType {
     private static final long serialVersionUID = -8539541069909649459L;
     private final SequenceOf<TimeValue> daySchedule;

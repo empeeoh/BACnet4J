@@ -32,7 +32,14 @@ import com.serotonin.bacnet4j.exception.BACnetException;
 import com.serotonin.bacnet4j.type.Encodable;
 import com.serotonin.bacnet4j.type.primitive.Date;
 import com.serotonin.util.queue.ByteQueue;
-
+/**
+ * ASHRAE Standard 135-2012 Clause 21 p. 667<br> 
+ * BACnetCalendarEntry ::= CHOICE {<br>
+ *		date 						[0] Date,<br>
+ *		dateRange 		 			[1] BACnetDateRange,<br>
+ *		weekNDay 					[2] BACnetWeekNDay <br>
+ *	}
+ */
 public class CalendarEntry extends BaseType {
     private static final long serialVersionUID = -4210434764578714766L;
     private static List<Class<? extends Encodable>> classes;
@@ -45,24 +52,24 @@ public class CalendarEntry extends BaseType {
 
     private final Choice entry;
 
-    public CalendarEntry(Date date) {
+    public CalendarEntry(final Date date) {
         entry = new Choice(0, date);
     }
 
-    public CalendarEntry(DateRange dateRange) {
+    public CalendarEntry(final DateRange dateRange) {
         entry = new Choice(1, dateRange);
     }
 
-    public CalendarEntry(WeekNDay weekNDay) {
+    public CalendarEntry(final WeekNDay weekNDay) {
         entry = new Choice(2, weekNDay);
     }
 
     @Override
-    public void write(ByteQueue queue) {
+    public void write(final ByteQueue queue) {
         write(queue, entry);
     }
 
-    public CalendarEntry(ByteQueue queue) throws BACnetException {
+    public CalendarEntry(final ByteQueue queue) throws BACnetException {
         entry = new Choice(queue, classes);
     }
 

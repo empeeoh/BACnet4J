@@ -26,17 +26,16 @@
 package com.serotonin.bacnet4j.type.constructed;
 
 import java.util.List;
-
 import com.serotonin.bacnet4j.exception.BACnetException;
 import com.serotonin.bacnet4j.type.Encodable;
 import com.serotonin.util.queue.ByteQueue;
 
 public class Choice extends BaseType {
     private static final long serialVersionUID = 7942157718147383894L;
-    private int contextId;
-    private Encodable datum;
+    private final int contextId;
+    private final Encodable datum;
 
-    public Choice(int contextId, Encodable datum) {
+    public Choice(final int contextId, final Encodable datum) {
         this.contextId = contextId;
         this.datum = datum;
     }
@@ -54,19 +53,27 @@ public class Choice extends BaseType {
         write(queue, datum, contextId);
     }
 
-    public Choice(ByteQueue queue, List<Class<? extends Encodable>> classes) throws BACnetException {
-        read(queue, classes);
+    public Choice(final ByteQueue queue, List<Class<? extends Encodable>> classes) 
+    													throws BACnetException {
+        final Choice c = read(queue, classes);
+        this.contextId =c.contextId;
+        this.datum = c.datum;
     }
 
-    public Choice(ByteQueue queue, List<Class<? extends Encodable>> classes, int contextId) throws BACnetException {
+    public Choice(final ByteQueue queue, List<Class<? extends Encodable>> classes,
+    			  final int contextId) throws BACnetException {
         popStart(queue, contextId);
-        read(queue, classes);
+        final Choice c = read(queue, classes);
         popEnd(queue, contextId);
+        this.contextId =c.contextId;
+        this.datum = c.datum;
     }
 
-    public void read(ByteQueue queue, List<Class<? extends Encodable>> classes) throws BACnetException {
-        contextId = peekTagNumber(queue);
-        datum = read(queue, classes.get(contextId), contextId);
+    private Choice read(final ByteQueue queue, List<Class<? extends Encodable>> classes)
+    													throws BACnetException {
+        final int tContextId = peekTagNumber(queue);
+        final Encodable tDatum = read(queue, classes.get(tContextId), tContextId);
+        return new Choice(tContextId, tDatum);
     }
 
     @Override

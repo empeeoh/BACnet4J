@@ -27,13 +27,23 @@ package com.serotonin.bacnet4j.type.constructed;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import com.serotonin.bacnet4j.exception.BACnetException;
 import com.serotonin.bacnet4j.type.Encodable;
 import com.serotonin.bacnet4j.type.primitive.ObjectIdentifier;
 import com.serotonin.bacnet4j.type.primitive.UnsignedInteger;
 import com.serotonin.util.queue.ByteQueue;
 
+/**
+ * ASHRAE Standard 135-2012 Clause 21 p. 712 <br>
+ * BACnetSpecialEvent ::= SEQUENCE {<br>
+ * period 				    CHOICE {<br>
+ * 							calendarEntry 		[0] BACnetCalendarEntry<br>
+ * 							calendarReference   [1] BACnetObjectIdentifier <br>
+ * 								   },<br>
+ * listOfTimeValues 		[2] SEQUENCE OF BACnetTimeValue,<br>
+ * eventPriority			[3] Unsigned (1..16)<br>
+ * }
+ */
 public class SpecialEvent extends BaseType {
     private static final long serialVersionUID = -5828791384033258372L;
     private static List<Class<? extends Encodable>> classes;
@@ -47,15 +57,17 @@ public class SpecialEvent extends BaseType {
     private final SequenceOf<TimeValue> listOfTimeValues;
     private final UnsignedInteger eventPriority;
 
-    public SpecialEvent(CalendarEntry calendarEntry, SequenceOf<TimeValue> listOfTimeValues,
-            UnsignedInteger eventPriority) {
+    public SpecialEvent(final CalendarEntry calendarEntry, 
+    					final SequenceOf<TimeValue> listOfTimeValues,
+    					final UnsignedInteger eventPriority) {
         calendar = new Choice(0, calendarEntry);
         this.listOfTimeValues = listOfTimeValues;
         this.eventPriority = eventPriority;
     }
 
-    public SpecialEvent(ObjectIdentifier calendarReference, SequenceOf<TimeValue> listOfTimeValues,
-            UnsignedInteger eventPriority) {
+    public SpecialEvent(final ObjectIdentifier calendarReference,
+    					final SequenceOf<TimeValue> listOfTimeValues,
+    					final UnsignedInteger eventPriority) {
         calendar = new Choice(1, calendarReference);
         this.listOfTimeValues = listOfTimeValues;
         this.eventPriority = eventPriority;

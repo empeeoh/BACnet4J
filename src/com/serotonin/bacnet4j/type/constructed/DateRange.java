@@ -28,7 +28,14 @@ package com.serotonin.bacnet4j.type.constructed;
 import com.serotonin.bacnet4j.exception.BACnetException;
 import com.serotonin.bacnet4j.type.primitive.Date;
 import com.serotonin.util.queue.ByteQueue;
-
+/**
+ * ASHRAE Standard 135-2012 Clause 21 p. 667<br> 
+ * BACnetDateRange ::= SEQUENCE { -- see {@link com.serotonin.bacnet4j.type.primitive.Date} 
+ * Clause 20.2.12 p.631 for restrictions <br>
+ * startDate Date,<br>
+ * endDate Date }<br>
+ *
+ */
 public class DateRange extends BaseType {
     private static final long serialVersionUID = 7219491325251523667L;
     private final Date startDate;
