@@ -5,6 +5,9 @@
     <fileset dir="lib">
       <include name="*.jar"/>
     </fileset>
+  	<fileset dir="lib-opt">
+  		<include name="*.jar"/>
+  	</fileset>
     <pathelement path="target"/>
   </path>
   
