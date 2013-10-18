@@ -28,7 +28,7 @@ package com.serotonin.bacnet4j.service.acknowledgement;
 import com.serotonin.bacnet4j.exception.BACnetException;
 import com.serotonin.bacnet4j.type.constructed.ReadAccessResult;
 import com.serotonin.bacnet4j.type.constructed.SequenceOf;
-import com.serotonin.util.queue.ByteQueue;
+import org.free.bacnet4j.util.ByteQueue;
 
 public class ReadPropertyConditionalAck extends AcknowledgementService {
     private static final long serialVersionUID = 2007538802044831429L;

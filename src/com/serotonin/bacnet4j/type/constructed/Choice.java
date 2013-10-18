@@ -28,7 +28,7 @@ package com.serotonin.bacnet4j.type.constructed;
 import java.util.List;
 import com.serotonin.bacnet4j.exception.BACnetException;
 import com.serotonin.bacnet4j.type.Encodable;
-import com.serotonin.util.queue.ByteQueue;
+import org.free.bacnet4j.util.ByteQueue;
 
 public class Choice extends BaseType {
     private static final long serialVersionUID = 7942157718147383894L;

@@ -31,7 +31,7 @@ import com.serotonin.bacnet4j.type.enumerated.ErrorClass;
 import com.serotonin.bacnet4j.type.enumerated.ErrorCode;
 import com.serotonin.bacnet4j.type.primitive.Null;
 import com.serotonin.bacnet4j.type.primitive.Real;
-import com.serotonin.util.queue.ByteQueue;
+import org.free.bacnet4j.util.ByteQueue;
 
 public class ClientCov extends BaseType {
     private static final long serialVersionUID = 654453440700433527L;

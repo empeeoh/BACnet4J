@@ -28,7 +28,7 @@ package com.serotonin.bacnet4j.type.error;
 import com.serotonin.bacnet4j.exception.BACnetException;
 import com.serotonin.bacnet4j.type.constructed.BACnetError;
 import com.serotonin.bacnet4j.type.primitive.UnsignedInteger;
-import com.serotonin.util.queue.ByteQueue;
+import org.free.bacnet4j.util.ByteQueue;
 
 public class ChangeListError extends BaseError {
     private static final long serialVersionUID = -466623385798604884L;

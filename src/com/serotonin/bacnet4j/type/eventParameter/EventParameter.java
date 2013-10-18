@@ -30,7 +30,7 @@ import com.serotonin.bacnet4j.exception.BACnetException;
 import com.serotonin.bacnet4j.type.constructed.BaseType;
 import com.serotonin.bacnet4j.type.enumerated.ErrorClass;
 import com.serotonin.bacnet4j.type.enumerated.ErrorCode;
-import com.serotonin.util.queue.ByteQueue;
+import org.free.bacnet4j.util.ByteQueue;
 
 abstract public class EventParameter extends BaseType {
     private static final long serialVersionUID = -8202182792179896645L;

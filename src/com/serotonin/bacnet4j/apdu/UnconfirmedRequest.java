@@ -28,7 +28,7 @@ package com.serotonin.bacnet4j.apdu;
 import com.serotonin.bacnet4j.exception.BACnetException;
 import com.serotonin.bacnet4j.service.unconfirmed.UnconfirmedRequestService;
 import com.serotonin.bacnet4j.type.constructed.ServicesSupported;
-import com.serotonin.util.queue.ByteQueue;
+import org.free.bacnet4j.util.ByteQueue;
 
 public class UnconfirmedRequest extends APDU {
     private static final long serialVersionUID = 1606568334137370062L;

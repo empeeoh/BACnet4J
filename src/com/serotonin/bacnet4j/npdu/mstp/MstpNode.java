@@ -12,10 +12,10 @@ import org.apache.commons.lang3.StringUtils;
 
 import com.serotonin.bacnet4j.util.ClockTimeSource;
 import com.serotonin.bacnet4j.util.TimeSource;
-import com.serotonin.io.StreamUtils;
-import com.serotonin.io.serial.SerialParameters;
-import com.serotonin.io.serial.SerialUtils;
-import com.serotonin.util.queue.ByteQueue;
+import org.free.bacnet4j.util.StreamUtils;
+import org.free.bacnet4j.util.SerialParameters;
+import org.free.bacnet4j.util.SerialUtils;
+import org.free.bacnet4j.util.ByteQueue;
 
 abstract public class MstpNode implements Runnable {
     private static final Logger LOG = Logger.getLogger(MstpNode.class.toString());

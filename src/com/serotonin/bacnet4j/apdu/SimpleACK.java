@@ -25,7 +25,7 @@
  */
 package com.serotonin.bacnet4j.apdu;
 
-import com.serotonin.util.queue.ByteQueue;
+import org.free.bacnet4j.util.ByteQueue;
 
 public class SimpleACK extends AckAPDU {
     private static final long serialVersionUID = -4585349985375271438L;

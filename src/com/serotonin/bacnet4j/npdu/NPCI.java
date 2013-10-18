@@ -28,7 +28,7 @@ package com.serotonin.bacnet4j.npdu;
 import java.math.BigInteger;
 
 import com.serotonin.bacnet4j.type.constructed.Address;
-import com.serotonin.util.queue.ByteQueue;
+import org.free.bacnet4j.util.ByteQueue;
 
 /**
  * Network layer protocol control information. This class currently only implements the reading of information.

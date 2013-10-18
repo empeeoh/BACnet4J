@@ -30,7 +30,7 @@ import com.serotonin.bacnet4j.type.constructed.StatusFlags;
 import com.serotonin.bacnet4j.type.enumerated.LifeSafetyMode;
 import com.serotonin.bacnet4j.type.enumerated.LifeSafetyOperation;
 import com.serotonin.bacnet4j.type.enumerated.LifeSafetyState;
-import com.serotonin.util.queue.ByteQueue;
+import org.free.bacnet4j.util.ByteQueue;
 
 public class ChangeOfLifeSafety extends NotificationParameters {
     private static final long serialVersionUID = -3145779272869271053L;

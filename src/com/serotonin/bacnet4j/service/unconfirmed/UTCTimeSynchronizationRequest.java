@@ -33,7 +33,7 @@ import com.serotonin.bacnet4j.type.constructed.DateTime;
 import com.serotonin.bacnet4j.type.constructed.ServicesSupported;
 import com.serotonin.bacnet4j.type.enumerated.PropertyIdentifier;
 import com.serotonin.bacnet4j.type.primitive.OctetString;
-import com.serotonin.util.queue.ByteQueue;
+import org.free.bacnet4j.util.ByteQueue;
 
 public class UTCTimeSynchronizationRequest extends UnconfirmedRequestService {
     private static final long serialVersionUID = 495223700432185701L;

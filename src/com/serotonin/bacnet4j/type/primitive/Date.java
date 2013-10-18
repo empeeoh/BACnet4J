@@ -30,7 +30,7 @@ import java.util.GregorianCalendar;
 
 import com.serotonin.bacnet4j.enums.DayOfWeek;
 import com.serotonin.bacnet4j.enums.Month;
-import com.serotonin.util.queue.ByteQueue;
+import org.free.bacnet4j.util.ByteQueue;
 /**
  * ASHRAE Standard 135-2012 Clause 20.2.12 Encoding of a Date Value p.631<br>
  * The encoding of a date value shall be primitive, with four contents octets<br>

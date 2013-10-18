@@ -20,7 +20,7 @@ import com.serotonin.bacnet4j.type.primitive.UnsignedInteger;
 import com.serotonin.bacnet4j.util.PropertyReferences;
 import com.serotonin.bacnet4j.util.RequestListener;
 import com.serotonin.bacnet4j.util.RequestUtils;
-import com.serotonin.io.serial.SerialParameters;
+import org.free.bacnet4j.util.SerialParameters;
 import com.serotonin.log.SimpleLog;
 
 public class MstpObjectList {

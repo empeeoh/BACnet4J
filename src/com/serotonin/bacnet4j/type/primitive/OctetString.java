@@ -33,9 +33,9 @@ import java.util.Arrays;
 import com.serotonin.bacnet4j.base.BACnetUtils;
 import com.serotonin.bacnet4j.npdu.ip.InetAddrCache;
 import com.serotonin.bacnet4j.npdu.ip.IpNetwork;
-import com.serotonin.util.ArrayUtils;
-import com.serotonin.util.IpAddressUtils;
-import com.serotonin.util.queue.ByteQueue;
+import org.free.bacnet4j.util.ArrayUtils;
+import org.free.bacnet4j.util.IpAddressUtils;
+import org.free.bacnet4j.util.ByteQueue;
 
 public class OctetString extends Primitive {
     private static final long serialVersionUID = -3557657941142811228L;

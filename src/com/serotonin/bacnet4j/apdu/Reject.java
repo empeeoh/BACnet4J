@@ -26,7 +26,7 @@
 package com.serotonin.bacnet4j.apdu;
 
 import com.serotonin.bacnet4j.type.enumerated.RejectReason;
-import com.serotonin.util.queue.ByteQueue;
+import org.free.bacnet4j.util.ByteQueue;
 
 /**
  * The BACnet-Reject-PDU is used to reject a received confirmed request PDU based on syntactical flaws or other protocol

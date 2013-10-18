@@ -27,7 +27,7 @@ package com.serotonin.bacnet4j.type.primitive;
 
 import java.math.BigInteger;
 
-import com.serotonin.util.queue.ByteQueue;
+import org.free.bacnet4j.util.ByteQueue;
 
 public class Enumerated extends UnsignedInteger {
     private static final long serialVersionUID = 2462119559912570064L;

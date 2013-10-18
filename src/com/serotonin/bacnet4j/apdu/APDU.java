@@ -30,7 +30,7 @@ import java.io.Serializable;
 import com.serotonin.bacnet4j.exception.BACnetException;
 import com.serotonin.bacnet4j.exception.IllegalPduTypeException;
 import com.serotonin.bacnet4j.type.constructed.ServicesSupported;
-import com.serotonin.util.queue.ByteQueue;
+import org.free.bacnet4j.util.ByteQueue;
 
 abstract public class APDU implements Serializable {
     private static final long serialVersionUID = -5844093063653180470L;

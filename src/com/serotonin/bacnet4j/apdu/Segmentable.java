@@ -26,7 +26,7 @@
 package com.serotonin.bacnet4j.apdu;
 
 import com.serotonin.bacnet4j.exception.BACnetException;
-import com.serotonin.util.queue.ByteQueue;
+import org.free.bacnet4j.util.ByteQueue;
 
 public interface Segmentable {
     byte getInvokeId();

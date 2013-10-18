@@ -28,7 +28,7 @@ package com.serotonin.bacnet4j.type.error;
 import com.serotonin.bacnet4j.exception.BACnetException;
 import com.serotonin.bacnet4j.type.constructed.BACnetError;
 import com.serotonin.bacnet4j.type.constructed.BaseType;
-import com.serotonin.util.queue.ByteQueue;
+import org.free.bacnet4j.util.ByteQueue;
 
 public class BaseError extends BaseType {
     private static final long serialVersionUID = 8363160647986011176L;

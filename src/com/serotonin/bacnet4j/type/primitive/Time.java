@@ -28,7 +28,7 @@ package com.serotonin.bacnet4j.type.primitive;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
-import com.serotonin.util.queue.ByteQueue;
+import org.free.bacnet4j.util.ByteQueue;
 /**
  * ASHRAE Standard 135-2012 Clause 20.2.13 Encoding of a Time Value p. 631<br>
  * <br>

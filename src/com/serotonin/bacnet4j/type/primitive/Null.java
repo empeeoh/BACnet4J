@@ -25,7 +25,7 @@
  */
 package com.serotonin.bacnet4j.type.primitive;
 
-import com.serotonin.util.queue.ByteQueue;
+import org.free.bacnet4j.util.ByteQueue;
 
 public class Null extends Primitive {
     private static final long serialVersionUID = 4511984655190634429L;

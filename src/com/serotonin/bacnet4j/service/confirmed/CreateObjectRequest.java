@@ -46,7 +46,7 @@ import com.serotonin.bacnet4j.type.error.CreateObjectError;
 import com.serotonin.bacnet4j.type.primitive.ObjectIdentifier;
 import com.serotonin.bacnet4j.type.primitive.OctetString;
 import com.serotonin.bacnet4j.type.primitive.UnsignedInteger;
-import com.serotonin.util.queue.ByteQueue;
+import org.free.bacnet4j.util.ByteQueue;
 
 public class CreateObjectRequest extends ConfirmedRequestService {
     private static final long serialVersionUID = -610206284148696878L;
@@ -81,7 +81,7 @@ public class CreateObjectRequest extends ConfirmedRequestService {
     @Override
     public AcknowledgementService handle(LocalDevice localDevice, Address from, OctetString linkService)
             throws BACnetErrorException {
-        ObjectIdentifier id;
+        final ObjectIdentifier id;
         if (objectSpecifier.getContextId() == 0) {
             ObjectType type = (ObjectType) objectSpecifier.getDatum();
             id = localDevice.getNextInstanceObjectIdentifier(type);
