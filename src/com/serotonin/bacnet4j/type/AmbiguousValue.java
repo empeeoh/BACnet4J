@@ -27,7 +27,7 @@ package com.serotonin.bacnet4j.type;
 
 import com.serotonin.bacnet4j.exception.BACnetException;
 import com.serotonin.bacnet4j.type.primitive.Boolean;
-import com.serotonin.util.queue.ByteQueue;
+import org.free.bacnet4j.util.ByteQueue;
 
 public class AmbiguousValue extends Encodable {
     private static final long serialVersionUID = -1554703777454557893L;

@@ -26,7 +26,7 @@
 package com.serotonin.bacnet4j.type.primitive;
 
 import com.serotonin.bacnet4j.type.enumerated.ObjectType;
-import com.serotonin.util.queue.ByteQueue;
+import org.free.bacnet4j.util.ByteQueue;
 
 public class ObjectIdentifier extends Primitive {
     private static final long serialVersionUID = 4171263406246161971L;

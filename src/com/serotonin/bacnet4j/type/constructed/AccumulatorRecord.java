@@ -28,7 +28,7 @@ package com.serotonin.bacnet4j.type.constructed;
 import com.serotonin.bacnet4j.exception.BACnetException;
 import com.serotonin.bacnet4j.type.primitive.Enumerated;
 import com.serotonin.bacnet4j.type.primitive.UnsignedInteger;
-import com.serotonin.util.queue.ByteQueue;
+import org.free.bacnet4j.util.ByteQueue;
 
 public class AccumulatorRecord extends BaseType {
     private static final long serialVersionUID = 6871737486792988550L;

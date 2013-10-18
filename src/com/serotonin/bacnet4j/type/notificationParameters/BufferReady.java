@@ -28,7 +28,7 @@ package com.serotonin.bacnet4j.type.notificationParameters;
 import com.serotonin.bacnet4j.exception.BACnetException;
 import com.serotonin.bacnet4j.type.constructed.DeviceObjectPropertyReference;
 import com.serotonin.bacnet4j.type.primitive.UnsignedInteger;
-import com.serotonin.util.queue.ByteQueue;
+import org.free.bacnet4j.util.ByteQueue;
 
 public class BufferReady extends NotificationParameters {
     private static final long serialVersionUID = 1210370718867995350L;

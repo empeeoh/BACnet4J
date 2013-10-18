@@ -31,7 +31,7 @@ import java.util.GregorianCalendar;
 import com.serotonin.bacnet4j.exception.BACnetException;
 import com.serotonin.bacnet4j.type.primitive.Date;
 import com.serotonin.bacnet4j.type.primitive.Time;
-import com.serotonin.util.queue.ByteQueue;
+import org.free.bacnet4j.util.ByteQueue;
 
 public class DateTime extends BaseType {
     private static final long serialVersionUID = -5792783146879193344L;

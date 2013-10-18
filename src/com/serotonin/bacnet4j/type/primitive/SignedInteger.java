@@ -27,7 +27,7 @@ package com.serotonin.bacnet4j.type.primitive;
 
 import java.math.BigInteger;
 
-import com.serotonin.util.queue.ByteQueue;
+import org.free.bacnet4j.util.ByteQueue;
 
 public class SignedInteger extends Primitive {
     private static final long serialVersionUID = 3344404709705407437L;

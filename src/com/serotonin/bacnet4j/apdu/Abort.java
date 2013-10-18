@@ -26,7 +26,7 @@
 package com.serotonin.bacnet4j.apdu;
 
 import com.serotonin.bacnet4j.type.enumerated.AbortReason;
-import com.serotonin.util.queue.ByteQueue;
+import org.free.bacnet4j.util.ByteQueue;
 
 /**
  * The BACnet-Abort-PDU is used to terminate a transaction between two peers.

@@ -27,7 +27,7 @@ package com.serotonin.bacnet4j.service.acknowledgement;
 
 import com.serotonin.bacnet4j.exception.BACnetException;
 import com.serotonin.bacnet4j.type.primitive.UnsignedInteger;
-import com.serotonin.util.queue.ByteQueue;
+import org.free.bacnet4j.util.ByteQueue;
 
 public class AuthenticateAck extends AcknowledgementService {
     private static final long serialVersionUID = 1433915425430939025L;

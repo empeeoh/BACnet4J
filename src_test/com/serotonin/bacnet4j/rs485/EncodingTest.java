@@ -1,7 +1,7 @@
 package com.serotonin.bacnet4j.rs485;
 
 import com.serotonin.bacnet4j.npdu.NPCI;
-import com.serotonin.util.queue.ByteQueue;
+import org.free.bacnet4j.util.ByteQueue;
 
 public class EncodingTest {
     //    public static void main(String[] args) {

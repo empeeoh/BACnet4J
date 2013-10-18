@@ -6,8 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import com.serotonin.io.serial.SerialParameters;
+import org.free.bacnet4j.util.SerialParameters;
 
 public class MasterNode extends MstpNode {
     private static final Logger LOG = Logger.getLogger(MasterNode.class.toString());

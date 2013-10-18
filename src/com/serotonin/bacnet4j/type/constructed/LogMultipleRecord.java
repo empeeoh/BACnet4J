@@ -26,7 +26,7 @@
 package com.serotonin.bacnet4j.type.constructed;
 
 import com.serotonin.bacnet4j.exception.BACnetException;
-import com.serotonin.util.queue.ByteQueue;
+import org.free.bacnet4j.util.ByteQueue;
 
 public class LogMultipleRecord extends BaseType {
     private static final long serialVersionUID = 3817374635968734673L;

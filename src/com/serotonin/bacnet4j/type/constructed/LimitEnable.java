@@ -26,7 +26,7 @@
 package com.serotonin.bacnet4j.type.constructed;
 
 import com.serotonin.bacnet4j.type.primitive.BitString;
-import com.serotonin.util.queue.ByteQueue;
+import org.free.bacnet4j.util.ByteQueue;
 
 public class LimitEnable extends BitString {
     private static final long serialVersionUID = -8754983228968085042L;

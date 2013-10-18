@@ -31,7 +31,7 @@ import com.serotonin.bacnet4j.type.constructed.EventTransitionBits;
 import com.serotonin.bacnet4j.type.constructed.SequenceOf;
 import com.serotonin.bacnet4j.type.enumerated.EventState;
 import com.serotonin.bacnet4j.type.primitive.ObjectIdentifier;
-import com.serotonin.util.queue.ByteQueue;
+import org.free.bacnet4j.util.ByteQueue;
 
 public class GetAlarmSummaryAck extends AcknowledgementService {
     private static final long serialVersionUID = 6838220512669552863L;

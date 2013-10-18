@@ -36,7 +36,7 @@ import com.serotonin.bacnet4j.type.notificationParameters.FloatingLimit;
 import com.serotonin.bacnet4j.type.notificationParameters.OutOfRange;
 import com.serotonin.bacnet4j.type.notificationParameters.UnsignedRange;
 import com.serotonin.bacnet4j.type.primitive.Enumerated;
-import com.serotonin.util.queue.ByteQueue;
+import org.free.bacnet4j.util.ByteQueue;
 
 public class EventType extends Enumerated {
     private static final long serialVersionUID = -3342337624733065326L;

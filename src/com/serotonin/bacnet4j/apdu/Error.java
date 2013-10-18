@@ -27,7 +27,7 @@ package com.serotonin.bacnet4j.apdu;
 
 import com.serotonin.bacnet4j.exception.BACnetException;
 import com.serotonin.bacnet4j.type.error.BaseError;
-import com.serotonin.util.queue.ByteQueue;
+import org.free.bacnet4j.util.ByteQueue;
 
 /**
  * The BACnet-Error-PDU is used to convey the information contained in a service response primitive ('Result(-)') that

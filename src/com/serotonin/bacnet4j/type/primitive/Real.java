@@ -26,7 +26,7 @@
 package com.serotonin.bacnet4j.type.primitive;
 
 import com.serotonin.bacnet4j.base.BACnetUtils;
-import com.serotonin.util.queue.ByteQueue;
+import org.free.bacnet4j.util.ByteQueue;
 
 public class Real extends Primitive {
     private static final long serialVersionUID = -165304995181723832L;

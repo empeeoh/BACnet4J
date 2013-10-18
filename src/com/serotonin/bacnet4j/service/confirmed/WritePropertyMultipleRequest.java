@@ -41,7 +41,7 @@ import com.serotonin.bacnet4j.type.enumerated.ErrorClass;
 import com.serotonin.bacnet4j.type.enumerated.ErrorCode;
 import com.serotonin.bacnet4j.type.error.WritePropertyMultipleError;
 import com.serotonin.bacnet4j.type.primitive.OctetString;
-import com.serotonin.util.queue.ByteQueue;
+import org.free.bacnet4j.util.ByteQueue;
 
 public class WritePropertyMultipleRequest extends ConfirmedRequestService {
     private static final long serialVersionUID = 4702397545138383955L;

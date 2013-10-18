@@ -26,7 +26,7 @@
 package com.serotonin.bacnet4j.type.enumerated;
 
 import com.serotonin.bacnet4j.type.primitive.Enumerated;
-import com.serotonin.util.queue.ByteQueue;
+import org.free.bacnet4j.util.ByteQueue;
 
 public class LoggingType extends Enumerated {
     private static final long serialVersionUID = 7142631539010266808L;

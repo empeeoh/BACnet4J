@@ -8,7 +8,7 @@ import java.io.OutputStream;
 import com.serotonin.bacnet4j.npdu.mstp.MasterNode;
 import com.serotonin.bacnet4j.npdu.mstp.MstpNetwork;
 import com.serotonin.bacnet4j.util.TimeSource;
-import com.serotonin.util.queue.ByteQueue;
+import org.free.bacnet4j.util.ByteQueue;
 
 /**
  * Tests the MS/TP master node using a script from a RS-485 dump of a single master node.

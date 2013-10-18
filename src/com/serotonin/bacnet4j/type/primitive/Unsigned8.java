@@ -25,7 +25,7 @@
  */
 package com.serotonin.bacnet4j.type.primitive;
 
-import com.serotonin.util.queue.ByteQueue;
+import org.free.bacnet4j.util.ByteQueue;
 
 public class Unsigned8 extends UnsignedInteger {
     private static final long serialVersionUID = 3671427317129449189L;

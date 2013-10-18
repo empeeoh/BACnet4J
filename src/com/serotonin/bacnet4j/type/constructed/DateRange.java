@@ -27,7 +27,7 @@ package com.serotonin.bacnet4j.type.constructed;
 
 import com.serotonin.bacnet4j.exception.BACnetException;
 import com.serotonin.bacnet4j.type.primitive.Date;
-import com.serotonin.util.queue.ByteQueue;
+import org.free.bacnet4j.util.ByteQueue;
 /**
  * ASHRAE Standard 135-2012 Clause 21 p. 667<br> 
  * BACnetDateRange ::= SEQUENCE { -- see {@link com.serotonin.bacnet4j.type.primitive.Date} 

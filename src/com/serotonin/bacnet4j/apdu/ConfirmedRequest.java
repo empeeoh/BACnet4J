@@ -30,7 +30,7 @@ import com.serotonin.bacnet4j.enums.MaxSegments;
 import com.serotonin.bacnet4j.exception.BACnetException;
 import com.serotonin.bacnet4j.service.confirmed.ConfirmedRequestService;
 import com.serotonin.bacnet4j.type.constructed.ServicesSupported;
-import com.serotonin.util.queue.ByteQueue;
+import org.free.bacnet4j.util.ByteQueue;
 
 public class ConfirmedRequest extends APDU implements Segmentable {
     private static final long serialVersionUID = -8338535273752015450L;

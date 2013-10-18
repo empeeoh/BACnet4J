@@ -29,7 +29,7 @@ import com.serotonin.bacnet4j.enums.DayOfWeek;
 import com.serotonin.bacnet4j.enums.Month;
 import com.serotonin.bacnet4j.type.primitive.Enumerated;
 import com.serotonin.bacnet4j.type.primitive.OctetString;
-import com.serotonin.util.queue.ByteQueue;
+import org.free.bacnet4j.util.ByteQueue;
 /**
  * ASHRAE Standard 135-2012 Clause 21 p. 713<br>
  * BACnetWeekNDay ::= OCTET STRING (SIZE (3))<br>

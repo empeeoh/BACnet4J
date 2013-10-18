@@ -31,7 +31,7 @@ import java.util.List;
 import com.serotonin.bacnet4j.exception.BACnetException;
 import com.serotonin.bacnet4j.type.enumerated.PropertyIdentifier;
 import com.serotonin.bacnet4j.type.primitive.ObjectIdentifier;
-import com.serotonin.util.queue.ByteQueue;
+import org.free.bacnet4j.util.ByteQueue;
 
 public class ReadAccessSpecification extends BaseType {
     private static final long serialVersionUID = -9098153421380700655L;

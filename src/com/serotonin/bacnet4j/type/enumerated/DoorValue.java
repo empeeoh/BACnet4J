@@ -26,7 +26,7 @@
 package com.serotonin.bacnet4j.type.enumerated;
 
 import com.serotonin.bacnet4j.type.primitive.Enumerated;
-import com.serotonin.util.queue.ByteQueue;
+import org.free.bacnet4j.util.ByteQueue;
 
 /**
  * @author Matthew Lohbihler

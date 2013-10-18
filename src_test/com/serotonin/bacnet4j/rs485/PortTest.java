@@ -5,8 +5,8 @@ import gnu.io.SerialPort;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import com.serotonin.io.serial.SerialParameters;
-import com.serotonin.io.serial.SerialUtils;
+import org.free.bacnet4j.util.SerialParameters;
+import org.free.bacnet4j.util.SerialUtils;
 
 public class PortTest {
     public static void main(String[] args) throws Exception {
