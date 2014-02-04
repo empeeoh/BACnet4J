@@ -187,10 +187,13 @@ public class RequestUtils {
         return results;
     }
 
-    public static PropertyValues readProperties(LocalDevice localDevice, RemoteDevice d, PropertyReferences refs,
-            RequestListener callback) throws BACnetException {
+    public static PropertyValues readProperties(LocalDevice localDevice, 
+    											RemoteDevice d, 
+    											PropertyReferences refs,
+    											RequestListener callback) 
+    													throws BACnetException {
         Map<ObjectIdentifier, List<PropertyReference>> properties;
-        PropertyValues propertyValues = new PropertyValues();
+        final PropertyValues propertyValues = new PropertyValues();
         RequestListenerUpdater updater = new RequestListenerUpdater(callback, propertyValues, refs.size());
 
         boolean multipleSupported = d.getServicesSupported() != null
@@ -200,9 +203,10 @@ public class RequestUtils {
         // Check if a "special" property identifier is contained in the references.
         for (List<PropertyReference> prs : refs.getProperties().values()) {
             for (PropertyReference pr : prs) {
-                PropertyIdentifier pi = pr.getPropertyIdentifier();
-                if (pi.equals(PropertyIdentifier.all) || pi.equals(PropertyIdentifier.required)
-                        || pi.equals(PropertyIdentifier.optional)) {
+                final PropertyIdentifier pi = pr.getPropertyIdentifier();
+                if (pi.equals(PropertyIdentifier.all) ||
+                	pi.equals(PropertyIdentifier.required) ||
+                    pi.equals(PropertyIdentifier.optional)) {
                     forceMultiple = true;
                     break;
                 }
@@ -213,7 +217,8 @@ public class RequestUtils {
         }
 
         if (forceMultiple && !multipleSupported)
-            throw new BACnetException("Cannot send request. ReadPropertyMultiple is required but not supported.");
+            throw new BACnetException("Cannot send request. "
+            		 + "  ReadPropertyMultiple is required but not supported.");
 
         if (forceMultiple || (refs.size() > 1 && multipleSupported)) {
             // Read property multiple can be used. Determine the max references

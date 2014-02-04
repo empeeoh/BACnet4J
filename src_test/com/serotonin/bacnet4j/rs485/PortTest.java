@@ -1,10 +1,7 @@
 package com.serotonin.bacnet4j.rs485;
 
 import gnu.io.SerialPort;
-
 import java.io.InputStream;
-import java.io.OutputStream;
-
 import org.free.bacnet4j.util.SerialParameters;
 import org.free.bacnet4j.util.SerialUtils;
 
@@ -17,7 +14,7 @@ public class PortTest {
 
         SerialPort serialPort = SerialUtils.openSerialPort(params);
         InputStream in = serialPort.getInputStream();
-        OutputStream out = serialPort.getOutputStream();
+        //OutputStream out = serialPort.getOutputStream();
 
         while (true) {
             System.out.print(Integer.toString(in.read(), 16));

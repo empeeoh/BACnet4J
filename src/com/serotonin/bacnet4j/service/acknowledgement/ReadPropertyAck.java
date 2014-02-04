@@ -42,8 +42,10 @@ public class ReadPropertyAck extends AcknowledgementService {
     private final UnsignedInteger propertyArrayIndex;
     private final Encodable value;
 
-    public ReadPropertyAck(ObjectIdentifier eventObjectIdentifier, PropertyIdentifier propertyIdentifier,
-            UnsignedInteger propertyArrayIndex, Encodable value) {
+    public ReadPropertyAck(ObjectIdentifier eventObjectIdentifier, 
+    					   PropertyIdentifier propertyIdentifier,
+            			   UnsignedInteger propertyArrayIndex, 
+            			   Encodable value) {
         this.eventObjectIdentifier = eventObjectIdentifier;
         this.propertyIdentifier = propertyIdentifier;
         this.propertyArrayIndex = propertyArrayIndex;

@@ -57,7 +57,7 @@ public class GetAlarmSummaryRequest extends ConfirmedRequestService {
         // no op
     }
 
-    GetAlarmSummaryRequest(@SuppressWarnings("unused") ByteQueue queue) {
+    GetAlarmSummaryRequest(ByteQueue queue) {
         // no op
     }
 

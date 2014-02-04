@@ -46,26 +46,9 @@ public class Sequence extends BaseType {
         this.values = values;
     }
 
-    @Override
-    public void write(ByteQueue queue) {
-        List<ElementSpecification> specs = definition.getElements();
-        for (ElementSpecification spec : specs) {
-            if (spec.isOptional()) {
-                if (spec.hasContextId())
-                    writeOptional(queue, values.get(spec.getId()), spec.getContextId());
-                else
-                    writeOptional(queue, values.get(spec.getId()));
-            }
-            else {
-                if (spec.hasContextId())
-                    write(queue, values.get(spec.getId()), spec.getContextId());
-                else
-                    write(queue, values.get(spec.getId()));
-            }
-        }
-    }
 
-    public Sequence(SequenceDefinition definition, ByteQueue queue, int contextId) throws BACnetException {
+    public Sequence(SequenceDefinition definition, 
+    				ByteQueue queue, int contextId) throws BACnetException {
         this(definition, popStart0(queue, contextId));
         Encodable.popEnd(queue, contextId);
     }
@@ -102,6 +85,25 @@ public class Sequence extends BaseType {
         }
     }
 
+    @Override
+    public void write(ByteQueue queue) {
+        List<ElementSpecification> specs = definition.getElements();
+        for (ElementSpecification spec : specs) {
+            if (spec.isOptional()) {
+                if (spec.hasContextId())
+                    writeOptional(queue, values.get(spec.getId()), spec.getContextId());
+                else
+                    writeOptional(queue, values.get(spec.getId()));
+            }
+            else {
+                if (spec.hasContextId())
+                    write(queue, values.get(spec.getId()), spec.getContextId());
+                else
+                    write(queue, values.get(spec.getId()));
+            }
+        }
+    }
+    
     public SequenceDefinition getDefinition() {
         return definition;
     }

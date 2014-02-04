@@ -29,7 +29,8 @@ import com.serotonin.bacnet4j.exception.BACnetException;
 import org.free.bacnet4j.util.ByteQueue;
 
 public interface Segmentable {
-    byte getInvokeId();
+    
+	byte getInvokeId();
 
     boolean isSegmentedMessage();
 

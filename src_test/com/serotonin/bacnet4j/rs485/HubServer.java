@@ -7,13 +7,13 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.logging.Logger;
+//import java.util.logging.Logger;
 
 /**
  * Creates a hub that distributes all messages to all listeners except the sender.
  */
 public class HubServer implements Runnable {
-    private static final Logger LOG = Logger.getLogger(HubServer.class.toString());
+   // private static final Logger LOG = Logger.getLogger(HubServer.class.toString());
 
     public static void main(String[] args) throws Exception {
         new HubServer();
@@ -27,10 +27,8 @@ public class HubServer implements Runnable {
 
     @Override
     public void run() {
-        try {
-            // Use the main thread for the socket acceptor.
-            ServerSocket acceptor = new ServerSocket(50505);
-
+    	// Use the main thread for the socket acceptor.
+        try ( ServerSocket acceptor = new ServerSocket(50505)){
             while (true) {
                 Socket socket = acceptor.accept();
                 try {

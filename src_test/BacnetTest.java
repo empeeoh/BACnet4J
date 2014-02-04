@@ -56,8 +56,11 @@ public class BacnetTest {
                 getExtendedDeviceInformation(d);
                 System.out.println("Done getting extended information");
 
-                List oids = ((SequenceOf) RequestUtils.sendReadPropertyAllowNull(localDevice, d,
-                        d.getObjectIdentifier(), PropertyIdentifier.objectList)).getValues();
+                @SuppressWarnings("unchecked")
+				List<ObjectIdentifier> oids = ((SequenceOf<ObjectIdentifier>)
+                						 RequestUtils.sendReadPropertyAllowNull(
+                						localDevice, d, d.getObjectIdentifier(), 
+                						PropertyIdentifier.objectList)).getValues();
                 System.out.println(oids);
             }
             catch (BACnetException e) {

@@ -55,7 +55,10 @@ public class SequenceDefinition implements Serializable {
         private final boolean sequenceOf;
         private final boolean optional;
 
-        public ElementSpecification(String id, Class<? extends Encodable> clazz, boolean sequenceOf, boolean optional) {
+        public ElementSpecification(final String id, 
+        							final Class<? extends Encodable> clazz, 
+        							final boolean sequenceOf, 
+        							final boolean optional) {
             this.id = id;
             this.clazz = clazz;
             this.contextId = -1;
@@ -63,8 +66,11 @@ public class SequenceDefinition implements Serializable {
             this.optional = optional;
         }
 
-        public ElementSpecification(String id, Class<? extends Encodable> clazz, int contextId, boolean sequenceOf,
-                boolean optional) {
+        public ElementSpecification(final String id, 
+        							final Class<? extends Encodable> clazz, 
+        							final int contextId, 
+        							final boolean sequenceOf,
+        							final boolean optional) {
             this.id = id;
             this.clazz = clazz;
             this.contextId = contextId;
