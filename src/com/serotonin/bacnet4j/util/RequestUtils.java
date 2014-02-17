@@ -4,10 +4,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Logger;
 
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
+import org.apache.log4j.Logger;
 
 import com.serotonin.bacnet4j.LocalDevice;
 import com.serotonin.bacnet4j.RemoteDevice;
@@ -17,6 +17,7 @@ import com.serotonin.bacnet4j.exception.BACnetException;
 import com.serotonin.bacnet4j.exception.BACnetTimeoutException;
 import com.serotonin.bacnet4j.exception.ErrorAPDUException;
 import com.serotonin.bacnet4j.obj.ObjectProperties;
+import com.serotonin.bacnet4j.obj.PropertyTypeDefinition;
 import com.serotonin.bacnet4j.service.acknowledgement.ReadPropertyAck;
 import com.serotonin.bacnet4j.service.acknowledgement.ReadPropertyMultipleAck;
 import com.serotonin.bacnet4j.service.confirmed.ReadPropertyMultipleRequest;
@@ -34,13 +35,13 @@ import com.serotonin.bacnet4j.type.constructed.ServicesSupported;
 import com.serotonin.bacnet4j.type.enumerated.AbortReason;
 import com.serotonin.bacnet4j.type.enumerated.ErrorClass;
 import com.serotonin.bacnet4j.type.enumerated.ErrorCode;
+import com.serotonin.bacnet4j.type.enumerated.ObjectType;
 import com.serotonin.bacnet4j.type.enumerated.PropertyIdentifier;
 import com.serotonin.bacnet4j.type.primitive.ObjectIdentifier;
 import com.serotonin.bacnet4j.type.primitive.UnsignedInteger;
 
 public class RequestUtils {
-    private static final Logger LOG = Logger.getLogger(RequestUtils.class.toString());
-
+	private static final Logger LOG = Logger.getLogger(RequestUtils.class);
     /**
      * Does not work with aggregate PIDs like "all".
      */
@@ -137,67 +138,105 @@ public class RequestUtils {
             throw e;
         }
     }
+/**
+ * Given a local device and a remote device with no more than the skeleton of<br> 
+ * information provided by an IAmReq (inst#, segSupp, maxApdu).<br>
+ * Attempts to query the remote device for all required device obj properties one at a time: <br>
+ * -Services supported <br>
+ * -Objects present on device<br>
+ * It adds those to the remote device. These are blocking calls within the method
+ * @param localDevice
+ * @param rd
+ * @throws BACnetException
+ */
+    
+	public static void getExtendedDeviceInformation(final LocalDevice localDevice, 
+    												final RemoteDevice rd) throws BACnetException {
+        final ObjectIdentifier oid = rd.getObjectIdentifier();
 
-    public static void getExtendedDeviceInformation(LocalDevice localDevice, RemoteDevice d) throws BACnetException {
-        ObjectIdentifier oid = d.getObjectIdentifier();
-
-        // Get the device's supported services
-        if (d.getServicesSupported() == null) {
-            ReadPropertyAck supportedServicesAck = (ReadPropertyAck) localDevice.send(d, new ReadPropertyRequest(oid,
-                    PropertyIdentifier.protocolServicesSupported));
-            d.setServicesSupported((ServicesSupported) supportedServicesAck.getValue());
+        // Get the device's supported services if not already present
+        if (rd.getServicesSupported() == null) {
+        	final ReadPropertyRequest rpr = new ReadPropertyRequest(oid, PropertyIdentifier.protocolServicesSupported);
+            final ReadPropertyAck supportedServicesAck = (ReadPropertyAck) localDevice.send(rd, rpr);
+            rd.setServicesSupported((ServicesSupported) supportedServicesAck.getValue());
         }
 
-        // Uses the readProperties method here because this list will probably be extended.
-        PropertyReferences properties = new PropertyReferences();
-        properties.add(oid, PropertyIdentifier.objectName);
-        properties.add(oid, PropertyIdentifier.protocolVersion);
-        //        properties.add(oid, PropertyIdentifier.protocolRevision);
-
-        PropertyValues values = readProperties(localDevice, d, properties, null);
-
-        d.setName(values.getString(oid, PropertyIdentifier.objectName));
-        d.setProtocolVersion((UnsignedInteger) values.getNullOnError(oid, PropertyIdentifier.protocolVersion));
-        //        d.setProtocolRevision((UnsignedInteger) values.getNullOnError(oid, PropertyIdentifier.protocolRevision));
+        // Uses the readProperties method here as this list will probably be extended.
+        PropertyReferences propRefsByObjId = new PropertyReferences();
+     // We could list all the properties or just ask for all.
+       //propRefsByObjId.add(oid, PropertyIdentifier.all);// doesn't work on those that don't support RPM like Contemp controls router(!)
+       final List<PropertyTypeDefinition> objProps = ObjectProperties.getRequiredPropertyTypeDefinitions(ObjectType.device);
+       for(PropertyTypeDefinition pdt: objProps){
+    	   propRefsByObjId.add(oid, pdt.getPropertyIdentifier());
+       }
+       // propRefsByObjId.add(oid, PropertyIdentifier.objectName);
+       // propRefsByObjId.add(oid, PropertyIdentifier.protocolVersion);
+       // propRefsByObjId.add(oid, PropertyIdentifier.protocolRevision);
+        final PropertyValues values = readProperties(localDevice, rd, propRefsByObjId, null);
+        rd.setName(values.getString(oid, PropertyIdentifier.objectName));
+        // systemStatus
+        rd.setVendorName(values.getString(oid, PropertyIdentifier.vendorName));
+        rd.setModelName(values.getString(oid, PropertyIdentifier.modelName));
+        rd.setFirmwareRevision(values.getString(oid, PropertyIdentifier.firmwareRevision));
+        rd.setApplicationSoftwareVersion(values.getString(oid, PropertyIdentifier.applicationSoftwareVersion));
+        rd.setProtocolVersion((UnsignedInteger) values.getNullOnError(oid, PropertyIdentifier.protocolVersion));
+        rd.setProtocolRevision((UnsignedInteger) values.getNullOnError(oid, PropertyIdentifier.protocolRevision));
+        // object types supported
+        final Encodable vees = values.getNullOnError(oid,PropertyIdentifier.objectList);
+        if(vees != null){
+        	@SuppressWarnings("unchecked")
+        	final List<ObjectIdentifier> oids = ((SequenceOf<ObjectIdentifier>)vees).getValues();
+        	for(final ObjectIdentifier obj: oids){
+        		rd.setObject(new RemoteObject(obj));
+        	}
+        }
+        // APDU timeout
+        // apdu retries
+        // device address binding
+        // database revision
+        
     }
 
     /**
      * This version of the readProperties method will preserve the order of properties given in the list in the results.
      * 
-     * @param d
+     * @param rd
      *            the device to which to send the request
      * @param oprs
      *            the list of property references to request
      * @return a list of the original property reference objects wrapped with their values
      * @throws BACnetException
      */
-    public static List<Pair<ObjectPropertyReference, Encodable>> readProperties(LocalDevice localDevice,
-            RemoteDevice d, List<ObjectPropertyReference> oprs, RequestListener callback) throws BACnetException {
-        PropertyReferences refs = new PropertyReferences();
-        for (ObjectPropertyReference opr : oprs)
+    public static List<Pair<ObjectPropertyReference, Encodable>> readProperties(
+    											  final LocalDevice localDevice,
+    											  final RemoteDevice rd, 
+    											  final List<ObjectPropertyReference> oprs, 
+    											  final RequestListener callback) 
+    													throws BACnetException {
+        final PropertyReferences refs = new PropertyReferences();
+        // Defensive copy of the refs maps.
+        for (final ObjectPropertyReference opr : oprs)
             refs.add(opr.getObjectIdentifier(), opr.getPropertyIdentifier());
 
-        PropertyValues pvs = readProperties(localDevice, d, refs, callback);
+        final PropertyValues pvs = readProperties(localDevice, rd, refs, callback);
 
         // Read the properties in the same order.
-        List<Pair<ObjectPropertyReference, Encodable>> results = new ArrayList<Pair<ObjectPropertyReference, Encodable>>();
-        for (ObjectPropertyReference opr : oprs)
+        final List<Pair<ObjectPropertyReference, Encodable>> results = new ArrayList<>();
+        for (final ObjectPropertyReference opr : oprs)
             results.add(new ImmutablePair<ObjectPropertyReference, Encodable>(opr, pvs.getNoErrorCheck(opr)));
 
         return results;
     }
 
-    public static PropertyValues readProperties(LocalDevice localDevice, 
-    											RemoteDevice d, 
-    											PropertyReferences refs,
-    											RequestListener callback) 
+    public static PropertyValues readProperties(final LocalDevice localDevice, 
+    											final RemoteDevice rd, 
+    											final PropertyReferences refs,
+    											final RequestListener callback) 
     													throws BACnetException {
-        Map<ObjectIdentifier, List<PropertyReference>> properties;
         final PropertyValues propertyValues = new PropertyValues();
-        RequestListenerUpdater updater = new RequestListenerUpdater(callback, propertyValues, refs.size());
-
-        boolean multipleSupported = d.getServicesSupported() != null
-                && d.getServicesSupported().isReadPropertyMultiple();
+        final RequestListenerUpdater updater = new RequestListenerUpdater(callback, propertyValues, refs.size());
+        boolean multipleSupported = rd.getServicesSupported() != null
+                && rd.getServicesSupported().isReadPropertyMultiple();
 
         boolean forceMultiple = false;
         // Check if a "special" property identifier is contained in the references.
@@ -211,44 +250,40 @@ public class RequestUtils {
                     break;
                 }
             }
-
             if (forceMultiple)
                 break;
         }
 
         if (forceMultiple && !multipleSupported)
-            throw new BACnetException("Cannot send request. "
+            throw new BACnetException("Cannot send request to device " + rd.getInstanceNumber()
             		 + "  ReadPropertyMultiple is required but not supported.");
 
         if (forceMultiple || (refs.size() > 1 && multipleSupported)) {
             // Read property multiple can be used. Determine the max references
 
-            int maxRef = d.getMaxReadMultipleReferences();
+            int maxRef = rd.getMaxReadMultipleReferences();
 
             // If the device supports read property multiple, send them all at once, or at least in partitions.
-            List<PropertyReferences> partitions = refs.getPropertiesPartitioned(maxRef);
+            final List<PropertyReferences> partitions = refs.getPropertiesPartitioned(maxRef);
             int counter = 0;
             for (PropertyReferences partition : partitions) {
-                properties = partition.getProperties();
-                List<ReadAccessSpecification> specs = new ArrayList<ReadAccessSpecification>();
+            	final Map<ObjectIdentifier, List<PropertyReference>> properties = partition.getProperties();
+                final List<ReadAccessSpecification> specs = new ArrayList<>();
                 for (ObjectIdentifier oid : properties.keySet())
                     specs.add(new ReadAccessSpecification(oid, new SequenceOf<PropertyReference>(properties.get(oid))));
-
-                ReadPropertyMultipleRequest request = new ReadPropertyMultipleRequest(
-                        new SequenceOf<ReadAccessSpecification>(specs));
-
-                ReadPropertyMultipleAck ack;
+                final ReadPropertyMultipleRequest request = new ReadPropertyMultipleRequest(
+                        		new SequenceOf<ReadAccessSpecification>(specs));
                 try {
-                    ack = (ReadPropertyMultipleAck) localDevice.send(d, request);
+                    final ReadPropertyMultipleAck ack = (ReadPropertyMultipleAck) 
+                    								localDevice.send(rd, request);
                     counter++;
-
-                    List<ReadAccessResult> results = ack.getListOfReadAccessResults().getValues();
-                    ObjectIdentifier oid;
-                    for (ReadAccessResult objectResult : results) {
-                        oid = objectResult.getObjectIdentifier();
-                        for (Result result : objectResult.getListOfResults().getValues()) {
-                            updater.increment(oid, result.getPropertyIdentifier(), result.getPropertyArrayIndex(),
-                                    result.getReadResult().getDatum());
+                    final List<ReadAccessResult> results = ack.getListOfReadAccessResults().getValues();
+                    for (final ReadAccessResult objectResult : results) {
+                        final ObjectIdentifier oid = objectResult.getObjectIdentifier();
+                        for (final Result result : objectResult.getListOfResults().getValues()) {
+                            updater.increment(oid, result.getPropertyIdentifier(), 
+                            				  result.getPropertyArrayIndex(),
+                            				  result.getReadResult().getDatum());
                             if (updater.cancelled())
                                 break;
                         }
@@ -258,16 +293,16 @@ public class RequestUtils {
                     }
                 }
                 catch (AbortAPDUException e) {
-                    LOG.warning("Chunked request failed.");
+                    LOG.warn("Chunked request failed.");
                     if (e.getApdu().getAbortReason() == AbortReason.bufferOverflow.intValue()
-                            || e.getApdu().getAbortReason() == AbortReason.segmentationNotSupported.intValue()) {
+                     || e.getApdu().getAbortReason() == AbortReason.segmentationNotSupported.intValue()) {
                         if (counter > 0)
-                            sendOneAtATime(localDevice, d, partition, updater);
+                            sendOneAtATime(localDevice, rd, partition, updater);
                         else {
                             // Failed on the first partition. Send all one at a time, reduce the device's max
                             // references, and quit.
-                            sendOneAtATime(localDevice, d, refs, updater);
-                            d.reduceMaxReadMultipleReferences();
+                            sendOneAtATime(localDevice, rd, refs, updater);
+                            rd.reduceMaxReadMultipleReferences();
                             break;
                         }
                     }
@@ -291,7 +326,7 @@ public class RequestUtils {
         }
         else
             // If it doesn't support read property multiple, send them one at a time.
-            sendOneAtATime(localDevice, d, refs, updater);
+            sendOneAtATime(localDevice, rd, refs, updater);
 
         return propertyValues;
     }
