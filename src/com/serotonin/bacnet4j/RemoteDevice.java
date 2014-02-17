@@ -44,12 +44,15 @@ public class RemoteDevice implements Serializable {
     private final int instanceNumber;
     private final Address address;
     private final OctetString linkService;
+    
     private int maxAPDULengthAccepted;
     private Segmentation segmentationSupported;
     private int vendorId;
     private String vendorName;
     private String name;
     private String modelName;
+    private String firmwareRevision; 
+    private String applicationSoftwareVersion;
     private UnsignedInteger protocolVersion;
     private UnsignedInteger protocolRevision;
     private ServicesSupported servicesSupported;
@@ -74,10 +77,14 @@ public class RemoteDevice implements Serializable {
     }
 
     public String toExtendedString() {
-        return "RemoteDevice(instanceNumber=" + instanceNumber + ", address=" + address + ", linkServiceAddress="
-                + linkService + ", maxAPDULengthAccepted=" + maxAPDULengthAccepted + ", segmentationSupported="
-                + segmentationSupported + ", vendorId=" + vendorId + ", vendorName=" + vendorName + ", name=" + name
-                + ", servicesSupported=" + servicesSupported + ", objects=" + objects + ")";
+        return "RemoteDevice(instanceNumber=" + instanceNumber + 
+        		", address=" + address + ", linkServiceAddress=" + linkService +
+        		", maxAPDULengthAccepted=" + maxAPDULengthAccepted + 
+        		", segmentationSupported=" + segmentationSupported + 
+        		", vendorId=" + vendorId + ", vendorName=" + vendorName + 
+        		", name=" + name + ", firmwareRevision=" + firmwareRevision +
+        		", applicationSoftwareVersion=" + applicationSoftwareVersion + 
+        		", servicesSupported=" + servicesSupported + ", objects=" + objects + ")";
     }
 
     public void setObject(RemoteObject o) {
@@ -134,6 +141,22 @@ public class RemoteDevice implements Serializable {
 
     public void setVendorName(String vendorName) {
         this.vendorName = vendorName;
+    }
+    
+    public String getFirmwareRevision() {
+        return firmwareRevision;
+    }
+
+    public void setFirmwareRevision(String firmwareRevision) {
+        this.firmwareRevision = firmwareRevision;
+    }
+
+    public String getApplicationSoftwareVersion() {
+        return applicationSoftwareVersion;
+    }
+
+    public void setApplicationSoftwareVersion(String applicationSoftwareVersion) {
+        this.applicationSoftwareVersion = applicationSoftwareVersion;
     }
 
     public int getInstanceNumber() {
