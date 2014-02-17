@@ -36,35 +36,35 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Collections;
 
-import com.serotonin.bacnet4j.LocalDevice;
 import com.serotonin.bacnet4j.apdu.APDU;
 import com.serotonin.bacnet4j.base.BACnetUtils;
 import com.serotonin.bacnet4j.enums.MaxApduLength;
 import com.serotonin.bacnet4j.exception.BACnetException;
 import com.serotonin.bacnet4j.npdu.IncomingRequestParser;
+import com.serotonin.bacnet4j.npdu.IncomingRequestProcessor;
 import com.serotonin.bacnet4j.npdu.MessageValidationAssertionException;
 import com.serotonin.bacnet4j.npdu.Network;
 import com.serotonin.bacnet4j.npdu.NetworkIdentifier;
 import com.serotonin.bacnet4j.transport.Transport;
 import com.serotonin.bacnet4j.type.constructed.Address;
 import com.serotonin.bacnet4j.type.primitive.OctetString;
+
+import org.apache.log4j.Logger;
 import org.free.bacnet4j.util.ByteQueue;
 
-public class IpNetwork extends Network implements Runnable {
+public class IpNetwork extends Network{
+	private static final Logger LOG = Logger.getLogger(IpNetwork.class);
     public static final String DEFAULT_BROADCAST_IP = "255.255.255.255";
     public static final int DEFAULT_PORT = 0xBAC0; // == 47808
     public static final String DEFAULT_BIND_IP = "0.0.0.0";
 
     private static final int MESSAGE_LENGTH = 2048;
-
-    LocalDevice localDevice;
-
     private final int port;
     private final String localBindAddress;
     private final String broadcastIp;
 
     // Runtime
-    private Thread thread;
+    final private Thread incomingMessageProcessor;
     private DatagramSocket socket;
     private Address broadcastAddress;
 
@@ -84,11 +84,15 @@ public class IpNetwork extends Network implements Runnable {
         this(broadcastIp, port, localBindAddress, 0);
     }
 
-    public IpNetwork(String broadcastIp, int port, String localBindAddress, int localNetworkNumber) {
+    public IpNetwork(final String broadcastIp, 
+    			     final int port, 
+    			     final String localBindAddress, 
+    			     final int localNetworkNumber) {
         super(localNetworkNumber);
         this.broadcastIp = broadcastIp;
         this.port = port;
         this.localBindAddress = localBindAddress;
+        this.incomingMessageProcessor = new IncomingMessageProcessor();
     }
 
     @Override
@@ -112,24 +116,19 @@ public class IpNetwork extends Network implements Runnable {
     public String getBroadcastIp() {
         return broadcastIp;
     }
-
+    
     @Override
     public void initialize(Transport transport) throws Exception {
         super.initialize(transport);
-
-        this.localDevice = transport.getLocalDevice();
-
         if (localBindAddress.equals("0.0.0.0"))
             socket = new DatagramSocket(port);
         else
             socket = new DatagramSocket(port, InetAddress.getByName(localBindAddress));
         socket.setBroadcast(true);
 
-        //        broadcastAddress = new Address(broadcastIp, port, new Network(0xffff, new byte[0]));
+        //broadcastAddress = new Address(broadcastIp, port, new Network(0xffff, new byte[0]));
         broadcastAddress = new Address(BACnetUtils.dottedStringToBytes(broadcastIp), port);
-
-        thread = new Thread(this);
-        thread.start();
+        incomingMessageProcessor.start();
     }
 
     @Override
@@ -149,7 +148,7 @@ public class IpNetwork extends Network implements Runnable {
 
     @Override
     public void checkSendThread() {
-        if (Thread.currentThread() == thread)
+        if (Thread.currentThread() == incomingMessageProcessor)
             throw new IllegalStateException("Cannot send a request in the socket listener thread.");
     }
 
@@ -226,31 +225,29 @@ public class IpNetwork extends Network implements Runnable {
         }
     }
 
-    //
-    // For receiving
-    @Override
-    public void run() {
-        byte[] buffer = new byte[MESSAGE_LENGTH];
-        DatagramPacket p = new DatagramPacket(buffer, buffer.length);
-
-        while (!socket.isClosed()) {
-            try {
-                socket.receive(p);
-
-                ByteQueue queue = new ByteQueue(p.getData(), 0, p.getLength());
-                OctetString link = new OctetString(p.getAddress().getAddress(), p.getPort());
-                new IncomingMessageExecutor(this, queue, link).run();
-                p.setData(buffer);
-            }
-            catch (IOException e) {
-                // no op. This happens if the socket gets closed by the destroy method.
-            }
-        }
-    }
-
-    public void testDecoding(byte[] message) {
-        IncomingMessageExecutor ime = new IncomingMessageExecutor(null, new ByteQueue(message), null);
-        ime.run();
+    private class IncomingMessageProcessor extends Thread{
+    	/**
+    	 * Runnable that handles incoming messages
+    	 */
+    	@Override
+    	public void run() {
+    		byte[] buffer = new byte[MESSAGE_LENGTH];
+    		final DatagramPacket p = new DatagramPacket(buffer, buffer.length);
+    		while (!socket.isClosed()) {
+    			try {
+    				socket.receive(p);
+    				final ByteQueue queue = new ByteQueue(p.getData(), 0, p.getLength());
+    				final OctetString link = new OctetString(p.getAddress().getAddress(), 
+    						p.getPort());
+    				IncomingRequestProcessor.getIncomingRequestProcessor().submit(
+    				new IncomingMessageExecutor(IpNetwork.this, queue, link));
+    				p.setData(buffer);
+    			}
+    			catch (IOException e) {
+    				// no op. This happens if the socket gets closed by the destroy method.
+    			}
+    		}
+    	}
     }
 
     public APDU createApdu(byte[] message) throws Exception {
@@ -258,8 +255,14 @@ public class IpNetwork extends Network implements Runnable {
         return ime.parseApdu();
     }
 
-    class IncomingMessageExecutor extends IncomingRequestParser {
-        public IncomingMessageExecutor(Network network, ByteQueue queue, OctetString localFrom) {
+//  public void testDecoding(byte[] message) {
+//  IncomingMessageExecutor ime = new IncomingMessageExecutor(null, new ByteQueue(message), null);
+//  ime.run();
+//}
+    static class IncomingMessageExecutor extends IncomingRequestParser {
+    	
+        public IncomingMessageExecutor(final Network network, final ByteQueue queue,
+        							   final OctetString localFrom) {
             super(network, queue, localFrom);
         }
 
@@ -270,26 +273,25 @@ public class IpNetwork extends Network implements Runnable {
             if (queue.pop() != (byte) 0x81)
                 throw new MessageValidationAssertionException("Protocol id is not BACnet/IP (0x81)");
 
-            byte function = queue.pop();
-            if (function != 0xa && function != 0xb && function != 0x4 && function != 0x0)
-                throw new MessageValidationAssertionException("Function is not unicast, broadcast, forward"
-                        + " or foreign device reg anwser (0xa, 0xb, 0x4 or 0x0)");
-
-            int length = BACnetUtils.popShort(queue);
+            final byte function = queue.pop();
+            if (function != 0xa && function != 0xb && 
+            	function != 0x4 && function != 0x0)
+                throw new MessageValidationAssertionException("Function is not "
+                		+ "unicast, broadcast, forward or foreign device reg "
+                		+ "anwser (0xa, 0xb, 0x4 or 0x0)");
+            final int length = BACnetUtils.popShort(queue);
             if (length != queue.size() + 4)
-                throw new MessageValidationAssertionException("Length field does not match data: given=" + length
-                        + ", expected=" + (queue.size() + 4));
-
-            // answer to foreign device registration
+                throw new MessageValidationAssertionException("Length field does"
+                		+ " not match data: given=" + length + ", expected=" 
+                		+ (queue.size() + 4));
+            // Answer to foreign device registration
             if (function == 0x0) {
-                int result = BACnetUtils.popShort(queue);
+                final int result = BACnetUtils.popShort(queue);
                 if (result != 0)
-                    System.out.println("Foreign device registration not successful! result: " + result);
-
+                    LOG.info("Foreign device registration not successful! result: " + result);
                 // not APDU received, bail
                 return;
             }
-
             if (function == 0x4) {
                 // A forward. Use the address/port as the link service address.
                 byte[] addr = new byte[6];
@@ -320,7 +322,6 @@ public class IpNetwork extends Network implements Runnable {
                     return addr;
             }
         }
-
         return InetAddress.getLocalHost();
     }
 
@@ -361,7 +362,7 @@ public class IpNetwork extends Network implements Runnable {
             return false;
         if (getClass() != obj.getClass())
             return false;
-        IpNetwork other = (IpNetwork) obj;
+        final IpNetwork other = (IpNetwork) obj;
         if (broadcastIp == null) {
             if (other.broadcastIp != null)
                 return false;
