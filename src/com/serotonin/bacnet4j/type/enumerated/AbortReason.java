@@ -25,6 +25,8 @@
  */
 package com.serotonin.bacnet4j.type.enumerated;
 
+import java.util.HashMap;
+import java.util.Map;
 import com.serotonin.bacnet4j.type.primitive.Enumerated;
 import org.free.bacnet4j.util.ByteQueue;
 
@@ -35,31 +37,56 @@ public class AbortReason extends Enumerated {
     public static final AbortReason invalidApduInThisState = new AbortReason(2);
     public static final AbortReason preemptedByHigherPriorityTask = new AbortReason(3);
     public static final AbortReason segmentationNotSupported = new AbortReason(4);
-
-    public static final AbortReason[] ALL = { other, bufferOverflow, invalidApduInThisState,
-            preemptedByHigherPriorityTask, segmentationNotSupported, };
+    private final BNAbortReason bnAbortReason;
+    public enum BNAbortReason{
+    	OTHER((byte)0, "Other"),
+    	BUFFER_OVERFLOW((byte)1, "Buffer overflow"),
+    	INVALID_APDU_IN_THIS_STATE((byte)2, "Invalid APDU in this state"),
+    	PREEMPTED_BY_HIGHER_PRIORITY_TASK((byte)3, "Preempted by higher priority task"),
+    	SEGMENTATION_NOT_SUPPORTED((byte)4, "Segmentation not supported");
+    	
+    	private BNAbortReason(byte bCode, String desc) {
+            this.value = bCode;
+            this.desc = desc;
+        }
+    	private final String desc;
+    	private final byte value;
+    	
+    	public byte byteCode(){return value;}
+    	public String description(){return desc;}
+    
+    	private static final Map<Byte, BNAbortReason> reasonByBCode =
+                new HashMap<Byte, BNAbortReason>(BNAbortReason.values().length);
+    	static {
+    		for (BNAbortReason r : BNAbortReason.values())
+    			reasonByBCode.put(r.value, r);
+    	}
+        public static BNAbortReason reasonByBCode(byte bCode) {
+            return reasonByBCode.get(bCode);
+        }
+    }
+    
+    public static final AbortReason[] ALL = { 
+    	other, 
+    	bufferOverflow, 
+    	invalidApduInThisState,
+    	preemptedByHigherPriorityTask, 
+    	segmentationNotSupported };
 
     public AbortReason(int value) {
         super(value);
+        this.bnAbortReason = BNAbortReason.reasonByBCode((byte)value);
     }
 
     public AbortReason(ByteQueue queue) {
         super(queue);
+        this.bnAbortReason = BNAbortReason.reasonByBCode(byteValue());
     }
+    
+    public BNAbortReason getReason(){ return bnAbortReason;}
 
     @Override
     public String toString() {
-        int type = intValue();
-        if (type == other.intValue())
-            return "Other";
-        if (type == bufferOverflow.intValue())
-            return "Buffer overflow";
-        if (type == invalidApduInThisState.intValue())
-            return "Invalid APDU in this state";
-        if (type == preemptedByHigherPriorityTask.intValue())
-            return "Preempted by higher priority task";
-        if (type == segmentationNotSupported.intValue())
-            return "Segmentation not supported";
-        return "Unknown abort reason(" + type + ")";
+    	return bnAbortReason.description();
     }
 }
