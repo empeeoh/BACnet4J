@@ -5,6 +5,9 @@
     <fileset dir="lib">
       <include name="*.jar"/>
     </fileset>
+  	<fileset dir="lib/log4j">
+  	   <include name="log4j-1.2.17.jar"/>
+  	</fileset>
   	<fileset dir="lib-opt">
   		<include name="*.jar"/>
   	</fileset>
