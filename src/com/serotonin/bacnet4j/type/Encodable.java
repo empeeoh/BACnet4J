@@ -367,8 +367,11 @@ abstract public class Encodable implements Serializable {
     }
 
     // Read vendor-specific
-    protected static Sequence readVendorSpecific(ByteQueue queue, UnsignedInteger vendorId,
-            UnsignedInteger serviceNumber, Map<VendorServiceKey, SequenceDefinition> resolutions, int contextId)
+    protected static Sequence readVendorSpecific(final ByteQueue queue, 
+    											 final UnsignedInteger vendorId,
+    											 final UnsignedInteger serviceNumber,
+    											 final Map<VendorServiceKey, SequenceDefinition> resolutions, 
+    											 final int contextId)
             throws BACnetException {
         if (readStart(queue) != contextId)
             return null;

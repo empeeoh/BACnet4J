@@ -166,7 +166,7 @@ public class DeviceEventHandler {
     }
 
     public void firePrivateTransfer(final UnsignedInteger vendorId, final UnsignedInteger serviceNumber,
-            final Encodable serviceParameters) {
+            						final Encodable serviceParameters) {
         for (DeviceEventListener l : listeners) {
             try {
                 l.privateTransferReceived(vendorId, serviceNumber, serviceParameters);

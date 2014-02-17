@@ -1,8 +1,6 @@
 package com.serotonin.bacnet4j.transport;
 
 import java.util.LinkedList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import com.serotonin.bacnet4j.LocalDevice;
 import com.serotonin.bacnet4j.apdu.APDU;
@@ -40,6 +38,8 @@ import com.serotonin.bacnet4j.type.enumerated.ErrorCode;
 import com.serotonin.bacnet4j.type.enumerated.Segmentation;
 import com.serotonin.bacnet4j.type.error.BaseError;
 import com.serotonin.bacnet4j.type.primitive.OctetString;
+
+import org.apache.log4j.Logger;
 import org.free.bacnet4j.util.ByteQueue;
 
 /**
@@ -53,7 +53,7 @@ public class Transport {
     public static final int DEFAULT_SEG_WINDOW = 5;
     public static final int DEFAULT_RETRIES = 2;
 
-    private static final Logger LOG = Logger.getLogger(Transport.class.getName());
+    private static final Logger LOG = Logger.getLogger(LocalDevice.class);
     private static final MaxSegments MAX_SEGMENTS = MaxSegments.MORE_THAN_64;
 
     private LocalDevice localDevice;
@@ -65,7 +65,7 @@ public class Transport {
     private int segWindow = DEFAULT_SEG_WINDOW;
     private int retries = DEFAULT_RETRIES;
 
-    public Transport(Network network) {
+    public Transport(final Network network) {
         this.network = network;
     }
 
@@ -140,13 +140,20 @@ public class Transport {
      * @return
      * @throws BACnetException
      */
-    public AcknowledgementService send(Address address, OctetString linkService, int maxAPDULengthAccepted,
-            Segmentation segmentationSupported, ConfirmedRequestService service) throws BACnetException {
+    public AcknowledgementService send(final Address address, 
+    								   final OctetString linkService, 
+    								   final int maxAPDULengthAccepted,
+    								   final Segmentation segmentationSupported, 
+    								   final ConfirmedRequestService service) throws BACnetException {
         if (address == null)
             throw new IllegalArgumentException("address cannot be null");
         network.checkSendThread();
-        if (address.equals(linkService))
-            linkService = null;
+        final OctetString ls; 
+        if (address.equals(linkService)){
+            ls = null;
+        }else{
+        	ls = linkService;
+        }
 
         // Serialize the service request.
         ByteQueue serviceData = new ByteQueue();
@@ -158,14 +165,14 @@ public class Transport {
         if (serviceData.size() > maxAPDULengthAccepted - ConfirmedRequest.getHeaderSize(false)) {
             int maxServiceData = maxAPDULengthAccepted - ConfirmedRequest.getHeaderSize(true);
             // Check if the device can accept what we want to send.
-            if (segmentationSupported.intValue() == Segmentation.noSegmentation.intValue()
-                    || segmentationSupported.intValue() == Segmentation.segmentedTransmit.intValue())
+            if (segmentationSupported.intValue() == Segmentation.noSegmentation.intValue() ||
+                segmentationSupported.intValue() == Segmentation.segmentedTransmit.intValue())
                 throw new BACnetException("Request too big to send to device without segmentation");
             int segmentsRequired = serviceData.size() / maxServiceData + 1;
             if (segmentsRequired > 128)
                 throw new BACnetException("Request too big to send to device; too many segments required");
 
-            WaitingRoomKey key = waitingRoom.enterClient(address, linkService);
+            WaitingRoomKey key = waitingRoom.enterClient(address, ls);
             try {
                 ConfirmedRequest template = new ConfirmedRequest(true, true, true, MAX_SEGMENTS,
                         network.getMaxApduLength(), key.getInvokeId(), 0, segWindow, service.getChoiceId(),
@@ -181,9 +188,11 @@ public class Transport {
         }
         else {
             // We can send the whole APDU in one shot.
-            WaitingRoomKey key = waitingRoom.enterClient(address, linkService);
-            ConfirmedRequest apdu = new ConfirmedRequest(false, false, true, MAX_SEGMENTS, network.getMaxApduLength(),
-                    key.getInvokeId(), (byte) 0, 0, service.getChoiceId(), serviceData);
+            final WaitingRoomKey key = waitingRoom.enterClient(address, ls);
+            final ConfirmedRequest apdu = new ConfirmedRequest(false, false, true, 
+            							MAX_SEGMENTS, network.getMaxApduLength(),
+            							key.getInvokeId(), (byte) 0, 0, 
+            							service.getChoiceId(), serviceData);
             try {
                 ack = sendSegments(key, timeout, new APDU[] { apdu });
             }
@@ -214,18 +223,20 @@ public class Transport {
         return network.getLocalBroadcastAddress();
     }
 
-    public void sendUnconfirmed(Address address, OctetString linkService, UnconfirmedRequestService serviceRequest,
-            boolean broadcast) throws BACnetException {
-        if (address == null)
-            throw new IllegalArgumentException("address cannot be null");
-        if (address.equals(linkService))
-            linkService = null;
-
-        // Unconfirmed services will never have to be segmented, so just send it.
-        network.sendAPDU(address, linkService, new UnconfirmedRequest(serviceRequest), broadcast);
+    public void sendUnconfirmed(final Address address, 
+    							final OctetString linkService, 
+    							final UnconfirmedRequestService serviceRequest,
+    							final boolean broadcast) throws BACnetException {
+    	if (address == null)
+    		throw new IllegalArgumentException("Address cannot be null");
+    	// Unconfirmed services will never have to be segmented, so just send it.
+    	if (address.equals(linkService)){
+    		network.sendAPDU(address, null, new UnconfirmedRequest(serviceRequest), broadcast);
+    	}else{
+    		network.sendAPDU(address, linkService, new UnconfirmedRequest(serviceRequest), broadcast);   
+    	}
     }
 
-    //
     //
     // Receiving messages - messages are initiated externally, and received from the data link. Just call the handler
     // method in the service.
@@ -418,8 +429,8 @@ public class Transport {
      * @throws BACnetException
      */
     void receiveSegmented(WaitingRoomKey key, Segmentable firstPart) throws BACnetException {
-        if (LOG.isLoggable(Level.FINER))
-            LOG.finer("receiveSegmented: start");
+        if (LOG.isDebugEnabled())
+            LOG.debug("receiveSegmented: start");
 
         boolean server = !key.isFromServer();
         byte id = firstPart.getInvokeId();
@@ -461,8 +472,8 @@ public class Transport {
             // We have the required segment. Append the part to the first part.
             // System.out.println("Received segment "+ segment.getSequenceNumber());
             firstPart.appendServiceData(segment.getServiceData());
-            if (LOG.isLoggable(Level.FINER))
-                LOG.finer("receiveSegmented: got segment " + lastSeq);
+            if (LOG.isDebugEnabled())
+                LOG.debug("receiveSegmented: got segment " + lastSeq);
             lastSeq++;
 
             // Do we need to send an ack?
@@ -479,8 +490,8 @@ public class Transport {
                 break;
         }
 
-        if (LOG.isLoggable(Level.FINER))
-            LOG.finer("receiveSegmented: done");
+        if (LOG.isDebugEnabled())
+            LOG.debug("receiveSegmented: done");
     }
 
     public void incomingApdu(APDU apdu, Address address, OctetString linkService) throws BACnetException {

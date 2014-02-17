@@ -36,7 +36,7 @@ abstract public class Network {
 
     abstract public MaxApduLength getMaxApduLength();
 
-    public void initialize(Transport transport) throws Exception {
+    public void initialize(final Transport transport) throws Exception {
         this.transport = transport;
     }
 
@@ -46,8 +46,10 @@ abstract public class Network {
 
     abstract public Address[] getAllLocalAddresses();
 
-    abstract public void sendAPDU(Address recipient, OctetString linkService, APDU apdu, boolean broadcast)
-            throws BACnetException;
+    abstract public void sendAPDU(final Address recipient, 
+    							  final OctetString linkService, 
+    							  final APDU apdu, 
+    							  final boolean broadcast) throws BACnetException;
 
     abstract public void checkSendThread();
 

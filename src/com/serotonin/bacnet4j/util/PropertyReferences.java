@@ -46,7 +46,7 @@ public class PropertyReferences implements Serializable {
             refs = new ArrayList<PropertyReference>();
             properties.put(oid, refs);
         }
-        refs.add(ref);
+        refs.add(ref);//TODO: should this list be a set? can we have dups? does order matter?
     }
 
     public void add(ObjectIdentifier oid, PropertyIdentifier pid) {
@@ -64,9 +64,8 @@ public class PropertyReferences implements Serializable {
             partitions.add(this);
         else {
             PropertyReferences partition = null;
-            List<PropertyReference> refs;
             for (ObjectIdentifier oid : properties.keySet()) {
-                refs = properties.get(oid);
+            	final List<PropertyReference> refs = properties.get(oid);
                 for (PropertyReference ref : refs) {
                     if (partition == null || partition.size() >= maxPartitionSize) {
                         partition = new PropertyReferences();

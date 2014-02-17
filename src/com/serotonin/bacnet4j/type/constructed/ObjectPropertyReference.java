@@ -35,15 +35,17 @@ public class ObjectPropertyReference extends BaseType {
     private static final long serialVersionUID = 5896660853668343357L;
     private final ObjectIdentifier objectIdentifier;
     private final PropertyIdentifier propertyIdentifier;
-    private UnsignedInteger propertyArrayIndex;
+    private UnsignedInteger propertyArrayIndex = null;
 
-    public ObjectPropertyReference(ObjectIdentifier objectIdentifier, PropertyIdentifier propertyIdentifier) {
+    public ObjectPropertyReference(final ObjectIdentifier objectIdentifier, 
+    							   final PropertyIdentifier propertyIdentifier) {
         this.objectIdentifier = objectIdentifier;
         this.propertyIdentifier = propertyIdentifier;
     }
 
-    public ObjectPropertyReference(ObjectIdentifier objectIdentifier, PropertyIdentifier propertyIdentifier,
-            UnsignedInteger propertyArrayIndex) {
+    public ObjectPropertyReference(final ObjectIdentifier objectIdentifier, 
+    							   final PropertyIdentifier propertyIdentifier,
+    							   final UnsignedInteger propertyArrayIndex) {
         this.objectIdentifier = objectIdentifier;
         this.propertyIdentifier = propertyIdentifier;
         this.propertyArrayIndex = propertyArrayIndex;

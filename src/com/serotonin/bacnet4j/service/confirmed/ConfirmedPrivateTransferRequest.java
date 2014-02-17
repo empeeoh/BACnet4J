@@ -27,7 +27,6 @@ package com.serotonin.bacnet4j.service.confirmed;
 
 import java.util.HashMap;
 import java.util.Map;
-
 import com.serotonin.bacnet4j.LocalDevice;
 import com.serotonin.bacnet4j.exception.BACnetException;
 import com.serotonin.bacnet4j.service.VendorServiceKey;
@@ -50,8 +49,9 @@ public class ConfirmedPrivateTransferRequest extends ConfirmedRequestService {
     private final UnsignedInteger serviceNumber;
     private final Encodable serviceParameters;
 
-    public ConfirmedPrivateTransferRequest(UnsignedInteger vendorId, UnsignedInteger serviceNumber,
-            Encodable serviceParameters) {
+    public ConfirmedPrivateTransferRequest(final UnsignedInteger vendorId,
+    									   final UnsignedInteger serviceNumber,
+    									   final Encodable serviceParameters) {
         this.vendorId = vendorId;
         this.serviceNumber = serviceNumber;
         this.serviceParameters = serviceParameters;

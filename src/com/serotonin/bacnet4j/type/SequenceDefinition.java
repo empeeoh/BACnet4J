@@ -52,30 +52,30 @@ public class SequenceDefinition implements Serializable {
         private final String id;
         private final Class<? extends Encodable> clazz;
         private final int contextId;
-        private final boolean sequenceOf;
-        private final boolean optional;
+        private final boolean isSequenceOf;
+        private final boolean isOptional;
 
         public ElementSpecification(final String id, 
         							final Class<? extends Encodable> clazz, 
-        							final boolean sequenceOf, 
-        							final boolean optional) {
+        							final boolean isSequenceOf, 
+        							final boolean isOptional) {
             this.id = id;
             this.clazz = clazz;
             this.contextId = -1;
-            this.sequenceOf = sequenceOf;
-            this.optional = optional;
+            this.isSequenceOf = isSequenceOf;
+            this.isOptional = isOptional;
         }
 
         public ElementSpecification(final String id, 
         							final Class<? extends Encodable> clazz, 
         							final int contextId, 
-        							final boolean sequenceOf,
-        							final boolean optional) {
+        							final boolean isSequenceOf,
+        							final boolean isOptional) {
             this.id = id;
             this.clazz = clazz;
             this.contextId = contextId;
-            this.sequenceOf = sequenceOf;
-            this.optional = optional;
+            this.isSequenceOf = isSequenceOf;
+            this.isOptional = isOptional;
         }
 
         public String getId() {
@@ -91,11 +91,11 @@ public class SequenceDefinition implements Serializable {
         }
 
         public boolean isOptional() {
-            return optional;
+            return isOptional;
         }
 
         public boolean isSequenceOf() {
-            return sequenceOf;
+            return isSequenceOf;
         }
 
         public boolean hasContextId() {

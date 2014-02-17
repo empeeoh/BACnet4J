@@ -63,9 +63,7 @@ public class Sequence extends BaseType {
     public Sequence(SequenceDefinition definition, ByteQueue queue) throws BACnetException {
         this.definition = definition;
         values = new HashMap<String, Encodable>();
-        List<ElementSpecification> specs = definition.getElements();
-        for (int i = 0; i < specs.size(); i++) {
-            ElementSpecification spec = specs.get(i);
+        for (final ElementSpecification spec: definition.getElements()) {
             if (spec.isSequenceOf()) {
                 if (spec.isOptional())
                     values.put(spec.getId(), readOptionalSequenceOf(queue, spec.getClazz(), spec.getContextId()));

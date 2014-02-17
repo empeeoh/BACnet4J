@@ -20,8 +20,9 @@ import com.serotonin.bacnet4j.type.primitive.ObjectIdentifier;
 import com.serotonin.bacnet4j.type.primitive.UnsignedInteger;
 
 /**
- * A default class for easy implementation of the DeviceEventListener interface. Instead of having to implement all of
- * the defined methods, listener classes can override this and only implement the desired methods.
+ * A default class for easy implementation of the DeviceEventListener interface. 
+ * Instead of having to implement all of the defined methods, listener classes 
+ * can override this and only implement the desired methods.
  * 
  * @author Matthew Lohbihler
  */

@@ -12,17 +12,23 @@ public class RequestListenerUpdater {
     private int current;
     private boolean cancelled;
 
-    public RequestListenerUpdater(RequestListener callback, PropertyValues propertyValues, int max) {
+    public RequestListenerUpdater(final RequestListener callback, 
+    							  final PropertyValues propertyValues, 
+    							  final int max) {
         this.callback = callback;
         this.propertyValues = propertyValues;
         this.max = max;
     }
 
-    public void increment(ObjectIdentifier oid, PropertyIdentifier pid, UnsignedInteger pin, Encodable value) {
+    public void increment(final ObjectIdentifier oid, 
+    					  final PropertyIdentifier pid, 
+    					  final UnsignedInteger propindex, 
+    					  final Encodable value) {
         current++;
         if (callback != null)
-            cancelled = callback.requestProgress(((double) current) / max, oid, pid, pin, value);
-        propertyValues.add(oid, pid, pin, value);
+            cancelled = callback.requestProgress(((double) current) / max, oid, pid, 
+            									 propindex, value);
+        propertyValues.add(oid, pid, propindex, value);
     }
 
     public boolean cancelled() {
