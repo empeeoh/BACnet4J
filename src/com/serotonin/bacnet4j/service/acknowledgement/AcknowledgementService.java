@@ -27,7 +27,7 @@ package com.serotonin.bacnet4j.service.acknowledgement;
 
 import com.serotonin.bacnet4j.exception.BACnetException;
 import com.serotonin.bacnet4j.service.Service;
-import com.serotonin.util.queue.ByteQueue;
+import org.free.bacnet4j.util.ByteQueue;
 
 abstract public class AcknowledgementService extends Service {
     private static final long serialVersionUID = 3837098889443642001L;

@@ -27,7 +27,7 @@ package com.serotonin.bacnet4j.type.eventParameter;
 
 import com.serotonin.bacnet4j.exception.BACnetException;
 import com.serotonin.bacnet4j.type.primitive.UnsignedInteger;
-import com.serotonin.util.queue.ByteQueue;
+import org.free.bacnet4j.util.ByteQueue;
 
 public class BufferReady extends EventParameter {
     private static final long serialVersionUID = -6744922575783894743L;

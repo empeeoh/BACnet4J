@@ -26,7 +26,7 @@
 package com.serotonin.bacnet4j.type.constructed;
 
 import com.serotonin.bacnet4j.type.primitive.BitString;
-import com.serotonin.util.queue.ByteQueue;
+import org.free.bacnet4j.util.ByteQueue;
 
 public class ObjectTypesSupported extends BitString {
     private static final long serialVersionUID = 4916909530588071979L;

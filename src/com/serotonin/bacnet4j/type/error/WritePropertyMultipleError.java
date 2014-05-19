@@ -28,7 +28,7 @@ package com.serotonin.bacnet4j.type.error;
 import com.serotonin.bacnet4j.exception.BACnetException;
 import com.serotonin.bacnet4j.type.constructed.BACnetError;
 import com.serotonin.bacnet4j.type.constructed.ObjectPropertyReference;
-import com.serotonin.util.queue.ByteQueue;
+import org.free.bacnet4j.util.ByteQueue;
 
 public class WritePropertyMultipleError extends BaseError {
     private static final long serialVersionUID = 7893783677289456368L;

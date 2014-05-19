@@ -28,7 +28,7 @@ package com.serotonin.bacnet4j.type.constructed;
 import com.serotonin.bacnet4j.exception.BACnetException;
 import com.serotonin.bacnet4j.type.ThreadLocalObjectTypeStack;
 import com.serotonin.bacnet4j.type.primitive.ObjectIdentifier;
-import com.serotonin.util.queue.ByteQueue;
+import org.free.bacnet4j.util.ByteQueue;
 
 public class WriteAccessSpecification extends BaseType {
     private static final long serialVersionUID = -676251352183146270L;

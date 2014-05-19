@@ -28,7 +28,7 @@ package com.serotonin.bacnet4j.type.constructed;
 import com.serotonin.bacnet4j.exception.BACnetException;
 import com.serotonin.bacnet4j.type.enumerated.PropertyIdentifier;
 import com.serotonin.bacnet4j.type.primitive.UnsignedInteger;
-import com.serotonin.util.queue.ByteQueue;
+import org.free.bacnet4j.util.ByteQueue;
 
 public class PropertyReference extends BaseType {
     private static final long serialVersionUID = 1375764258364665118L;

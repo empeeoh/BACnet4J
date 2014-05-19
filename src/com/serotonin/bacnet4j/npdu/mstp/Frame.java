@@ -1,6 +1,6 @@
 package com.serotonin.bacnet4j.npdu.mstp;
 
-import com.serotonin.io.StreamUtils;
+import org.free.bacnet4j.util.StreamUtils;
 
 public class Frame implements Cloneable {
     private FrameType frameType;

@@ -42,7 +42,7 @@ import com.serotonin.bacnet4j.type.primitive.Boolean;
 import com.serotonin.bacnet4j.type.primitive.ObjectIdentifier;
 import com.serotonin.bacnet4j.type.primitive.OctetString;
 import com.serotonin.bacnet4j.type.primitive.UnsignedInteger;
-import com.serotonin.io.StreamUtils;
+import org.free.bacnet4j.util.StreamUtils;
 
 /**
  * @author Matthew Lohbihler

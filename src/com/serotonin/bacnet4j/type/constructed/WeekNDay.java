@@ -29,8 +29,25 @@ import com.serotonin.bacnet4j.enums.DayOfWeek;
 import com.serotonin.bacnet4j.enums.Month;
 import com.serotonin.bacnet4j.type.primitive.Enumerated;
 import com.serotonin.bacnet4j.type.primitive.OctetString;
-import com.serotonin.util.queue.ByteQueue;
-
+import org.free.bacnet4j.util.ByteQueue;
+/**
+ * ASHRAE Standard 135-2012 Clause 21 p. 713<br>
+ * BACnetWeekNDay ::= OCTET STRING (SIZE (3))<br>
+ * -- first octet  month(1..14)   1 = January<br>
+ * --                            13 = odd months<br>
+ * --							 14 = even months<br>
+ * --							255 = X'FF' = any month<br>
+ * -- second octet weekOfMonth where: 1 = days numbered 1-7<br>
+ * -- 								  2 = days numbered 8-14<br>
+ * -- 								  3 = days numbered 15-21<br>
+ * --								  4 = days numbered 22-28<br>
+ * --								  5 = days numbered 29-31<br>
+ * --								  6 = last 7 days of this month<br> 
+ * --								255 =X'FF' = any week of this month<br>
+ * -- third octet dayOfWeek where: 1 = Monday<br>
+ * -- 							   7 = Sunday<br>
+ * --							 255 = X'FF' = any day of week<br>
+ */
 public class WeekNDay extends OctetString {
     private static final long serialVersionUID = -2836161294089567458L;
 

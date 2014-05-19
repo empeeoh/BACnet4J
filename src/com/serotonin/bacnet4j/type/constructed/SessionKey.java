@@ -27,7 +27,7 @@ package com.serotonin.bacnet4j.type.constructed;
 
 import com.serotonin.bacnet4j.exception.BACnetException;
 import com.serotonin.bacnet4j.type.primitive.OctetString;
-import com.serotonin.util.queue.ByteQueue;
+import org.free.bacnet4j.util.ByteQueue;
 
 public class SessionKey extends BaseType {
     private static final long serialVersionUID = 2276895536699919255L;

@@ -30,7 +30,7 @@ import java.util.List;
 
 import com.serotonin.bacnet4j.exception.BACnetException;
 import com.serotonin.bacnet4j.type.primitive.Null;
-import com.serotonin.util.queue.ByteQueue;
+import org.free.bacnet4j.util.ByteQueue;
 
 public class PriorityArray extends SequenceOf<PriorityValue> {
     private static final long serialVersionUID = 8292702351986751796L;

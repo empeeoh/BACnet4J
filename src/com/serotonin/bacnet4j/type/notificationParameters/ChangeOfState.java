@@ -28,7 +28,7 @@ package com.serotonin.bacnet4j.type.notificationParameters;
 import com.serotonin.bacnet4j.exception.BACnetException;
 import com.serotonin.bacnet4j.type.constructed.PropertyStates;
 import com.serotonin.bacnet4j.type.constructed.StatusFlags;
-import com.serotonin.util.queue.ByteQueue;
+import org.free.bacnet4j.util.ByteQueue;
 
 public class ChangeOfState extends NotificationParameters {
     private static final long serialVersionUID = -3581834332371728769L;

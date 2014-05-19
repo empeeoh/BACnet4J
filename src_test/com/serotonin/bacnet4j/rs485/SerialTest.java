@@ -13,7 +13,7 @@ import com.serotonin.bacnet4j.service.unconfirmed.WhoIsRequest;
 import com.serotonin.bacnet4j.transport.Transport;
 import com.serotonin.bacnet4j.type.enumerated.PropertyIdentifier;
 import com.serotonin.bacnet4j.util.RequestUtils;
-import com.serotonin.io.serial.SerialParameters;
+import org.free.bacnet4j.util.SerialParameters;
 
 /**
  * This class tests the MS/TP code using an RS-485 network accessed via COM4.

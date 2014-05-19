@@ -24,9 +24,20 @@
  * without being obliged to provide the source code for any proprietary components.
  */
 package com.serotonin.bacnet4j.enums;
-
+/**
+ * Per ASHRAE Standard 135-2012 p.713
+ * 
+ *
+ */
 public enum DayOfWeek {
-    MONDAY(1), TUESDAY(2), WEDNESDAY(3), THURSDAY(4), FRIDAY(5), SATURDAY(6), SUNDAY(7), UNSPECIFIED(255);
+    MONDAY     (1), 
+    TUESDAY    (2), 
+    WEDNESDAY  (3), 
+    THURSDAY   (4), 
+    FRIDAY     (5), 
+    SATURDAY   (6), 
+    SUNDAY     (7), 
+    UNSPECIFIED(255);//i.e. X'FF' = any day of week
 
     private byte id;
 

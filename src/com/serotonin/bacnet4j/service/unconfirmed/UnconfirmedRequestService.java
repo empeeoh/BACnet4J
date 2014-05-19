@@ -31,7 +31,7 @@ import com.serotonin.bacnet4j.service.Service;
 import com.serotonin.bacnet4j.type.constructed.Address;
 import com.serotonin.bacnet4j.type.constructed.ServicesSupported;
 import com.serotonin.bacnet4j.type.primitive.OctetString;
-import com.serotonin.util.queue.ByteQueue;
+import org.free.bacnet4j.util.ByteQueue;
 
 abstract public class UnconfirmedRequestService extends Service {
     private static final long serialVersionUID = 8962921362279665295L;

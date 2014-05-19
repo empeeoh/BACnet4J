@@ -34,7 +34,7 @@ import org.apache.commons.lang3.ObjectUtils;
 
 import com.serotonin.bacnet4j.exception.BACnetException;
 import com.serotonin.bacnet4j.type.Encodable;
-import com.serotonin.util.queue.ByteQueue;
+import org.free.bacnet4j.util.ByteQueue;
 
 public class SequenceOf<E extends Encodable> extends BaseType implements Iterable<E> {
     private static final long serialVersionUID = -5118339248636778224L;

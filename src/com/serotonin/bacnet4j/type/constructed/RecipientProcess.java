@@ -27,7 +27,7 @@ package com.serotonin.bacnet4j.type.constructed;
 
 import com.serotonin.bacnet4j.exception.BACnetException;
 import com.serotonin.bacnet4j.type.primitive.UnsignedInteger;
-import com.serotonin.util.queue.ByteQueue;
+import org.free.bacnet4j.util.ByteQueue;
 
 public class RecipientProcess extends BaseType {
     private static final long serialVersionUID = -3615223495651827907L;

@@ -27,7 +27,7 @@ package com.serotonin.bacnet4j.apdu;
 
 import com.serotonin.bacnet4j.exception.BACnetException;
 import com.serotonin.bacnet4j.service.acknowledgement.AcknowledgementService;
-import com.serotonin.util.queue.ByteQueue;
+import org.free.bacnet4j.util.ByteQueue;
 
 public class ComplexACK extends AckAPDU implements Segmentable {
     private static final long serialVersionUID = 3393095437278653112L;
