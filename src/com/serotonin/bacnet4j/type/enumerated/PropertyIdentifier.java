@@ -239,7 +239,7 @@ public class PropertyIdentifier extends Enumerated {
     public static final PropertyIdentifier shedDuration = new PropertyIdentifier(219);
     public static final PropertyIdentifier shedLevelDescriptions = new PropertyIdentifier(220);
     public static final PropertyIdentifier shedLevels = new PropertyIdentifier(221);
-    public static final PropertyIdentifier stateDescription = new PropertyIdentifier(221);
+    public static final PropertyIdentifier stateDescription = new PropertyIdentifier(222);
     public static final PropertyIdentifier doorAlarmState = new PropertyIdentifier(226);
     public static final PropertyIdentifier doorExtendedPulseTime = new PropertyIdentifier(227);
     public static final PropertyIdentifier doorMembers = new PropertyIdentifier(228);
