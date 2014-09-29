@@ -6,6 +6,10 @@
 *.ear
 bin/*
 *.zip
+#Eclipse
+.classpath
+.project
+.settings/
 #Maven
 log/
 target/
