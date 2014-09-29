@@ -33,7 +33,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
-
+import org.apache.log4j.Logger;
 import org.apache.commons.lang3.ObjectUtils;
 
 import com.serotonin.bacnet4j.enums.MaxApduLength;
@@ -86,8 +86,9 @@ import com.serotonin.bacnet4j.util.RequestUtils;
  * @author mlohbihler
  */
 public class LocalDevice {
-    private static final int VENDOR_ID = 236; // Serotonin Software
-
+	private static final Logger LOG = Logger.getLogger(LocalDevice.class);
+	private static final int DEFAULT_VENDOR_ID = 132; // Blue Ridge Software
+    private final int vendorId;
     private final Transport transport;
     private BACnetObject configuration;
     private final List<BACnetObject> localObjects = new CopyOnWriteArrayList<BACnetObject>();
@@ -95,21 +96,23 @@ public class LocalDevice {
     private boolean initialized;
     private ExecutorService executorService;
     private boolean ownsExecutorService;
-
     /**
      * The local password of the device. Used in the ReinitializeDeviceRequest service.
      */
     private String password = "";
 
-    private boolean strict;
+    private boolean strict = true;// best default. encourage conformance to the spec.
 
     // Event listeners
     private final DeviceEventHandler eventHandler = new DeviceEventHandler();
 
-    //private final DeviceEventHandler eventHandler = new DeviceEventAsyncHandler();
-
     public LocalDevice(int deviceId, Transport transport) {
+    	this(DEFAULT_VENDOR_ID, deviceId, transport);
+    }
+    
+    public LocalDevice(int vendorId, int deviceId, Transport transport) {
         this.transport = transport;
+        this.vendorId = vendorId;
         transport.setLocalDevice(this);
 
         try {
@@ -117,9 +120,9 @@ public class LocalDevice {
 
             configuration = new BACnetObject(this, deviceIdentifier);
             configuration.setProperty(PropertyIdentifier.maxApduLengthAccepted, new UnsignedInteger(1476));
-            configuration.setProperty(PropertyIdentifier.vendorIdentifier, new Unsigned16(VENDOR_ID));
+            configuration.setProperty(PropertyIdentifier.vendorIdentifier, new Unsigned16(this.vendorId));
             configuration.setProperty(PropertyIdentifier.vendorName, new CharacterString(
-                    "Serotonin Software Technologies, Inc."));
+            									"Blueridge Technologies, Inc."));
             configuration.setProperty(PropertyIdentifier.segmentationSupported, Segmentation.segmentedBoth);
 
             SequenceOf<ObjectIdentifier> objectList = new SequenceOf<ObjectIdentifier>();
@@ -209,8 +212,6 @@ public class LocalDevice {
         }
         else
             ownsExecutorService = false;
-        // For the async handler
-        //eventHandler.initialize(executorService);
         transport.initialize();
         initialized = true;
     }
@@ -396,7 +397,7 @@ public class LocalDevice {
         transport.sendUnconfirmed(bcast, null, serviceRequest, true);
     }
 
-    public void sendGlobalBroadcast(UnconfirmedRequestService serviceRequest) throws BACnetException {
+    public void sendGlobalBroadcast(final UnconfirmedRequestService serviceRequest) throws BACnetException {
         transport.sendUnconfirmed(Address.GLOBAL, null, serviceRequest, true);
     }
 
@@ -425,22 +426,27 @@ public class LocalDevice {
         return d;
     }
 
-    public RemoteDevice getRemoteDeviceCreate(int instanceId, Address address, OctetString linkService) {
+    public RemoteDevice getRemoteDeviceCreate(final int instanceId, 
+    										  final Address address, 
+    										  final OctetString linkService) {
         RemoteDevice d = getRemoteDeviceImpl(instanceId, address, linkService);
         if (d == null) {
             if (address == null)
-                throw new NullPointerException("addr cannot be null");
+                throw new NullPointerException("Addr cannot be null on a newly discovered remote device.");
             d = new RemoteDevice(instanceId, address, linkService);
             remoteDevices.add(d);
         }
         return d;
     }
 
-    public void addRemoteDevice(RemoteDevice d) {
+    public void addRemoteDevice(final RemoteDevice d) {
         remoteDevices.add(d);
     }
 
-    private RemoteDevice getRemoteDeviceImpl(int instanceId, Address address, OctetString linkService) {
+    
+    private RemoteDevice getRemoteDeviceImpl(final int instanceId, 
+    										 final Address address, 
+    										 final OctetString linkService) {
         for (RemoteDevice d : remoteDevices) {
             if (strict || address == null) {
                 // Only compare by device id, as should be sufficient according to the spec's insistence on 

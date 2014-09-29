@@ -49,9 +49,9 @@ public class Test2 {
         }
     }
 
-    private static void getObjectList(LocalDevice localDevice, String ip, int deviceId) throws Exception {
-        getObjectList(localDevice, new Address(ip, 0xBAC0), null, deviceId);
-    }
+//    private static void getObjectList(LocalDevice localDevice, String ip, int deviceId) throws Exception {
+//        getObjectList(localDevice, new Address(ip, 0xBAC0), null, deviceId);
+//    }
 
     private static void getObjectList(LocalDevice localDevice, Address to, OctetString link, int deviceId)
             throws Exception {
@@ -61,7 +61,8 @@ public class Test2 {
                 Segmentation.segmentedBoth, read);
 
         System.out.println("IP: " + to.getDescription());
-        SequenceOf<ObjectIdentifier> oids = (SequenceOf<ObjectIdentifier>) ack.getValue();
+        @SuppressWarnings("unchecked")
+		SequenceOf<ObjectIdentifier> oids = (SequenceOf<ObjectIdentifier>) ack.getValue();
         for (ObjectIdentifier oid : oids)
             System.out.println("    " + oid);
     }

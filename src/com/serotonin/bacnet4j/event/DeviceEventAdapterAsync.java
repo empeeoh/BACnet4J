@@ -22,10 +22,11 @@ import com.serotonin.bacnet4j.type.primitive.ObjectIdentifier;
 import com.serotonin.bacnet4j.type.primitive.UnsignedInteger;
 
 /**
- * Event listener adapter that provides asynchronous notifications. Override the "async" methods to get async
- * notifications, or override the non-async method to receive synchronously. Note that methods that are not
- * overridden will go through the async dispatcher, so the non-async methods should be overridden even if they are not
- * needed.
+ * Event listener adapter that provides asynchronous notifications. 
+ * Override the "async" methods to get async notifications, or override the 
+ * non-async method to receive synchronously. Note that methods that are not
+ * overridden will go through the async dispatcher, so the non-async methods 
+ * should be overridden even if they are not needed.
  * 
  * @author Matthew
  */

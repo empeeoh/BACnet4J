@@ -21,10 +21,10 @@ import com.serotonin.bacnet4j.util.PropertyReferences;
 import com.serotonin.bacnet4j.util.RequestListener;
 import com.serotonin.bacnet4j.util.RequestUtils;
 import org.free.bacnet4j.util.SerialParameters;
-import com.serotonin.log.SimpleLog;
+//import com.serotonin.log.SimpleLog;
 
 public class MstpObjectList {
-    static final SimpleLog LOG = new SimpleLog();
+    //static final SimpleLog LOG = new SimpleLog();
     static LocalDevice localDevice;
     static boolean whoIsReceived;
 
@@ -41,12 +41,12 @@ public class MstpObjectList {
 
         try {
             localDevice.initialize();
-            LOG.out("Local device initialized");
+        //    LOG.out("Local device initialized");
 
             while (true) {
                 if (!whoIsReceived) {
                     localDevice.sendGlobalBroadcast(new WhoIsRequest());
-                    LOG.out("WhoIs sent");
+          //          LOG.out("WhoIs sent");
                 }
                 Thread.sleep(3000);
             }
@@ -61,7 +61,7 @@ public class MstpObjectList {
         public void iAmReceived(final RemoteDevice d) {
             if (!whoIsReceived) {
                 whoIsReceived = true;
-                LOG.out("IAm received from " + d);
+            //    LOG.out("IAm received from " + d);
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
@@ -79,21 +79,21 @@ public class MstpObjectList {
 
     @SuppressWarnings("unchecked")
     static void getObjectList(RemoteDevice d) throws BACnetException {
-        LOG.out("Getting extended information");
+        //LOG.out("Getting extended information");
         RequestUtils.getExtendedDeviceInformation(localDevice, d);
-        LOG.out("Got extended information");
+       // LOG.out("Got extended information");
 
         // Get the device's object list.
-        LOG.out("Getting object list");
+       // LOG.out("Getting object list");
         List<ObjectIdentifier> oids = ((SequenceOf<ObjectIdentifier>) RequestUtils.sendReadPropertyAllowNull(
                 localDevice, d, d.getObjectIdentifier(), PropertyIdentifier.objectList)).getValues();
-        LOG.out("Got object list: " + oids.size());
+       // LOG.out("Got object list: " + oids.size());
 
         PropertyReferences refs = new PropertyReferences();
         for (ObjectIdentifier oid : oids)
             addPropertyReferences(refs, oid);
 
-        LOG.out("Getting properties: " + refs.size());
+       // LOG.out("Getting properties: " + refs.size());
         RequestUtils.readProperties(localDevice, d, refs, new RequestListener() {
             @Override
             public boolean requestProgress(double d, ObjectIdentifier oid, PropertyIdentifier pid,
@@ -101,7 +101,7 @@ public class MstpObjectList {
                 return false;
             }
         });
-        LOG.out("Got properties");
+       // LOG.out("Got properties");
     }
 
     static void addPropertyReferences(PropertyReferences refs, ObjectIdentifier oid) {

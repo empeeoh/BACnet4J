@@ -42,43 +42,43 @@ import com.serotonin.bacnet4j.type.primitive.UnsignedInteger;
 public class PropertyValues implements Iterable<ObjectPropertyReference>, Serializable {
     private static final long serialVersionUID = 5880275533969236369L;
 
-    private final Map<ObjectPropertyReference, Encodable> values = new HashMap<ObjectPropertyReference, Encodable>();
+    private final Map<ObjectPropertyReference, Encodable> values = new HashMap<>();
 
-    public void add(ObjectIdentifier oid, PropertyIdentifier pid, UnsignedInteger pin, Encodable value) {
-        values.put(new ObjectPropertyReference(oid, pid, pin), value);
+    public void add(final ObjectIdentifier oid, final PropertyIdentifier pid, 
+    				final UnsignedInteger propArrayIndex, final Encodable value) {
+        values.put(new ObjectPropertyReference(oid, pid, propArrayIndex), value);
     }
 
-    public Encodable getNoErrorCheck(ObjectPropertyReference opr) {
+    public Encodable getNoErrorCheck(final ObjectPropertyReference opr) {
         return values.get(opr);
     }
 
-    public Encodable get(ObjectPropertyReference opr) throws PropertyValueException {
-        Encodable e = getNoErrorCheck(opr);
-
+    public Encodable get(final ObjectPropertyReference opr) throws PropertyValueException {
+        final Encodable e = getNoErrorCheck(opr);
         if (e instanceof BACnetError)
             throw new PropertyValueException((BACnetError) e);
-
         return e;
     }
 
-    public Encodable getNoErrorCheck(ObjectIdentifier oid, PropertyReference ref) {
-        return getNoErrorCheck(new ObjectPropertyReference(oid, ref.getPropertyIdentifier(),
-                ref.getPropertyArrayIndex()));
+    public Encodable getNoErrorCheck(final ObjectIdentifier oid, final PropertyReference ref) {
+        return getNoErrorCheck(new ObjectPropertyReference(oid, 
+        												   ref.getPropertyIdentifier(),
+        												   ref.getPropertyArrayIndex()));
     }
 
-    public Encodable getNoErrorCheck(ObjectIdentifier oid, PropertyIdentifier pid) {
+    public Encodable getNoErrorCheck(final ObjectIdentifier oid, final PropertyIdentifier pid) {
         return getNoErrorCheck(new ObjectPropertyReference(oid, pid));
     }
 
-    public Encodable get(ObjectIdentifier oid, PropertyIdentifier pid) throws PropertyValueException {
+    public Encodable get(final ObjectIdentifier oid, final PropertyIdentifier pid) throws PropertyValueException {
         return get(new ObjectPropertyReference(oid, pid));
     }
 
-    public Encodable getNullOnError(ObjectIdentifier oid, PropertyIdentifier pid) {
+    public Encodable getNullOnError(final ObjectIdentifier oid, final PropertyIdentifier pid) {
         return getNullOnError(getNoErrorCheck(new ObjectPropertyReference(oid, pid)));
     }
 
-    public String getString(ObjectIdentifier oid, PropertyIdentifier pid) {
+    public String getString(final ObjectIdentifier oid, final PropertyIdentifier pid) {
         return getString(getNoErrorCheck(oid, pid));
     }
 

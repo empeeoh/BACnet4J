@@ -52,24 +52,30 @@ public class SequenceDefinition implements Serializable {
         private final String id;
         private final Class<? extends Encodable> clazz;
         private final int contextId;
-        private final boolean sequenceOf;
-        private final boolean optional;
+        private final boolean isSequenceOf;
+        private final boolean isOptional;
 
-        public ElementSpecification(String id, Class<? extends Encodable> clazz, boolean sequenceOf, boolean optional) {
+        public ElementSpecification(final String id, 
+        							final Class<? extends Encodable> clazz, 
+        							final boolean isSequenceOf, 
+        							final boolean isOptional) {
             this.id = id;
             this.clazz = clazz;
             this.contextId = -1;
-            this.sequenceOf = sequenceOf;
-            this.optional = optional;
+            this.isSequenceOf = isSequenceOf;
+            this.isOptional = isOptional;
         }
 
-        public ElementSpecification(String id, Class<? extends Encodable> clazz, int contextId, boolean sequenceOf,
-                boolean optional) {
+        public ElementSpecification(final String id, 
+        							final Class<? extends Encodable> clazz, 
+        							final int contextId, 
+        							final boolean isSequenceOf,
+        							final boolean isOptional) {
             this.id = id;
             this.clazz = clazz;
             this.contextId = contextId;
-            this.sequenceOf = sequenceOf;
-            this.optional = optional;
+            this.isSequenceOf = isSequenceOf;
+            this.isOptional = isOptional;
         }
 
         public String getId() {
@@ -85,11 +91,11 @@ public class SequenceDefinition implements Serializable {
         }
 
         public boolean isOptional() {
-            return optional;
+            return isOptional;
         }
 
         public boolean isSequenceOf() {
-            return sequenceOf;
+            return isSequenceOf;
         }
 
         public boolean hasContextId() {

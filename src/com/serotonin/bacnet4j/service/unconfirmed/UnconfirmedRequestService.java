@@ -101,5 +101,6 @@ abstract public class UnconfirmedRequestService extends Service {
         throw new BACnetException("Unsupported unconfirmed service: " + (type & 0xff));
     }
 
-    abstract public void handle(LocalDevice localDevice, Address from, OctetString linkService) throws BACnetException;
+    abstract public void handle(final LocalDevice localDevice, final Address from, 
+    							final OctetString linkService) throws BACnetException;
 }

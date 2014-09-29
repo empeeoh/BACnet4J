@@ -41,16 +41,18 @@ public class MstpTest {
     }
 
     void master(byte station, int retryCount) throws Exception {
-        // Set up the socket
-        Socket socket = new Socket("localhost", 50505);
-        new MasterNode(socket.getInputStream(), socket.getOutputStream(), station, retryCount).initialize();
-        Thread.sleep(1000);
+    	// Set up the socket
+    	try(Socket socket = new Socket("localhost", 50505)){
+    		new MasterNode(socket.getInputStream(), socket.getOutputStream(), station, retryCount).initialize();
+    		Thread.sleep(1000);
+    	}
     }
 
     void slave(byte station) throws Exception {
-        // Set up the socket
-        Socket socket = new Socket("localhost", 50505);
-        new SlaveNode(socket.getInputStream(), socket.getOutputStream(), station).initialize();
-        Thread.sleep(1000);
+    	// Set up the socket
+    	try(Socket socket = new Socket("localhost", 50505)){
+    		new SlaveNode(socket.getInputStream(), socket.getOutputStream(), station).initialize();
+    		Thread.sleep(1000);
+    	}
     }
 }

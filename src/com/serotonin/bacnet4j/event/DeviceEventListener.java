@@ -46,10 +46,11 @@ import com.serotonin.bacnet4j.type.primitive.ObjectIdentifier;
 import com.serotonin.bacnet4j.type.primitive.UnsignedInteger;
 
 /**
- * There are two versions of each method. The "regular" version runs in a worker thread so that client code need not
- * be concerned with completing its processing in any timely manner. The "sync" version runs within the dispatching
- * thread, and so MUST return as quickly as possible. In particular, overrides of the sync methods MUST NOT send
- * requests.
+ * There are two versions of each method. The "regular" version runs in a worker
+ * thread so that client code need not be concerned with completing its processing
+ * in any timely manner. The "sync" version runs within the dispatching thread, 
+ * and so MUST return as quickly as possible. In particular, overrides of the 
+ * sync methods MUST NOT send requests.
  * 
  * @author Matthew
  */

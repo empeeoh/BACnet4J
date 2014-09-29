@@ -25,8 +25,6 @@
  */
 package com.serotonin.bacnet4j.service.unconfirmed;
 
-import java.util.logging.Logger;
-
 import com.serotonin.bacnet4j.LocalDevice;
 import com.serotonin.bacnet4j.RemoteDevice;
 import com.serotonin.bacnet4j.exception.BACnetException;
@@ -36,12 +34,12 @@ import com.serotonin.bacnet4j.type.enumerated.Segmentation;
 import com.serotonin.bacnet4j.type.primitive.ObjectIdentifier;
 import com.serotonin.bacnet4j.type.primitive.OctetString;
 import com.serotonin.bacnet4j.type.primitive.UnsignedInteger;
+import org.apache.log4j.Logger;
 import org.free.bacnet4j.util.ByteQueue;
 
 public class IAmRequest extends UnconfirmedRequestService {
     private static final long serialVersionUID = -5896735458454994754L;
-    private static final Logger LOGGER = Logger.getLogger(IAmRequest.class.getName());
-
+    private static final Logger LOG = Logger.getLogger(IAmRequest.class);
     public static final byte TYPE_ID = 0;
 
     private final ObjectIdentifier iAmDeviceIdentifier;
@@ -49,8 +47,10 @@ public class IAmRequest extends UnconfirmedRequestService {
     private final Segmentation segmentationSupported;
     private final UnsignedInteger vendorId;
 
-    public IAmRequest(ObjectIdentifier iamDeviceIdentifier, UnsignedInteger maxAPDULengthAccepted,
-            Segmentation segmentationSupported, UnsignedInteger vendorId) {
+    public IAmRequest(final ObjectIdentifier iamDeviceIdentifier, 
+    				  final UnsignedInteger maxAPDULengthAccepted,
+    				  final Segmentation segmentationSupported, 
+    				  final UnsignedInteger vendorId) {
         this.iAmDeviceIdentifier = iamDeviceIdentifier;
         this.maxAPDULengthAccepted = maxAPDULengthAccepted;
         this.segmentationSupported = segmentationSupported;
@@ -63,9 +63,10 @@ public class IAmRequest extends UnconfirmedRequestService {
     }
 
     @Override
-    public void handle(LocalDevice localDevice, Address from, OctetString linkService) {
+    public void handle(final LocalDevice localDevice, final Address from, 
+    				   final OctetString linkService) {
         if (!ObjectType.device.equals(iAmDeviceIdentifier.getObjectType())) {
-            LOGGER.warning("Received IAm from an object that is not a device.");
+            LOG.warn("Received IAm from an object that is not a device.");
             return;
         }
 
@@ -73,23 +74,30 @@ public class IAmRequest extends UnconfirmedRequestService {
         int myDoi = localDevice.getConfiguration().getInstanceId();
         int remoteDoi = iAmDeviceIdentifier.getInstanceNumber();
         if (remoteDoi == myDoi) {
+        	boolean isLocalLoopback = false;
             // Get my bacnet address and compare the addresses
-            for (Address addr : localDevice.getAllLocalAddresses()) {
+            for (final Address addr : localDevice.getAllLocalAddresses()) {
                 if (addr.getMacAddress().equals(from.getMacAddress()))
                     // This is a local address, so ignore.
+                	 isLocalLoopback = true;
                     return;
-                LOGGER.warning("Another instance with my device instance ID found!");
+            }
+            if(!isLocalLoopback){
+                LOG.warn("Another instance with my device instance ID (" + 
+                    iAmDeviceIdentifier.getInstanceNumber() +") found! Local: " +
+                    localDevice.getAllLocalAddresses()[0].getMacAddress() + " Remote: " + from.getMacAddress() 
+                    + ". " + Thread.currentThread());
             }
         }
 
         // Register the device in the list of known devices.
-        RemoteDevice d = localDevice.getRemoteDeviceCreate(remoteDoi, from, linkService);
-        d.setMaxAPDULengthAccepted(maxAPDULengthAccepted.intValue());
-        d.setSegmentationSupported(segmentationSupported);
-        d.setVendorId(vendorId.intValue());
+        final RemoteDevice rd = localDevice.getRemoteDeviceCreate(remoteDoi, from, linkService);
+        rd.setMaxAPDULengthAccepted(maxAPDULengthAccepted.intValue());
+        rd.setSegmentationSupported(segmentationSupported);
+        rd.setVendorId(vendorId.intValue());
 
         // Fire the appropriate event.
-        localDevice.getEventHandler().fireIAmReceived(d);
+        localDevice.getEventHandler().fireIAmReceived(rd);
     }
 
     @Override
