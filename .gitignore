@@ -6,3 +6,6 @@
 *.ear
 bin/*
 *.zip
+#Maven
+log/
+target/
