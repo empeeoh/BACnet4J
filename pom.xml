@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.serotonin</groupId>
   <artifactId>bacnet4j</artifactId>
-  <version>2.0.3</version>
+  <version>2.0.4</version>
   <name>BACnet4J</name>
   <description>Java Library implementing BACnet messaging</description>
   <build>
@@ -33,6 +33,35 @@
           <target>1.7</target>
         </configuration>
       </plugin>
+	<plugin>
+		<groupId>org.apache.maven.plugins</groupId>
+		<artifactId>maven-source-plugin</artifactId>
+		<version>2.3</version>
+		<executions>
+			<execution>
+				<id>attach-sources</id>
+				<goals>
+					<goal>jar</goal>
+				</goals>
+			</execution>
+		</executions>
+	</plugin>
+	<plugin>
+		<groupId>org.apache.maven.plugins</groupId>
+		<artifactId>maven-javadoc-plugin</artifactId>
+		<version>2.10</version>
+		<executions>
+			<execution>
+				<id>attach-javadocs</id>
+				<goals>
+					<goal>jar</goal>
+				</goals>
+				<configuration>
+                	<additionalparam>-Xdoclint:none</additionalparam>
+           		 </configuration>
+			</execution>
+		</executions>
+	</plugin>
     </plugins>
   </build>
   <dependencies>
