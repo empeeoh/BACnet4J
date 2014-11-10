@@ -1,3 +1,5 @@
+*Version 2.0.4 release notes*
+-Project now generates javadoc and source via maven in package phase.
 *Version 2.0.3 release notes*
 -Project is now test-build-deploy lifecycle now managed by maven(3) rather than ant. Dependent libraries removed from repo tracking.
 
